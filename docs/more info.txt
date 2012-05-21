@@ -1,0 +1,2 @@
+Find more info at:
+http://informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets
