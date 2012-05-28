@@ -8,13 +8,13 @@ import jebl.evolution.trees.CompactRootedTree;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
 import jebl.evolution.trees.SimpleRootedTree;
-import core.NexusReader;
+import core.TreeReader;
 import core.NexusWriter;
 
 public class CompactTreeTest {
 	public static void main(String[] args) throws IOException, ImportException{
 		String test = "test4.nex";
-		NexusReader reader = new NexusReader(test);
+		TreeReader reader = new TreeReader(test);
 
 		List<CompactRootedTree> compactTrees = reader.readCompactRootedTrees();
 
