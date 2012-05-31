@@ -31,34 +31,46 @@ public class BitStuffTest {
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
 		BitStuff bs = new BitStuff(trees);
-		Map<BitSet, Integer> clades = bs.getClades();
-		
-//		System.out.println(clades);
-		
+
 		List<ArrayList<BitSet>> bitTrees = bs.makeBits();
-		
-//		List<BitSet> tree1Clades = new ArrayList<BitSet>();
-//		Object[] ca = clades.keySet().toArray();
-//		tree1Clades.add((BitSet) ca[0]);
-//		tree1Clades.add((BitSet) ca[1]);
-//		tree1Clades.add((BitSet) ca[4]);
-//		tree1Clades.add((BitSet) ca[6]);
-//		tree1Clades.add((BitSet) ca[7]);
-		
-//		for(BitSet b : tree1Clades) {
-//			System.out.println(b);
-//		}
-		
-//		MutableRootedTree tr = bs.reconstructTree(tree1Clades);
-		
+
+
 		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
 		for(ArrayList<BitSet> bitTree : bitTrees) {
 			MutableRootedTree tr = bs.reconstructTree(bitTree);
 			trs.add(tr);
 		}
-				
-		
+
+
 		NexusWriter writer = new NexusWriter("reconstructed.nex");
+		writer.writeTrees(trs);
+
+		
+		//
+		//Pruning tests
+		//
+		System.out.println("before");
+		for(ArrayList<BitSet> rrr : bitTrees) {
+			for(BitSet b : rrr) {
+				System.out.println(b);
+			}
+		}
+		bs.pruneEVERYTHING();
+		System.out.println("after");
+		for(ArrayList<BitSet> rrr : bitTrees) {
+			for(BitSet b : rrr) {
+				System.out.println(b);
+			}
+		}
+		
+		trs = new ArrayList<MutableRootedTree>();
+		for(ArrayList<BitSet> bitTree : bitTrees) {
+			MutableRootedTree tr = bs.reconstructTree(bitTree);
+			trs.add(tr);
+		}
+
+
+		writer = new NexusWriter("reconstructed.nex");
 		writer.writeTrees(trs);
 		
 	}

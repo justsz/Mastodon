@@ -34,7 +34,7 @@ public class BitStuff {
 		this.trees = trees;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Integer>();
-		//this.bitTree = new ArrayList<BitSet>();
+//		this.bitTree = new ArrayList<BitSet>();
 
 		//construct full set of taxa
 		for(RootedTree tree : trees) {
@@ -97,12 +97,17 @@ public class BitStuff {
 			bitTree = new ArrayList<BitSet>();
 			newTree = true;
 		}
-		bitTree.add(bits);
 		Integer bset = clades.get(bits);
 		if (bset == null) {
 			clades.put(bits, 1);
 		} else {
 			clades.put(bits, clades.get(bits) + 1);
+		}
+		
+		for(BitSet s : clades.keySet()) {
+			if(s.equals((BitSet)(bits))) {
+				bitTree.add(s);
+			}
 		}
 	}
 
@@ -208,7 +213,21 @@ public class BitStuff {
 	//	List<BitSet> sort(List<BitSet> bitsets) {
 	//		Collections.sort
 	//	}
-
+	
+	public void pruneEVERYTHING(){
+		///Need to deal with clades that become equal to existing ones(add up frequency)
+		BitSet a = new BitSet();
+		a.set(0);
+		
+		for(BitSet key : clades.keySet()) {
+			if(a.intersects(key)) {
+				//BitSet rep = 
+				key.xor(a);
+			}
+		}
+		
+		System.out.println("COMPLETE");
+	}
 
 
 }
