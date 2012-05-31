@@ -21,12 +21,9 @@ import jebl.evolution.trees.Tree;
  *
  */
 public class TreeReader {
-	BufferedReader reader;
-	TreeImporter imp;
-	/**
-	 * Currently used filename.
-	 */
-	String fileName;
+	private FileReader reader;
+	private TreeImporter imp;	 
+	private String fileName;	//Currently used filename.	
 
 	/**
 	 * Constructor that creates a NexusImporter or NewickImporter object bound to the provided filename. 
@@ -44,16 +41,18 @@ public class TreeReader {
 	 */
 	public void setFile(String filename) throws IOException {
 		fileName = filename;
-		reader = new BufferedReader(new FileReader(fileName));
-
-		String line = reader.readLine();
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
+		
+		//(c) FigTree
+		String line = bufferedReader.readLine();
 		while (line != null && line.length() == 0) {
-			line = reader.readLine();
+			line = bufferedReader.readLine();
 		}
+		bufferedReader.close();
 
 		boolean isNexus = (line != null && line.toUpperCase().contains("#NEXUS"));
 
-		reader = new BufferedReader(new FileReader(fileName));
+		reader = new FileReader(fileName);
 
 		if (isNexus) {
 			imp = new NexusImporter(reader);
@@ -86,9 +85,12 @@ public class TreeReader {
 //			trees.add((SimpleRootedTree) tree);
 //		}
 		
+		//int place = 2;
 		while (imp.hasTree()) {
+			//System.out.println("tree" + place);
             tree = imp.importNextTree();
             trees.add((SimpleRootedTree) tree);
+            //place++;
         }
 
 		if (trees.size() == 0) {

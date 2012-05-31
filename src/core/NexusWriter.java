@@ -12,8 +12,8 @@ import jebl.evolution.trees.Tree;
  * @author justs
  */
 public class NexusWriter {
-	BufferedWriter writer;
-	NexusExporter exp;
+	private BufferedWriter writer;
+	private NexusExporter exp;
 
 	/**
 	 * Constructor that creates a NexusExporter object bound to the filename provided.

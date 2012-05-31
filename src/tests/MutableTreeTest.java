@@ -17,11 +17,11 @@ public class MutableTreeTest {
 		TreeReader reader = new TreeReader(test);
 
 		List<MutableRootedTree> mutableTrees = reader.readMutableRootedTrees();
-
+		
 		reader.reset();
 		List<SimpleRootedTree> simpleTrees = reader.readSimpleRootedTrees();
 
-		System.out.print("Mutable rooted trees equal to simple rooted trees: ");
+		System.out.println("Mutable rooted trees equal to simple rooted trees: ");
 		for(int i = 0; i < mutableTrees.size(); i++) {
 			if (!RootedTreeUtils.equal(mutableTrees.get(i), (RootedTree) simpleTrees.get(i)))
 				System.out.println(false);

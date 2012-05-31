@@ -1,0 +1,16 @@
+#NEXUS
+begin taxa;
+	dimensions ntax=3;
+	taxlabels
+	B
+	D
+	E
+;
+end;
+
+begin trees;
+	tree tree1 = [&R] [&weight=0.4]((B,D),E);
+	tree tree2 = [&R] [&weight=0.3]((D,E),B);
+	tree tree3 = [&R] [&weight=0.25]((B,D),E);
+	tree tree4 = [&R] [&weight=0.05]((D,B),E);
+end;

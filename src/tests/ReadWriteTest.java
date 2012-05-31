@@ -11,10 +11,12 @@ import core.*;
 public class ReadWriteTest {
 	public static void main(String[] args) throws IOException, ImportException {
 		//String test = "newickTest.txt";
-		String test = "test4.nex";
+		String test = "carnivores.trprobs";
 		TreeReader reader = new TreeReader(test);
 		List<SimpleRootedTree> trees1 = reader.readSimpleRootedTrees();
 
+		System.out.println(trees1.get(2).getAttribute("weight"));
+		
 		reader.reset();
 		List<SimpleRootedTree> trees2 = reader.readSimpleRootedTrees();
 		
