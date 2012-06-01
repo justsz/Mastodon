@@ -14,8 +14,8 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.Tree;
 
 /**
- * @author justs
- *	some stuff (c) BEAST
+ * 
+ *	(c) BEAST
  */
 public class CladeSystem {
 

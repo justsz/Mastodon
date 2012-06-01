@@ -11,11 +11,6 @@ import jebl.evolution.trees.RootedTree;
  *
  */
 public class MAPScoreCalculator {
-	//private List<? extends RootedTree> trees;
-
-//	public MAPScoreCalculator(List<? extends RootedTree> trees) {
-//		this.trees = trees;
-//	}
 
 	public float getMAPScore(RootedTree MAPTree, List<? extends RootedTree> trees) {
 		float sum = 0;
@@ -25,6 +20,7 @@ public class MAPScoreCalculator {
 		int count = 0; //used for testing
 		for (RootedTree tree : trees) {
 			if(RootedTreeUtils.equal(tree, MAPTree)) {
+				//could probably just have the count++ inside the try block
 				try {
 					sum += (Float) tree.getAttribute("weight");
 				} catch(Exception e) {
