@@ -31,9 +31,11 @@ public class BitStuffTest {
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
 		BitStuff bs = new BitStuff(trees);
+		Map<BitSet, Integer> clades = bs.getClades();
+		
 
 		List<ArrayList<BitSet>> bitTrees = bs.makeBits();
-
+		System.out.println(clades);
 
 		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
 		for(ArrayList<BitSet> bitTree : bitTrees) {
@@ -49,19 +51,26 @@ public class BitStuffTest {
 		//
 		//Pruning tests
 		//
-		System.out.println("before");
-		for(ArrayList<BitSet> rrr : bitTrees) {
-			for(BitSet b : rrr) {
-				System.out.println(b);
-			}
-		}
-		bs.pruneEVERYTHING();
-		System.out.println("after");
-		for(ArrayList<BitSet> rrr : bitTrees) {
-			for(BitSet b : rrr) {
-				System.out.println(b);
-			}
-		}
+//		System.out.println("before");
+//		for(ArrayList<BitSet> rrr : bitTrees) {
+//			for(BitSet b : rrr) {
+//				System.out.println(b);
+//			}
+//		}
+		BitSet a = new BitSet();
+		a.set(0);
+		a.set(2);
+		List<BitSet> filters = bs.prune(a);
+		System.out.println(clades);
+		bs.unPrune(filters);
+		System.out.println(clades);
+//		System.out.println("after");
+//		for(ArrayList<BitSet> rrr : bitTrees) {
+//			for(BitSet b : rrr) {
+//				System.out.println(b);
+//			}
+//		}
+		
 		
 		trs = new ArrayList<MutableRootedTree>();
 		for(ArrayList<BitSet> bitTree : bitTrees) {

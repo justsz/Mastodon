@@ -31,8 +31,9 @@ public class MHAlgorithm implements Algorithm{
 		List<Taxon> species = new ArrayList<Taxon>(originalTrees.get(0).getTaxa());	//full list of species assumed to be contained in mapTree (or any tree for that matter)
 		List<Taxon> bestChoice = new ArrayList<Taxon>(prunedSpeciesCount);
 		
-		
-		//||| FIRST STEP |||
+		//
+		//FIRST STEP
+		//
 		
 		//Taxon[] toPrune = new Taxon[prunedSpeciesCount];
 		List<Taxon> toPrune = new ArrayList<Taxon>(prunedSpeciesCount);	//eternal size issues
@@ -55,7 +56,9 @@ public class MHAlgorithm implements Algorithm{
 		
 		float bestScore = calc.getMAPScore(prunedTrees.get(0), prunedTrees);	//maybe stick pruning in here? probably not good design
 		
-		//||| ITERATIONS |||
+		//
+		//ITERATIONS
+		//
 		
 		for(int i = 0; i < iterations; i++) {
 			//toPrune = new ArrayList<Taxon>();

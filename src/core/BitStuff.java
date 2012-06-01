@@ -34,7 +34,7 @@ public class BitStuff {
 		this.trees = trees;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Integer>();
-//		this.bitTree = new ArrayList<BitSet>();
+		//		this.bitTree = new ArrayList<BitSet>();
 
 		//construct full set of taxa
 		for(RootedTree tree : trees) {
@@ -103,7 +103,7 @@ public class BitStuff {
 		} else {
 			clades.put(bits, clades.get(bits) + 1);
 		}
-		
+
 		for(BitSet s : clades.keySet()) {
 			if(s.equals((BitSet)(bits))) {
 				bitTree.add(s);
@@ -134,7 +134,9 @@ public class BitStuff {
 	List<Node> getNodes(Node[] externalNodes, BitSet bs) {
 		List<Node> nodes = new ArrayList<Node>();
 		for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
-			nodes.add(externalNodes[bs.nextSetBit(i)]);
+			Node node = externalNodes[bs.nextSetBit(i)];
+			if (node != null)
+				nodes.add(externalNodes[bs.nextSetBit(i)]);
 		}
 		return nodes;
 	}
@@ -156,25 +158,25 @@ public class BitStuff {
 		Node[] externalNodes = new Node[taxaA.length];
 
 		//if (taxaA.length == numberOfTaxaInTree) {
-			//for(int i = 0; i < taxaA.length; i ++) {
-		
+		//for(int i = 0; i < taxaA.length; i ++) {
+
 		//Problems arise in writer if there is a tree with a different sent of taxa in it.
-			for (int i = allTaxa.nextSetBit(0); i >= 0; i = allTaxa.nextSetBit(i+1)) {
-				externalNodes[i] = tree.createExternalNode((Taxon) taxaA[i]);
-			}
-//		} else {
-//			//not yet implemented how to handle a tree which has less taxa than the total number
-//			for(int i = 0; i < externalNodes.length; i++) {
-//				for(int e = 0; e < externalNodes.length; e++) {
-//					//extrenalNodes[i] = tree.createExternalNode((Taxon)bitSets.get(bitSets.size()-1));
-//				}
-//			}
-//		}
+		for (int i = allTaxa.nextSetBit(0); i >= 0; i = allTaxa.nextSetBit(i+1)) {
+			externalNodes[i] = tree.createExternalNode((Taxon) taxaA[i]);
+		}
+		//		} else {
+		//			//not yet implemented how to handle a tree which has less taxa than the total number
+		//			for(int i = 0; i < externalNodes.length; i++) {
+		//				for(int e = 0; e < externalNodes.length; e++) {
+		//					//extrenalNodes[i] = tree.createExternalNode((Taxon)bitSets.get(bitSets.size()-1));
+		//				}
+		//			}
+		//		}
 
 		int numberOfInternalNodes = bitSets.size();	//assumption
 		Node[] internalNodes = new Node[numberOfInternalNodes];
 
-		for(int i = 0; i < numberOfInternalNodes; i++) {	//exclude bitset representing the whole tree from this loop
+		for(int i = 0; i < numberOfInternalNodes; i++) {
 			//if(bitSets.get(i).cardinality() == 2) {
 			//	internalNodes[i] = tree.createInternalNode(getNodes(externalNodes, bitSets.get(i)));
 			//} else {
@@ -213,20 +215,57 @@ public class BitStuff {
 	//	List<BitSet> sort(List<BitSet> bitsets) {
 	//		Collections.sort
 	//	}
-	
-	public void pruneEVERYTHING(){
+
+	public List<BitSet> prune(BitSet a){
 		///Need to deal with clades that become equal to existing ones(add up frequency)
-		BitSet a = new BitSet();
-		a.set(0);
-		
+
+		List<BitSet> filters = new ArrayList<BitSet>();
 		for(BitSet key : clades.keySet()) {
-			if(a.intersects(key)) {
-				//BitSet rep = 
-				key.xor(a);
-			}
+
+			//BitSet rep = 
+			//int val = clades.get(key);
+			BitSet filter = (BitSet) a.clone();
+			filter.and(key);
+			filters.add(filter);
+			key.xor(filter);	//for some reason it also works with a simple xor, but then the clades are misleading...
+			//BitSet rep = key.xor(a);
+			//if (clades.get(key) != null) {
+			//	val += clades.get(key);
+			//}
+
+			//clades.put(key, val);
+
+
+
 		}
-		
+
+
+		//
+		//Beginning of code that would clean up "clades" of duplicate entries. 
+		//Might be easier to just adjust the probability calculator do take into account duplicates correctly.
+		//
+		//		Object[] keys = clades.keySet().toArray();
+		//		System.out.println();
+		//		for(int i = 0; i < keys.length; i++) {
+		//			for(int e = i+1; e < keys.length - 0; e++) {
+		//				//System.out.println(keys[i].equals(keys[e]));
+		//				//System.out.println(keys[i] + " vs " + keys[e]);
+		//				if(keys[i].equals(keys[e])) {
+		//					clades.put((BitSet) keys[i], clades.get(keys[i]) + clades.get(keys[e]));
+		//				}
+		//				
+		//			}
+		//		}
+
 		System.out.println("COMPLETE");
+		return filters;
+	}
+
+	public void unPrune(List<BitSet> a) {
+		Object[] keys = clades.keySet().toArray();
+		for(int i = 0; i < keys.length; i++) {
+			((BitSet) keys[i]).xor(a.get(i));
+		}
 	}
 
 
