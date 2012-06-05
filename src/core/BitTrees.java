@@ -145,6 +145,10 @@ public class BitTrees {
 	public Map<BitSet, Integer> getClades() {
 		return clades;
 	}
+	
+	public int getTaxaCount() {
+		return taxa.size();
+	}
 
 	/**
 	 * Creates a list of nodes corresponding to a full list of nodes and BitSet of "active" nodes. 

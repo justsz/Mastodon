@@ -16,9 +16,11 @@ public class MHAlgorithm implements Algorithm{
 
 	private List<Taxon> taxa;
 	private List<MutableRootedTree> originalTrees;
+	private boolean weighted;
 
 
-	public MHAlgorithm(List<MutableRootedTree> trees) {
+	public MHAlgorithm(List<MutableRootedTree> trees, boolean weighted) {
+		this.weighted = weighted;
 		originalTrees = trees;
 	}
 
@@ -68,7 +70,7 @@ public class MHAlgorithm implements Algorithm{
 
 
 		List<MutableRootedTree> prunedTrees = MutableRootedTree.prune(originalTrees, toPrune);
-		float bestScore = calc.getMAPScore(prunedTrees.get(0), prunedTrees);
+		float bestScore = calc.getMAPScore(prunedTrees.get(0), prunedTrees, weighted);
 		maxScore = bestScore;
 
 		///////////////
@@ -83,6 +85,7 @@ public class MHAlgorithm implements Algorithm{
 				int numberToPrune = (int) (Random.nextDouble() * prunedSpeciesCount + 1);	//prune 1 or more species
 				//do {
 				for(int e = 0; e < numberToPrune; e++) {
+					//there is a probability that you will make a silly choice loop like AB -> AC -> AB but the probability is low for a large set of taxa
 					int choice = 0;
 					do {
 						choice = (int) (Random.nextDouble() * species.size());
@@ -109,16 +112,18 @@ public class MHAlgorithm implements Algorithm{
 				System.out.println();
 
 				prunedTrees = MutableRootedTree.prune(originalTrees, toPrune);			
-				float score = calc.getMAPScore(prunedTrees.get(0), prunedTrees);
+				float score = calc.getMAPScore(prunedTrees.get(0), prunedTrees, weighted);
+				
+				if (score > maxScore) {	//should this accept equality?
+					maxScore = score;
+					maxTaxa = new ArrayList<Taxon>(toPrune);
+				}
 
 				if (score/bestScore > Random.nextFloat()) {
 					System.out.println("Accepted.");
 					bestChoice = new ArrayList<Taxon>(toPrune); 
 					bestScore = score;
-					if (bestScore > maxScore) {	//should this accept equality?
-						maxScore = bestScore;
-						maxTaxa = bestChoice;
-					}
+					
 				} else {
 					//do nothing
 				}

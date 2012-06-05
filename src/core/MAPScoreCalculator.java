@@ -12,29 +12,36 @@ import jebl.evolution.trees.RootedTree;
  */
 public class MAPScoreCalculator {
 
-	public float getMAPScore(RootedTree MAPTree, List<? extends RootedTree> trees) {
+	public float getMAPScore(RootedTree MAPTree, List<? extends RootedTree> trees, boolean weighted) {
 		float sum = 0;
 		int setSize = trees.size();
 
 
-		int count = 0; //used for testing
+		int count = 0;
 		for (RootedTree tree : trees) {
 			if(RootedTreeUtils.equal(tree, MAPTree)) {
-				//could probably just have the count++ inside the try block
-				try {
-					sum += (Float) tree.getAttribute("weight");
-				} catch(Exception e) {
-					System.out.println(tree.getAttributeMap());
-					count--;
-				}
 				count++;
+				if (weighted) {
+					try {
+						sum += (Float) tree.getAttribute("weight");
+					} catch(Exception e) {
+						System.out.println("Missing weight attribute.");
+						System.out.println(tree.getAttributeMap());
+						System.exit(1);
+					}
+				} else {
+					sum++;
+				}
 			}
-
 		}
 
 		System.out.println("number of matching trees: " + count);
 		System.out.println(sum);
-		return sum;
+		if (weighted) {
+			return sum;
+		} else {
+			return sum/setSize;
+		}
 	}
 
 }

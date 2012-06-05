@@ -7,18 +7,18 @@ import java.io.IOException;
 import java.util.List;
 
 import algorithms.MHAlgorithm;
+import algorithms.MHBitAlgorithm;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.MutableRootedTree;
-import core.NexusWriter;
-import core.TreeReader;
+import core.*;
 
 /**
  * @author justs
  *
  */
-public class MHAlgorithmTest {
+public class MHBitAlgorithmTest {
 
 	/**
 	 * @param args
@@ -30,16 +30,16 @@ public class MHAlgorithmTest {
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
-		MHAlgorithm mh = new MHAlgorithm(trees, true);
+		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false);
 
 		mh.run();
 
-		NexusWriter writer = new NexusWriter("MHed.trees");
-		writer.writeTrees(mh.getOutputTrees());
-		System.out.print("Final Pruned taxa: ");
-		for(Taxon taxon : mh.getPrunedTaxa()) {
-			System.out.print(taxon.getName() + ", ");	
-		}
+		//NexusWriter writer = new NexusWriter("MHed.trees");
+		//writer.writeTrees(mh.getOutputTrees());
+		//System.out.print("Final Pruned taxa: ");
+		//for(Taxon taxon : mh.getPrunedTaxa()) {
+		//	System.out.print(taxon.getName() + ", ");	
+		//}
 
 	}
 
