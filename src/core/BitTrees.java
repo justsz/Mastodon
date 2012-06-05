@@ -20,7 +20,7 @@ import jebl.evolution.trees.RootedTree;
  * @author justs
  * @author Creating clade summary code adapted from CladeSystem in BEAST's code.
  */
-public class BitStuff {
+public class BitTrees {
 	private List<? extends RootedTree> trees;
 	private Set<Taxon> taxa;	//Set of all unique taxa
 	private Map<BitSet, Integer> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
@@ -32,7 +32,7 @@ public class BitStuff {
 	 * Constructor that creates a list of all unique taxa in the set. Object will hold all information about the set of trees needed for their analysis.
 	 * @param trees - input trees
 	 */
-	public BitStuff(List<? extends RootedTree> trees) {
+	public BitTrees(List<? extends RootedTree> trees) {
 		this.trees = trees;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Integer>();

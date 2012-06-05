@@ -36,7 +36,7 @@ public class MHAlgorithmTest {
 
 		NexusWriter writer = new NexusWriter("MHed.trees");
 		writer.writeTrees(mh.getOutputTrees());
-		System.out.print("Pruned taxa: ");
+		System.out.print("Final Pruned taxa: ");
 		for(Taxon taxon : mh.getPrunedTaxa()) {
 			System.out.print(taxon.getName() + ", ");	
 		}

@@ -30,7 +30,7 @@ public class BitStuffTest {
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
-		BitStuff bs = new BitStuff(trees);
+		BitTrees bs = new BitTrees(trees);
 		Map<BitSet, Integer> clades = bs.getClades();
 		
 
