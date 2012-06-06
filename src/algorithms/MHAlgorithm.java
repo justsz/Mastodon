@@ -26,7 +26,7 @@ public class MHAlgorithm implements Algorithm{
 
 	public void run() {
 		MAPScoreCalculator calc = new MAPScoreCalculator();
-		int maxPrunedSpeciesCount = 3;
+		int maxPrunedSpeciesCount = 5;
 		int prunedSpeciesCount = 1;
 		float limit = 0.95f;
 		int iterations = 5;	//don't know any better for now

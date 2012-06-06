@@ -12,8 +12,8 @@ begin taxa;
 end;
 
 begin trees;
-	tree tree_1 = [&R] (((F,E),C),((B,D),A));
-	tree tree_2 = [&R] ((((F,E),C),D),(A,B));
-	tree tree_3 = [&R] (((F,E),C),((A,D),B));
-	tree tree_4 = [&R] (((C,F),E),((A,B),D));
+	tree tree_1 = [&R] [&weight=0.4](((F,E),C),((B,D),A));
+	tree tree_2 = [&R] [&weight=0.3]((((F,E),C),D),(A,B));
+	tree tree_3 = [&R] [&weight=0.25](((F,E),C),((A,D),B));
+	tree tree_4 = [&R] [&weight=0.05](((C,F),E),((A,B),D));
 end;

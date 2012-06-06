@@ -25,8 +25,8 @@ public class MHAlgorithmTest {
 	 * @throws Throwable 
 	 */
 	public static void main(String[] args) throws Throwable {
-		String test = "simple.trees";
-		//String test = "carnivores.trprobs";
+		//String test = "simple.trees";
+		String test = "carnivores.trprobs";
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 

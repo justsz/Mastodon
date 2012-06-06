@@ -36,10 +36,11 @@ public class MAPScoreCalculator {
 		}
 
 		System.out.println("number of matching trees: " + count);
-		System.out.println(sum);
 		if (weighted) {
+			System.out.println(sum);
 			return sum;
 		} else {
+			System.out.println(sum/setSize);
 			return sum/setSize;
 		}
 	}

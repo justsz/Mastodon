@@ -22,7 +22,7 @@ public class MAPScoreCalcTest {
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 		
 		MAPScoreCalculator calc = new MAPScoreCalculator();
-		float score = calc.getMAPScore(trees.get(0), trees);
+		float score = calc.getMAPScore(trees.get(0), trees, true);
 		System.out.println("score: " + score);
 	}
 

@@ -30,15 +30,15 @@ public class BitStuffTest {
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
-		BitTrees bs = new BitTrees(trees);
+		BitTreeSystem bs = new BitTreeSystem(trees);
 		Map<BitSet, Integer> clades = bs.getClades();
 		
 
-		List<ArrayList<BitSet>> bitTrees = bs.makeBits();
+		List<BitTree> bitTrees = bs.makeBits();
 		System.out.println(clades);
 
 		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
-		for(ArrayList<BitSet> bitTree : bitTrees) {
+		for(BitTree bitTree : bitTrees) {
 			MutableRootedTree tr = bs.reconstructTree(bitTree);
 			trs.add(tr);
 		}
@@ -73,7 +73,7 @@ public class BitStuffTest {
 		
 		
 		trs = new ArrayList<MutableRootedTree>();
-		for(ArrayList<BitSet> bitTree : bitTrees) {
+		for(BitTree bitTree : bitTrees) {
 			MutableRootedTree tr = bs.reconstructTree(bitTree);
 			trs.add(tr);
 		}

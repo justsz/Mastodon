@@ -18,18 +18,19 @@ public class MHBitAlgorithm implements Algorithm{
 	private BitSet taxa;
 	//private List<MutableRootedTree> originalTrees;
 	private boolean weighted;
-	private BitTrees bts;
-	List<ArrayList<BitSet>> bitTrees;
+	private BitTreeSystem bts;
+	List<BitTree> bitTrees;
 
 
 	public MHBitAlgorithm(List<MutableRootedTree> trees, boolean weighted) {
 		this.weighted = weighted;
-		bts = new BitTrees(trees);
+		bts = new BitTreeSystem(trees);
 		//originalTrees = trees;
 	}
 
 	public void run() {
 		bitTrees = bts.makeBits();
+		System.out.println("Bits created.");
 		BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
 		int maxPrunedSpeciesCount = 3;
 		int prunedSpeciesCount = 1;

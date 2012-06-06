@@ -16,57 +16,45 @@ import jebl.evolution.trees.RootedTree;
  */
 public class BitMAPScoreCalculator {
 
-	public float getMAPScore(List<BitSet> MAPTree, List<ArrayList<BitSet>> trees, boolean weighted) {
+	public float getMAPScore(BitTree MAPTree, List<BitTree> trees, boolean weighted) {
 		float sum = 0;
 		int setSize = trees.size();
 
 
 		int count = 0;
-		Set<BitSet> set1 = new HashSet<BitSet>();
-		for(BitSet bs : MAPTree) {
-			if(bs.cardinality() > 1) {	//what if it's pruned down to a stump?
-				set1.add(bs);
-			}
-		}
 		
+		boolean[] matches = MAPTree.equalsList(trees);
 
 		
-		for (List<BitSet> tree : trees) {
-			Set<BitSet> set2 = new HashSet<BitSet>();
-			for(BitSet bs : tree) {
-				if(bs.cardinality() > 1) {	//what if it's pruned down to a stump?
-					set2.add(bs);
-				}
-			}
-			
+		for (int i = 0; i < matches.length; i++) {			
 
 			
-			if(set1.equals(set2)) {
+			if(matches[i]) {
 				count++;
-				if (weighted) {
-					System.out.println("Don't know how to do weighted BitTrees yet!");
+				//if (weighted) {
+					
 //					try {
-//						sum += (Float) tree.getAttribute("weight");
+						sum += (Float) trees.get(i).getWeight();
 //					} catch(Exception e) {
 //						System.out.println("Missing weight attribute.");
 //						System.out.println(tree.getAttributeMap());
 //						System.exit(1);
 //					}
-				} else {
-					sum++;
-				}
+				//} else {
+				//	sum++;
+				//}
 			}
 		}
 
 		System.out.println("number of matching trees: " + count);
 		
-		if (weighted) {
+//		if (weighted) {
 			System.out.println(sum);
 			return sum;
-		} else {
-			System.out.println(sum/setSize);
-			return sum/setSize;
-		}
+//		} else {
+//			System.out.println(sum/setSize);
+//			return sum/setSize;
+//		}
 	}
 
 }

@@ -20,7 +20,7 @@ import jebl.evolution.trees.RootedTree;
  * @author justs
  * @author Creating clade summary code adapted from CladeSystem in BEAST's code.
  */
-public class BitTrees {
+public class BitTreeSystem {
 	private List<? extends RootedTree> trees;
 	private Set<Taxon> taxa;	//Set of all unique taxa
 	private Map<BitSet, Integer> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
@@ -32,7 +32,7 @@ public class BitTrees {
 	 * Constructor that creates a list of all unique taxa in the set. Object will hold all information about the set of trees needed for their analysis.
 	 * @param trees - input trees
 	 */
-	public BitTrees(List<? extends RootedTree> trees) {
+	public BitTreeSystem(List<? extends RootedTree> trees) {
 		this.trees = trees;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Integer>();
@@ -48,11 +48,17 @@ public class BitTrees {
 	 * Map of clades and represent the tree set.
 	 * @return list of BitSet representation of trees
 	 */
-	public List<ArrayList<BitSet>> makeBits() {
-		List<ArrayList<BitSet>> bitTrees = new ArrayList<ArrayList<BitSet>>(trees.size());
+	public List<BitTree> makeBits() {
+		List<BitTree> bitTrees = new ArrayList<BitTree>(trees.size());
 		for(RootedTree tree : trees) {
 			addClades(tree, tree.getRootNode());
-			bitTrees.add((ArrayList<BitSet>) bitTree);
+			float weight;
+			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
+				weight = (Float) tree.getAttribute("weight");
+			} else {
+				weight = 1.0f / trees.size();
+			}
+			bitTrees.add(new BitTree(bitTree, weight));
 			newTree = false;
 		}
 		return bitTrees;
@@ -173,7 +179,7 @@ public class BitTrees {
 	 * @param bitSets - list of all the clades that make up the tree
 	 * @return reconstructed tree object
 	 */
-	public MutableRootedTree reconstructTree(List<BitSet> bitSets) {
+	public MutableRootedTree reconstructTree(BitTree bitTree) {
 		//Pay attention to order and size of all the various Lists.
 		
 		//sort bitSets in ascending cardinality(number of bits set)
@@ -182,6 +188,7 @@ public class BitTrees {
 				return ((Integer)b1.cardinality()).compareTo(b2.cardinality());
 			}
 		};
+		List<BitSet> bitSets = bitTree.getBits();
 		Collections.sort(bitSets, c);
 		
 		Object[] taxaA = taxa.toArray();	//could be stored as an instance variable since it's so useful
@@ -218,6 +225,7 @@ public class BitTrees {
 			nodes.addAll(getNodes(externalNodes, copy));
 			internalNodes[i] = tree.createInternalNode(nodes);
 		}
+		tree.setAttribute("W", bitTree.getWeight());	//should the attribute be named W or weight?
 		return tree;
 	}
 
@@ -265,8 +273,6 @@ public class BitTrees {
 		//				
 		//			}
 		//		}
-
-		System.out.println("COMPLETE");
 		return filters;
 	}
 
