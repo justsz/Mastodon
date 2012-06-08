@@ -1,0 +1,16 @@
+carnivores10k|10max|500iter
+Bits created.
+0
+1 pruned taxa running time: 41084.0
+2 pruned taxa running time: 40574.0
+3 pruned taxa running time: 40411.0
+4 pruned taxa running time: 40142.0
+5 pruned taxa running time: 39893.0
+6 pruned taxa running time: 39567.0
+7 pruned taxa running time: 39394.0
+8 pruned taxa running time: 38942.0
+9 pruned taxa running time: 38467.0
+10 pruned taxa running time: 38120.0
+6.5E-4
+total running time: 402068.0
+Final Pruned taxa: SLOTHBEAR, AMMARTEN, JAPMARTEN, COUGAR, SIBTIGER, AFRLION,

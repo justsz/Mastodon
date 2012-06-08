@@ -11,7 +11,7 @@ import jebl.evolution.trees.Tree;
  */
 public interface Algorithm {
 	void run();
-	List<Taxon> getPrunedTaxa();
+	List<? extends List<Taxon>> getPrunedTaxa();
 	List<? extends Tree> getOutputTrees();
 }
 

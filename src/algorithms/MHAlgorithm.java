@@ -3,6 +3,8 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
+import scoreCalculators.MAPScoreCalculator;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.MutableRootedTree;
 import core.*;

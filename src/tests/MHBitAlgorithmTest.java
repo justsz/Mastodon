@@ -25,21 +25,31 @@ public class MHBitAlgorithmTest {
 	 * @throws Throwable 
 	 */
 	public static void main(String[] args) throws Throwable {
-		String test = "simple.trees";
-		//String test = "carnivores.trprobs";
+		String test = 
+//								"simple.trees";
+				//				"carnivores.trprobs";
+				"snowflake-48d.trees";
+		//				"carnivores_edited.trprobs";
+		//				"carnivores10k.trprobs";
+
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
-		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false);
+		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false, 0.5f, 10);
 
+		double start = System.currentTimeMillis();
 		mh.run();
+		System.out.println("total running time: " + (System.currentTimeMillis() - start));
 
 		//NexusWriter writer = new NexusWriter("MHed.trees");
 		//writer.writeTrees(mh.getOutputTrees());
-		//System.out.print("Final Pruned taxa: ");
-		//for(Taxon taxon : mh.getPrunedTaxa()) {
-		//	System.out.print(taxon.getName() + ", ");	
-		//}
+		System.out.print("Final Pruned taxa: ");
+		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
+			for (Taxon taxon : taxaList) {
+				System.out.print(taxon.getName() + ", ");
+			}
+			System.out.println();
+		}
 
 	}
 

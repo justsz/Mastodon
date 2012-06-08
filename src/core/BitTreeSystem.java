@@ -20,12 +20,17 @@ import jebl.evolution.trees.RootedTree;
  * @author justs
  * @author Creating clade summary code adapted from CladeSystem in BEAST's code.
  */
+/**
+ * @author justs
+ *
+ */
 public class BitTreeSystem {
 	private List<? extends RootedTree> trees;
 	private Set<Taxon> taxa;	//Set of all unique taxa
 	private Map<BitSet, Integer> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
 	private boolean newTree = false;	//used to mark the beginning of a new tree during the search for unique clades
 	private List<BitSet> bitTree;	//temporary storage for BitSet representation of individual trees
+	private List<BitTree> bitTrees;
 
 
 	/**
@@ -61,6 +66,7 @@ public class BitTreeSystem {
 			bitTrees.add(new BitTree(bitTree, weight));
 			newTree = false;
 		}
+		this.bitTrees = bitTrees;
 		return bitTrees;
 	}
 
@@ -89,6 +95,54 @@ public class BitTreeSystem {
 			addClade(bits);
 		}
 		return bits;
+	}
+
+	/**
+	 * If the trees are weighted, returns the max weight tree. Otherwise returns the index of the tree that has the maximum probability clades. 
+	 * @return index of the MAP tree
+	 */
+	public int getMapTreeIndex() {	//this could all be done at creation time
+		int index = 0;
+		if(trees.get(0).getAttribute("weight") != null) {
+			float maxWeight = 0.0f;
+			for(int i = 0; i < trees.size(); i++) {
+				try {
+					float weight = (Float) trees.get(i).getAttribute("weight");
+					if(weight > maxWeight) {
+						maxWeight = weight;
+						index = i;
+					}
+				} catch (NullPointerException e) {
+					System.out.println("No weight found for tree: " + i);
+					System.exit(1);
+				}
+			}
+		} else {
+
+			int[] scores = new int[trees.size()];
+			for(int i = 0; i < scores.length; i++) {
+				int score = 0;
+				BitTree tree = bitTrees.get(i);
+				for(BitSet bs1 : tree.getBits()) {
+					for(BitSet bs2 : clades.keySet()) {
+						if (bs1.equals(bs2)) {
+							score += clades.get(bs2);
+						}
+					}
+				}
+				scores[i] = score;
+			}
+
+			float maxScore = 0;
+
+			for(int i = 0; i < scores.length; i++) {
+				if(scores[i] > maxScore) {
+					maxScore = scores[i];
+					index = i;
+				}
+			}
+		}
+		return index;
 	}
 
 	/**
@@ -144,6 +198,14 @@ public class BitTreeSystem {
 		return (Taxon) taxaA[index];
 	}
 
+	public List<Taxon> getTaxa(BitSet bits) {
+		List<Taxon> taxaList = new ArrayList<Taxon>();
+		for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i+1)) {
+			taxaList.add(getTaxon(taxa, i));
+		}
+		return taxaList;
+	}
+
 	/**
 	 * Returns Map of all unique clades in set of trees.
 	 * @return Map of all unique clades in set of trees.
@@ -151,7 +213,7 @@ public class BitTreeSystem {
 	public Map<BitSet, Integer> getClades() {
 		return clades;
 	}
-	
+
 	public int getTaxaCount() {
 		return taxa.size();
 	}
@@ -181,7 +243,7 @@ public class BitTreeSystem {
 	 */
 	public MutableRootedTree reconstructTree(BitTree bitTree) {
 		//Pay attention to order and size of all the various Lists.
-		
+
 		//sort bitSets in ascending cardinality(number of bits set)
 		Comparator<BitSet> c = new Comparator<BitSet>() {
 			public int compare(BitSet b1, BitSet b2) {
@@ -190,7 +252,7 @@ public class BitTreeSystem {
 		};
 		List<BitSet> bitSets = bitTree.getBits();
 		Collections.sort(bitSets, c);
-		
+
 		Object[] taxaA = taxa.toArray();	//could be stored as an instance variable since it's so useful
 		MutableRootedTree tree = new MutableRootedTree();
 		//BitSet of all taxa in this tree, not necessarily in all trees
@@ -198,9 +260,9 @@ public class BitTreeSystem {
 		int numberOfTaxaInTree = allTaxa.cardinality();
 		Node[] externalNodes = new Node[taxaA.length];
 
-		
+
 		// !!! Problems arise in writer if there is a tree with a different sent of taxa in it.
-		
+
 		//build the tree from bottom up
 		//first create all tips
 		for (int i = allTaxa.nextSetBit(0); i >= 0; i = allTaxa.nextSetBit(i+1)) {

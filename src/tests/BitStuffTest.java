@@ -11,6 +11,7 @@ import java.util.Map;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.RootedTreeUtils;
 import core.*;
 
 /**
@@ -25,10 +26,12 @@ public class BitStuffTest {
 	 * @throws ImportException 
 	 */
 	public static void main(String[] args) throws IOException, ImportException {
-		String test = "simple.trees";
-		//String test = "carnivores.trprobs";
+//		String test = "simple.trees";
+//		String test = "carnivores.trprobs";
+		String test = "snowflake-48d.trees";
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
+		
 
 		BitTreeSystem bs = new BitTreeSystem(trees);
 		Map<BitSet, Integer> clades = bs.getClades();
@@ -44,8 +47,8 @@ public class BitStuffTest {
 		}
 
 
-		NexusWriter writer = new NexusWriter("reconstructed.nex");
-		writer.writeTrees(trs);
+		//NexusWriter writer = new NexusWriter("reconstructed.nex");
+		//writer.writeTrees(trs);
 
 		
 		//
@@ -79,8 +82,8 @@ public class BitStuffTest {
 		}
 
 
-		writer = new NexusWriter("reconstructed.nex");
-		writer.writeTrees(trs);
+		//writer = new NexusWriter("reconstructed.nex");
+		//writer.writeTrees(trs);
 		
 	}
 

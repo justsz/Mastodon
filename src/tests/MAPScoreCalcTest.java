@@ -3,10 +3,11 @@ package tests;
 import java.io.IOException;
 import java.util.List;
 
+import scoreCalculators.MAPScoreCalculator;
+
 import jebl.evolution.io.ImportException;
 import jebl.evolution.trees.MutableRootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
-import core.MAPScoreCalculator;
 import core.TreeReader;
 
 /**
