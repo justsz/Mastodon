@@ -30,12 +30,12 @@ public class MHBitAlgorithmTest {
 				//				"carnivores.trprobs";
 				"snowflake-48d.trees";
 		//				"carnivores_edited.trprobs";
-		//				"carnivores10k.trprobs";
+//						"carnivores10k.trprobs";
 
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
-		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false, 0.5f, 10);
+		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false, 0.5f, 10, 10000);
 
 		double start = System.currentTimeMillis();
 		mh.run();

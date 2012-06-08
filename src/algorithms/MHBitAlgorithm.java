@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.math3.distribution.PoissonDistribution;
+import org.apache.commons.math3.util.ArithmeticUtils;
+
 import scoreCalculators.BitMAPScoreCalculator;
 
 import jebl.evolution.taxa.Taxon;
@@ -26,13 +29,15 @@ public class MHBitAlgorithm implements Algorithm{
 	List<BitTree> bitTrees;
 	float limit;
 	int maxPrunedSpeciesCount;
+	int totalIterations;
 
 
-	public MHBitAlgorithm(List<MutableRootedTree> trees, boolean weighted, float limit, int max) {
+	public MHBitAlgorithm(List<MutableRootedTree> trees, boolean weighted, float limit, int max, int totalIterations) {
 		this.weighted = weighted;
 		bts = new BitTreeSystem(trees);
 		this.limit = limit;
 		this.maxPrunedSpeciesCount = max;
+		this.totalIterations = totalIterations;
 		//originalTrees = trees;
 	}
 
@@ -46,7 +51,7 @@ public class MHBitAlgorithm implements Algorithm{
 		
 		System.out.println("Map tree: " + mapTreeIndex);
 		int prunedSpeciesCount = 1;
-		int iterations = 500;	//don't know any better for now
+		
 
 		float maxScore = 0.0f;
 		Set<BitSet> maxTaxa = new HashSet<BitSet>();
@@ -90,26 +95,48 @@ public class MHBitAlgorithm implements Algorithm{
 		//ITERATIONS//
 		/////////////
 		boolean repeat = true;
+		
+		double[] iterations = new double[maxPrunedSpeciesCount];
+		for(int i = 0; i < maxPrunedSpeciesCount; i++) {
+			iterations[i] = ArithmeticUtils.binomialCoefficientLog(taxaCount, i+1);
+		}
+		double sum = 0.0;
+		for (double d : iterations) {
+			sum += d;
+		}
+		
+		for(int i = 0; i < maxPrunedSpeciesCount; i++) {
+			iterations[i] = iterations[i] / sum * totalIterations;
+		}
 
 		while(repeat) {
 			double start = System.currentTimeMillis();
-			for(int i = 0; i < iterations; i++) {
+			double mean = 1.0;	//needed when pruning 1 taxon
+			if (prunedSpeciesCount > 1) {
+				mean = 0.5 * (prunedSpeciesCount - 1);
+			}
+			PoissonDistribution pd = new PoissonDistribution(mean);
+			for(int i = 0; i < (int) iterations[prunedSpeciesCount-1]; i++) {
 				toPrune = (BitSet) toPrune.clone();
 				
 				
 				//choose the number of species in list to perturb based on a Gaussian distributions
 				int numberToPrune = 0;
-				double gaus = Random.nextGaussian();
-				if (gaus > 3) {
-					numberToPrune = prunedSpeciesCount;
-				} else if (gaus < -3) {
-					numberToPrune = 1;
-				} else {
-					numberToPrune = (int) ((gaus + 3) / 6 * prunedSpeciesCount + 1);
-				}
+//				double gaus = Random.nextGaussian();
+//				if (gaus > 3) {
+//					numberToPrune = prunedSpeciesCount;
+//				} else if (gaus < -3) {
+//					numberToPrune = 1;
+//				} else {
+//					numberToPrune = (int) ((gaus + 3) / 6 * prunedSpeciesCount + 1);
+//				}
 				
 				//int numberToPrune = (int) (Random.nextDouble() * prunedSpeciesCount + 1);	//prune 1 or more species
-				//do {
+				
+				while(numberToPrune == 0 || numberToPrune > prunedSpeciesCount) {
+					numberToPrune = pd.sample() + 1;
+				} 
+				
 				for(int e = 0; e < numberToPrune; e++) {
 					int choice = 0;
 					do {
@@ -132,7 +159,7 @@ public class MHBitAlgorithm implements Algorithm{
 					toPrune.set(choice);
 					
 				}
-				//} while (triedCombinations);
+				
 
 //				System.out.print("pruning: ");
 //				System.out.println(toPrune);
