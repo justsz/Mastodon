@@ -26,16 +26,16 @@ public class MHBitAlgorithmTest {
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
-//								"simple.trees";
+								"simple.trees";
 				//				"carnivores.trprobs";
-				"snowflake-48d.trees";
+//				"snowflake-48d.trees";
 		//				"carnivores_edited.trprobs";
 //						"carnivores10k.trprobs";
 
 		TreeReader reader = new TreeReader(test);
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 
-		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false, 0.5f, 10, 10000);
+		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false, 0.5f, 10, 4000);	//need to enforce that max taxa to prune should be less than total number of taxa
 
 		double start = System.currentTimeMillis();
 		mh.run();
