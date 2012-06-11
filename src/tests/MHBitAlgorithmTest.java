@@ -26,18 +26,28 @@ public class MHBitAlgorithmTest {
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
-								"simple.trees";
+												"simple.trees";
 				//				"carnivores.trprobs";
-//				"snowflake-48d.trees";
-		//				"carnivores_edited.trprobs";
-//						"carnivores10k.trprobs";
+//								"snowflake-48d.trees";
+				//				"carnivores_edited.trprobs";
+//				"carnivores10k.trprobs";
 
 		TreeReader reader = new TreeReader(test);
-		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
+		BitTreeSystem bts = new BitTreeSystem();
+		List<MutableRootedTree> trees;
+		do {
+			trees = reader.read100Trees();
+			bts.addTrees(trees);
+		} while (trees.size() == 100);
+		
+		
+		List<BitTree> bitTrees = bts.getBitTrees();
 
-		MHBitAlgorithm mh = new MHBitAlgorithm(trees, false, 0.5f, 10, 4000);	//need to enforce that max taxa to prune should be less than total number of taxa
-
+		MHBitAlgorithm mh = new MHBitAlgorithm();
 		double start = System.currentTimeMillis();
+
+		mh.setTrees(bts, bitTrees);
+		mh.setLimits(0.5f, 3, 5000);
 		mh.run();
 		System.out.println("total running time: " + (System.currentTimeMillis() - start));
 

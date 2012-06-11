@@ -25,27 +25,65 @@ import jebl.evolution.trees.RootedTree;
  *
  */
 public class BitTreeSystem {
-	private List<? extends RootedTree> trees;
+	//	private List<? extends RootedTree> trees;
 	private Set<Taxon> taxa;	//Set of all unique taxa
 	private Map<BitSet, Integer> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
 	private boolean newTree = false;	//used to mark the beginning of a new tree during the search for unique clades
 	private List<BitSet> bitTree;	//temporary storage for BitSet representation of individual trees
 	private List<BitTree> bitTrees;
+	private int treeCount;
+	private boolean weighted;
 
 
 	/**
-	 * Constructor that creates a list of all unique taxa in the set. Object will hold all information about the set of trees needed for their analysis.
-	 * @param trees - input trees
+	 * Object will hold all information about the set of trees needed for their analysis.
 	 */
-	public BitTreeSystem(List<? extends RootedTree> trees) {
-		this.trees = trees;
+	public BitTreeSystem() {
+		treeCount = 0;
+		weighted = true;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Integer>();
+		this.bitTrees = new ArrayList<BitTree>();
 
 		//construct full set of taxa
+		//		for(RootedTree tree : trees) {
+		//			taxa.addAll(tree.getTaxa());
+		//		}
+	}
+
+	public void addTrees(List<? extends RootedTree> trees) {
+		//need to do this for every tree? Can it be assumed that all trees have the same taxa list?
 		for(RootedTree tree : trees) {
 			taxa.addAll(tree.getTaxa());
 		}
+
+		for(RootedTree tree : trees) {
+			addClades(tree, tree.getRootNode());
+			float weight = -1;	//signifies unweighted tree
+			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
+				if(!weighted) {
+					System.out.println("Weight annotation error. Not all trees are weighted. Exiting.");
+					System.exit(2);
+				}
+				weighted = true;
+				weight = (Float) tree.getAttribute("weight");
+			} else {
+				if(weighted && treeCount != 0) {
+					System.out.println("Weight annotation error at: " + tree.getAttributeMap() + " Exiting.");
+					System.exit(2);
+				}
+				weighted = false;
+			}
+			bitTrees.add(new BitTree(bitTree, weight));
+			newTree = false;
+		}
+
+		treeCount += trees.size();
+	}
+
+	public List<BitTree> getBitTrees() {
+		System.out.println("treeCount=" + treeCount + "\tbitTrees=" + bitTrees.size() + "\ttaxaCount=" + taxa.size());
+		return bitTrees;
 	}
 
 	/**
@@ -53,22 +91,23 @@ public class BitTreeSystem {
 	 * Map of clades and represent the tree set.
 	 * @return list of BitSet representation of trees
 	 */
-	public List<BitTree> makeBits() {
-		List<BitTree> bitTrees = new ArrayList<BitTree>(trees.size());
-		for(RootedTree tree : trees) {
-			addClades(tree, tree.getRootNode());
-			float weight;
-			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
-				weight = (Float) tree.getAttribute("weight");
-			} else {
-				weight = 1.0f / trees.size();
-			}
-			bitTrees.add(new BitTree(bitTree, weight));
-			newTree = false;
-		}
-		this.bitTrees = bitTrees;
-		return bitTrees;
-	}
+	//Deprecated
+//	public List<BitTree> makeBits() {
+//		List<BitTree> bitTrees = new ArrayList<BitTree>(treeCount);
+//		for(RootedTree tree : trees) {
+//			addClades(tree, tree.getRootNode());
+//			float weight;
+//			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
+//				weight = (Float) tree.getAttribute("weight");
+//			} else {
+//				weight = 1.0f / treeCount;
+//			}
+//			bitTrees.add(new BitTree(bitTree, weight));
+//			newTree = false;
+//		}
+//		this.bitTrees = bitTrees;
+//		return bitTrees;
+//	}
 
 	/**
 	 * Recursively traverses a tree to extract all unique clades.
@@ -97,53 +136,6 @@ public class BitTreeSystem {
 		return bits;
 	}
 
-	/**
-	 * If the trees are weighted, returns the max weight tree. Otherwise returns the index of the tree that has the maximum probability clades. 
-	 * @return index of the MAP tree
-	 */
-	public int getMapTreeIndex() {	//this could all be done at creation time
-		int index = 0;
-		if(trees.get(0).getAttribute("weight") != null) {
-			float maxWeight = 0.0f;
-			for(int i = 0; i < trees.size(); i++) {
-				try {
-					float weight = (Float) trees.get(i).getAttribute("weight");
-					if(weight > maxWeight) {
-						maxWeight = weight;
-						index = i;
-					}
-				} catch (NullPointerException e) {
-					System.out.println("No weight found for tree: " + i);
-					System.exit(1);
-				}
-			}
-		} else {
-
-			int[] scores = new int[trees.size()];
-			for(int i = 0; i < scores.length; i++) {
-				int score = 0;
-				BitTree tree = bitTrees.get(i);
-				for(BitSet bs1 : tree.getBits()) {
-					for(BitSet bs2 : clades.keySet()) {
-						if (bs1.equals(bs2)) {
-							score += clades.get(bs2);
-						}
-					}
-				}
-				scores[i] = score;
-			}
-
-			float maxScore = 0;
-
-			for(int i = 0; i < scores.length; i++) {
-				if(scores[i] > maxScore) {
-					maxScore = scores[i];
-					index = i;
-				}
-			}
-		}
-		return index;
-	}
 
 	/**
 	 * Add given clade to the central list of unique clades
@@ -169,6 +161,49 @@ public class BitTreeSystem {
 				bitTree.add(s);
 			}
 		}
+	}
+
+	/**
+	 * If the trees are weighted, returns the max weight tree. Otherwise returns the index of the tree that has the maximum probability clades. 
+	 * @return index of the MAP tree
+	 */
+	public int getMapTreeIndex() {	//this could all be done at creation time
+		int index = 0;
+		if(weighted) {
+			float maxWeight = 0.0f;
+			for(int i = 0; i < treeCount; i++) {
+				float weight = bitTrees.get(i).getWeight();
+				if(weight > maxWeight) {
+					maxWeight = weight;
+					index = i;
+				}
+			}
+		} else {
+
+			int[] scores = new int[treeCount];
+			for(int i = 0; i < scores.length; i++) {
+				int score = 0;
+				BitTree tree = bitTrees.get(i);
+				for(BitSet bs1 : tree.getBits()) {
+					for(BitSet bs2 : clades.keySet()) {
+						if (bs1.equals(bs2)) {
+							score += clades.get(bs2);
+						}
+					}
+				}
+				scores[i] = score;
+			}
+
+			float maxScore = 0;
+
+			for(int i = 0; i < scores.length; i++) {
+				if(scores[i] > maxScore) {
+					maxScore = scores[i];
+					index = i;
+				}
+			}
+		}
+		return index;
 	}
 
 	/**

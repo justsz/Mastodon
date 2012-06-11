@@ -18,45 +18,30 @@ import jebl.evolution.trees.RootedTree;
  */
 public class BitMAPScoreCalculator {
 
-	public float getMAPScore(BitTree MAPTree, List<BitTree> trees, boolean weighted) {
+	public float getMAPScore(BitTree MAPTree, List<BitTree> trees) {
 		float sum = 0;
-		int setSize = trees.size();
-
-
 		int count = 0;
-		
+		boolean weighted = true;
+
 		boolean[] matches = MAPTree.equalsList(trees);
 
-		
 		for (int i = 0; i < matches.length; i++) {			
-
-			
 			if(matches[i]) {
 				count++;
-				//if (weighted) {
-					
-//					try {
-						sum += (Float) trees.get(i).getWeight();
-//					} catch(Exception e) {
-//						System.out.println("Missing weight attribute.");
-//						System.out.println(tree.getAttributeMap());
-//						System.exit(1);
-//					}
-				//} else {
-				//	sum++;
-				//}
+				float weight = trees.get(i).getWeight();
+				if(weight == -1) {
+					sum++;
+					weighted = false;
+				} else {
+					sum += trees.get(i).getWeight();
+				}
+
 			}
 		}
-
-//		System.out.println("number of matching trees: " + count);
-		
-//		if (weighted) {
-//			System.out.println(sum);
+		if(weighted) {
 			return sum;
-//		} else {
-//			System.out.println(sum/setSize);
-//			return sum/setSize;
-//		}
+		} else {
+			return sum/trees.size();
+		}
 	}
-
 }

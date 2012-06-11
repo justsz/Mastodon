@@ -1,8 +1,8 @@
 #NEXUS
 begin trees;
-tree tree1 [&W 0.40] = ((A,(B,D)),(C,(F,E)));
 tree tree2 [&W 0.30] = ((A,B),(D,(C,(F,E))));
 tree tree3 [&W 0.25] = (((A,D),B),(C,(F,E)));
+tree tree1 [&W 0.40] = ((A,(B,D)),(C,(F,E)));
 tree tree4 [&W 0.05] = (((A,B),D),((C,F),E));
 [tree tree5 [&W 0.01] = ((A,B),((D,E),F));]
 end;

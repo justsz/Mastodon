@@ -42,7 +42,7 @@ public class TreeReader {
 	public void setFile(String filename) throws IOException {
 		fileName = filename;
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
-		
+
 		//(c) FigTree
 		String line = bufferedReader.readLine();
 		while (line != null && line.length() == 0) {
@@ -81,17 +81,10 @@ public class TreeReader {
 	public List<SimpleRootedTree> readSimpleRootedTrees() throws IOException, ImportException {
 		List<SimpleRootedTree> trees = new ArrayList<SimpleRootedTree>();
 		Tree tree;
-//		while((tree = imp.importNextTree()) != null) {
-//			trees.add((SimpleRootedTree) tree);
-//		}
-		
-		//int place = 2;
 		while (imp.hasTree()) {
-			//System.out.println("tree" + place);
-            tree = imp.importNextTree();
-            trees.add((SimpleRootedTree) tree);
-            //place++;
-        }
+			tree = imp.importNextTree();
+			trees.add((SimpleRootedTree) tree);
+		}
 
 		if (trees.size() == 0) {
 			throw new ImportException("This file contained no trees.");
@@ -111,14 +104,11 @@ public class TreeReader {
 	public List<MutableRootedTree> readMutableRootedTrees() throws IOException, ImportException {
 		List<MutableRootedTree> trees = new ArrayList<MutableRootedTree>();
 		Tree tree;
-//		while((tree = imp.importNextTree()) != null) {
-//			trees.add(new MutableRootedTree((RootedTree) tree));
-//		}
-		
+
 		while (imp.hasTree()) {
-            tree = imp.importNextTree();
-            trees.add(new MutableRootedTree((RootedTree) tree));
-        }
+			tree = imp.importNextTree();
+			trees.add(new MutableRootedTree((RootedTree) tree));
+		}
 
 		if (trees.size() == 0) {
 			throw new ImportException("This file contained no trees.");
@@ -126,6 +116,41 @@ public class TreeReader {
 
 		reader.close();
 		return trees;
+	}
+
+
+	/**
+	 * Reads the next 100 trees in the file file and converts to a list of MutableRootedTree objects.
+	 * @return list of MutableRootedTree objects
+	 * @throws IOException
+	 * @throws ImportException
+	 */
+	public List<MutableRootedTree> read100Trees() throws IOException, ImportException {
+		List<MutableRootedTree> trees = new ArrayList<MutableRootedTree>();
+		Tree tree;
+
+		if(!imp.hasTree()) {	//in case number of trees is an integer multiple of 100
+			reader.close();
+		} else {
+			int counter = 100;
+			while (imp.hasTree() && counter > 0) {
+				tree = imp.importNextTree();
+				trees.add(new MutableRootedTree((RootedTree) tree));
+				counter--;
+			}
+		}
+		return trees;
+	}
+	
+	public MutableRootedTree getTree(int index) throws IOException, ImportException {
+		reset();
+		MutableRootedTree tree = new MutableRootedTree((RootedTree) imp.importNextTree());
+		while (index > 0) {
+			//this can give null pointer exception if you give index too large. 
+			tree = new MutableRootedTree((RootedTree) imp.importNextTree());
+			index--;
+		}
+		return tree;
 	}
 
 
@@ -138,14 +163,11 @@ public class TreeReader {
 	public List<CompactRootedTree> readCompactRootedTrees() throws IOException, ImportException {
 		List<CompactRootedTree> trees = new ArrayList<CompactRootedTree>();
 		Tree tree;
-//		while((tree = imp.importNextTree()) != null) {
-//			trees.add(new CompactRootedTree((RootedTree) tree));
-//		}
-		
+
 		while (imp.hasTree()) {
-            tree = imp.importNextTree();
-            trees.add(new CompactRootedTree((RootedTree) tree));
-        }
+			tree = imp.importNextTree();
+			trees.add(new CompactRootedTree((RootedTree) tree));
+		}
 
 		if (trees.size() == 0) {
 			throw new ImportException("This file contained no trees.");

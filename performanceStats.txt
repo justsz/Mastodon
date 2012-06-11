@@ -68,3 +68,31 @@ SLOTHBEAR, AFS, SABLE, MALTAICA, DOG, WOLF, CAT, BOBCAT, COUGAR, AFRLION,
 SLOTHBEAR, SASL, JAPMARTEN, JAPBADGER, SWFOX, DOG, CAT, BOBCAT, SIBTIGER, AFRLION, 
 SLOTHBEAR, WOLVERINE, JAPMARTEN, JAPBADGER, DOG, WOLF, CAT, SIBTIGER, AFRLION, 
 SLOTHBEAR, JAPMARTEN, MALTAICA, CAT, 
+
+------Memory saving pipe added------
+Map tree: 0
+1 pruned taxa running time: 7003.0
+2 pruned taxa running time: 12691.0
+3 pruned taxa running time: 17849.0
+4 pruned taxa running time: 22435.0
+5 pruned taxa running time: 26495.0
+6 pruned taxa running time: 30320.0
+7 pruned taxa running time: 33810.0
+8 pruned taxa running time: 36840.0
+9 pruned taxa running time: 39596.0
+10 pruned taxa running time: 42195.0
+11 pruned taxa running time: 44523.0
+12 pruned taxa running time: 46666.0
+13 pruned taxa running time: 48575.0
+14 pruned taxa running time: 50394.0
+15 pruned taxa running time: 51950.0
+16 pruned taxa running time: 53442.0
+17 pruned taxa running time: 54809.0
+18 pruned taxa running time: 56417.0
+19 pruned taxa running time: 57490.0
+20 pruned taxa running time: 58621.0
+7.9999985E-8
+total running time: 792543.0
+Final Pruned taxa: TAYRA, BEECHMART, AMMARTEN, STEPPEPOL, RIVOTTER, EURBADGER, HOGNOSESK, WESTSPOTSK, ARCFOX, SWFOX, DOG, WOLF, CAT, LYNX, BOBCAT, COUGAR, SIBTIGER, AFRLION, 
+SUN, RINGED, BEECHMART, SIBWEAS, SPNECKOTT, MARINOTT, HOGBADGER, WESTSPOTSK, SWFOX, DOG, WOLF, CAT, LYNX, BOBCAT, COUGAR, SIBTIGER, AFRLION, 
+

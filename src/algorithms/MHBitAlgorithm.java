@@ -23,31 +23,31 @@ import jebl.math.Random;
 public class MHBitAlgorithm implements Algorithm{
 
 	private Set<BitSet> taxa;
-	//private List<MutableRootedTree> originalTrees;
-	private boolean weighted;
 	private BitTreeSystem bts;
 	List<BitTree> bitTrees;
-	float limit;
+	float tolerance;
 	int maxPrunedSpeciesCount;
 	int totalIterations;
-
-
-	public MHBitAlgorithm(List<MutableRootedTree> trees, boolean weighted, float limit, int max, int totalIterations) {
-		this.weighted = weighted;
-		bts = new BitTreeSystem(trees);
-		this.limit = limit;
+	
+	public void setTrees(BitTreeSystem bts, List<BitTree> bitTrees) {
+		this.bts = bts;
+		this.bitTrees = bitTrees;			
+	}
+	
+	public void setLimits(float tolerance, int max, int totalIterations) {
+		this.tolerance = tolerance;
 		this.maxPrunedSpeciesCount = max;
 		this.totalIterations = totalIterations;
-		//originalTrees = trees;
 	}
+	
 
 	public void run() {
-		bitTrees = bts.makeBits();
-		System.out.println("Bits created.");
+
+
 		BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
 
 		int mapTreeIndex = bts.getMapTreeIndex();
-		float notPrunedScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees, weighted);		
+		float notPrunedScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 
 		System.out.println("Map tree: " + mapTreeIndex);
 		int prunedSpeciesCount = 1;
@@ -87,7 +87,7 @@ public class MHBitAlgorithm implements Algorithm{
 		//		System.out.println();
 
 		List<BitSet> filters = bts.prune(toPrune);
-		float bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees, weighted);		
+		float bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 		bts.unPrune(filters);
 		maxScore = bestScore;
 
@@ -172,7 +172,7 @@ public class MHBitAlgorithm implements Algorithm{
 
 
 				filters = bts.prune(toPrune);
-				float score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees, weighted);		
+				float score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 				bts.unPrune(filters);
 
 
@@ -195,7 +195,7 @@ public class MHBitAlgorithm implements Algorithm{
 
 			}
 			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
-			if (maxScore < limit && prunedSpeciesCount < maxPrunedSpeciesCount) {
+			if (maxScore < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
 				prunedSpeciesCount++;
 			} else {
 				System.out.println(maxScore);
