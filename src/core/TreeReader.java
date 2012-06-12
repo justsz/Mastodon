@@ -25,6 +25,14 @@ public class TreeReader {
 	private TreeImporter imp;	 
 	private String fileName;	//Currently used filename.	
 
+	
+	/**
+	 * Plain constructor. Call setFile afterwards. 
+	 * @throws IOException 
+	 */
+	public TreeReader() throws IOException {
+	}
+	
 	/**
 	 * Constructor that creates a NexusImporter or NewickImporter object bound to the provided filename. 
 	 * @param filename - name of input file

@@ -18,7 +18,8 @@ import jebl.evolution.trees.RootedTree;
  */
 public class BitMAPScoreCalculator {
 
-	public float getMAPScore(BitTree MAPTree, List<BitTree> trees) {
+	public float[] getMAPScore(BitTree MAPTree, List<BitTree> trees) {
+		float[] result = new float[2];
 		float sum = 0;
 		int count = 0;
 		boolean weighted = true;
@@ -38,10 +39,14 @@ public class BitMAPScoreCalculator {
 
 			}
 		}
+		
+		result[1] = count;
 		if(weighted) {
-			return sum;
+			result[0] = sum;
 		} else {
-			return sum/trees.size();
+			result[0] = sum/trees.size();
 		}
+		
+		return result;
 	}
 }

@@ -82,7 +82,7 @@ public class BitTreeSystem {
 	}
 
 	public List<BitTree> getBitTrees() {
-		System.out.println("treeCount=" + treeCount + "\tbitTrees=" + bitTrees.size() + "\ttaxaCount=" + taxa.size());
+		//System.out.println("treeCount=" + treeCount + "\tbitTrees=" + bitTrees.size() + "\ttaxaCount=" + taxa.size());
 		return bitTrees;
 	}
 
@@ -180,9 +180,9 @@ public class BitTreeSystem {
 			}
 		} else {
 
-			int[] scores = new int[treeCount];
+			long[] scores = new long[treeCount];
 			for(int i = 0; i < scores.length; i++) {
-				int score = 0;
+				long score = 0;
 				BitTree tree = bitTrees.get(i);
 				for(BitSet bs1 : tree.getBits()) {
 					for(BitSet bs2 : clades.keySet()) {
@@ -194,7 +194,7 @@ public class BitTreeSystem {
 				scores[i] = score;
 			}
 
-			float maxScore = 0;
+			long maxScore = 0;
 
 			for(int i = 0; i < scores.length; i++) {
 				if(scores[i] > maxScore) {

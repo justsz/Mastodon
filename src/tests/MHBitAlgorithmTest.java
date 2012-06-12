@@ -26,30 +26,33 @@ public class MHBitAlgorithmTest {
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
-												"simple.trees";
+//												"simple.trees";
 				//				"carnivores.trprobs";
-//								"snowflake-48d.trees";
-				//				"carnivores_edited.trprobs";
-//				"carnivores10k.trprobs";
+								"snowflake-48d.trees";
+//								"carnivores_edited.trprobs";
+//				"carnivores1k.trprobs";
 
 		TreeReader reader = new TreeReader(test);
 		BitTreeSystem bts = new BitTreeSystem();
 		List<MutableRootedTree> trees;
+		
+		double start = System.currentTimeMillis();
 		do {
 			trees = reader.read100Trees();
 			bts.addTrees(trees);
 		} while (trees.size() == 100);
-		
+		trees = null;	//signals to the GC that this can be disposed of
+		System.out.println("tree adding time: " + (System.currentTimeMillis() - start));
 		
 		List<BitTree> bitTrees = bts.getBitTrees();
 
 		MHBitAlgorithm mh = new MHBitAlgorithm();
-		double start = System.currentTimeMillis();
+		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.5f, 3, 5000);
+		mh.setLimits(0.5f, 10, 10000);
 		mh.run();
-		System.out.println("total running time: " + (System.currentTimeMillis() - start));
+		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
 		//NexusWriter writer = new NexusWriter("MHed.trees");
 		//writer.writeTrees(mh.getOutputTrees());
