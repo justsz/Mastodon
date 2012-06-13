@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import algorithms.MHAlgorithm;
 import algorithms.MHBitAlgorithm;
 
 import jebl.evolution.io.ImportException;
