@@ -3,6 +3,7 @@
 	<name>Mastodon</name>
 	<comment></comment>
 	<projects>
+		<project>jebl</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
