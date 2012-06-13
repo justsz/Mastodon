@@ -23,6 +23,7 @@ public class MHBitAlgorithmTest {
 	/**
 	 * @param args
 	 * @throws Throwable 
+	 * 
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
