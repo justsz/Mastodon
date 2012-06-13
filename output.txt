@@ -1,2 +1,0 @@
-Pruned taxa	[MAP score for this pruning, number of matching subtrees]
-D, C, [1.0, 4]
