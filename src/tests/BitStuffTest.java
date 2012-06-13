@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import jebl.evolution.io.ImportException;
-import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
 import core.*;
 
@@ -30,7 +30,7 @@ public class BitStuffTest {
 //		String test = "carnivores.trprobs";
 		String test = "snowflake-48d.trees";
 		TreeReader reader = new TreeReader(test);
-		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
+		List<SimpleRootedTree> trees = reader.readSimpleRootedTrees();
 		
 
 		BitTreeSystem bs = new BitTreeSystem();
@@ -41,9 +41,9 @@ public class BitStuffTest {
 		List<BitTree> bitTrees = bs.getBitTrees();
 		System.out.println(clades);
 
-		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
+		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
-			MutableRootedTree tr = bs.reconstructTree(bitTree);
+			SimpleRootedTree tr = bs.reconstructTree(bitTree);
 			trs.add(tr);
 		}
 
@@ -76,9 +76,9 @@ public class BitStuffTest {
 //		}
 		
 		
-		trs = new ArrayList<MutableRootedTree>();
+		trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
-			MutableRootedTree tr = bs.reconstructTree(bitTree);
+			SimpleRootedTree tr = bs.reconstructTree(bitTree);
 			trs.add(tr);
 		}
 

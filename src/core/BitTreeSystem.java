@@ -12,7 +12,7 @@ import java.util.Set;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.RootedTree;
 
 /**
@@ -276,7 +276,7 @@ public class BitTreeSystem {
 	 * @param bitSets - list of all the clades that make up the tree
 	 * @return reconstructed tree object
 	 */
-	public MutableRootedTree reconstructTree(BitTree bitTree) {
+	public SimpleRootedTree reconstructTree(BitTree bitTree) {
 		//Pay attention to order and size of all the various Lists.
 
 		//sort bitSets in ascending cardinality(number of bits set)
@@ -289,7 +289,7 @@ public class BitTreeSystem {
 		Collections.sort(bitSets, c);
 
 		Object[] taxaA = taxa.toArray();	//could be stored as an instance variable since it's so useful
-		MutableRootedTree tree = new MutableRootedTree();
+		SimpleRootedTree tree = new SimpleRootedTree();
 		//BitSet of all taxa in this tree, not necessarily in all trees
 		BitSet allTaxa = bitSets.get(bitSets.size()-1);
 		int numberOfTaxaInTree = allTaxa.cardinality();

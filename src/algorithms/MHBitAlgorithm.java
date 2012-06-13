@@ -14,7 +14,7 @@ import org.apache.commons.math3.util.ArithmeticUtils;
 import scoreCalculators.BitMAPScoreCalculator;
 
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 import core.*;
 import jebl.math.Random;
 
@@ -213,12 +213,12 @@ public class MHBitAlgorithm implements Algorithm{
 	}
 	
 
-	public List<MutableRootedTree> getOutputTrees() {
+	public List<SimpleRootedTree> getOutputTrees() {
 		//might need to change the interface for this one
 		List<BitSet> filters = bts.prune(taxa.keySet().iterator().next());
-		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
+		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
-			MutableRootedTree tr = bts.reconstructTree(bitTree);
+			SimpleRootedTree tr = bts.reconstructTree(bitTree);
 			trs.add(tr);
 		}
 		bts.unPrune(filters);
@@ -236,8 +236,8 @@ public class MHBitAlgorithm implements Algorithm{
 		return output;
 	}
 	
-	public List<MutableRootedTree> getPrunedMapTrees() {
-		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
+	public List<SimpleRootedTree> getPrunedMapTrees() {
+		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
 		for(BitSet bs : taxa.keySet()) {
 			BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
 			mapTree.pruneTree(bs);

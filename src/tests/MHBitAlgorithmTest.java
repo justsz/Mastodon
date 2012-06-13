@@ -12,6 +12,7 @@ import algorithms.MHBitAlgorithm;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 import core.*;
 
 /**
@@ -31,11 +32,11 @@ public class MHBitAlgorithmTest {
 				//				"carnivores.trprobs";
 //								"snowflake-48d.trees";
 //								"carnivores_edited.trprobs";
-//				"carnivores1k.trprobs";
+//				"carnivores5k.trprobs";
 
 		TreeReader reader = new TreeReader(test);
 		BitTreeSystem bts = new BitTreeSystem();
-		List<MutableRootedTree> trees;
+		List<SimpleRootedTree> trees;
 		
 		double start = System.currentTimeMillis();
 		do {
@@ -55,13 +56,13 @@ public class MHBitAlgorithmTest {
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
-		List<MutableRootedTree> prunedTrees = mh.getPrunedMapTrees();
-		for(int i = 0; i < prunedTrees.size(); i++) {
-			NexusWriter writer = new NexusWriter("MHed" + i + ".trees");
-			List<MutableRootedTree> tree = new ArrayList<MutableRootedTree>();
-			tree.add(prunedTrees.get(i));
-			writer.writeTrees(tree);
-		}
+//		List<SimpleRootedTree> prunedTrees = mh.getPrunedMapTrees();
+//		for(int i = 0; i < prunedTrees.size(); i++) {
+//			NexusWriter writer = new NexusWriter("MHed" + i + ".trees");
+//			List<SimpleRootedTree> tree = new ArrayList<SimpleRootedTree>();
+//			tree.add(prunedTrees.get(i));
+//			writer.writeTrees(tree);
+//		}
 		
 		
 		System.out.print("Final Pruned taxa: ");

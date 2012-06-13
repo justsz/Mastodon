@@ -14,6 +14,7 @@ import java.util.Scanner;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 
 import algorithms.*;
 import core.*;
@@ -59,7 +60,7 @@ public class Main {
 		System.out.println("----");
 		System.out.println("Loading trees...");
 		int treeCounter = 0;
-		List<MutableRootedTree> trees;		
+		List<SimpleRootedTree> trees;		
 		do {
 			trees = reader.read100Trees();
 			bts.addTrees(trees);

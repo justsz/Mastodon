@@ -133,8 +133,8 @@ public class TreeReader {
 	 * @throws IOException
 	 * @throws ImportException
 	 */
-	public List<MutableRootedTree> read100Trees() throws IOException, ImportException {
-		List<MutableRootedTree> trees = new ArrayList<MutableRootedTree>();
+	public List<SimpleRootedTree> read100Trees() throws IOException, ImportException {
+		List<SimpleRootedTree> trees = new ArrayList<SimpleRootedTree>();
 		Tree tree;
 
 		if(!imp.hasTree()) {	//in case number of trees is an integer multiple of 100
@@ -143,7 +143,8 @@ public class TreeReader {
 			int counter = 100;
 			while (imp.hasTree() && counter > 0) {
 				tree = imp.importNextTree();
-				trees.add(new MutableRootedTree((RootedTree) tree));
+				//trees.add(new MutableRootedTree((RootedTree) tree));
+				trees.add((SimpleRootedTree) tree);
 				counter--;
 			}
 		}
