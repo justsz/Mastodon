@@ -211,38 +211,50 @@ public class MHBitAlgorithm implements Algorithm{
 		}
 		return output;
 	}
-	
+
 
 	public List<SimpleRootedTree> getOutputTrees() {
 		//might need to change the interface for this one
 		List<BitSet> filters = bts.prune(taxa.keySet().iterator().next());
 		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
-			SimpleRootedTree tr = bts.reconstructTree(bitTree);
+			SimpleRootedTree tr = bts.reconstructTree(bitTree, null);
 			trs.add(tr);
 		}
 		bts.unPrune(filters);
 		return trs;
 	}
-	
+
 	public Map<ArrayList<Taxon>, float[]> getTaxa() {
 		Map<ArrayList<Taxon>, float[]> output = new HashMap<ArrayList<Taxon>, float[]>();
-		
+
 		Object[] keys = taxa.keySet().toArray();
 		for(int i = 0; i < keys.length; i ++) {
 			output.put((ArrayList<Taxon>) bts.getTaxa((BitSet) keys[i]), taxa.get(keys[i]));
 		}
-		
+
 		return output;
 	}
-	
+
 	public List<SimpleRootedTree> getPrunedMapTrees() {
 		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
+		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+		trs.add(bts.reconstructTree(mapTree, null));
 		for(BitSet bs : taxa.keySet()) {
-			BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+			mapTree = bitTrees.get(mapTreeIndex).clone();
 			mapTree.pruneTree(bs);
-			trs.add(bts.reconstructTree(mapTree));
+			trs.add(bts.reconstructTree(mapTree, null));
 		}				
 		return trs;
 	}
+
+	public List<SimpleRootedTree> getHighlightedPrunedMapTrees() {
+		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
+		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+		for(BitSet bs : taxa.keySet()) {
+			trs.add(bts.reconstructTree(mapTree, bs));
+		}
+		return trs;
+	}
+
 }

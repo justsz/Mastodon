@@ -1,5 +1,6 @@
 package core;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -92,22 +93,22 @@ public class BitTreeSystem {
 	 * @return list of BitSet representation of trees
 	 */
 	//Deprecated
-//	public List<BitTree> makeBits() {
-//		List<BitTree> bitTrees = new ArrayList<BitTree>(treeCount);
-//		for(RootedTree tree : trees) {
-//			addClades(tree, tree.getRootNode());
-//			float weight;
-//			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
-//				weight = (Float) tree.getAttribute("weight");
-//			} else {
-//				weight = 1.0f / treeCount;
-//			}
-//			bitTrees.add(new BitTree(bitTree, weight));
-//			newTree = false;
-//		}
-//		this.bitTrees = bitTrees;
-//		return bitTrees;
-//	}
+	//	public List<BitTree> makeBits() {
+	//		List<BitTree> bitTrees = new ArrayList<BitTree>(treeCount);
+	//		for(RootedTree tree : trees) {
+	//			addClades(tree, tree.getRootNode());
+	//			float weight;
+	//			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
+	//				weight = (Float) tree.getAttribute("weight");
+	//			} else {
+	//				weight = 1.0f / treeCount;
+	//			}
+	//			bitTrees.add(new BitTree(bitTree, weight));
+	//			newTree = false;
+	//		}
+	//		this.bitTrees = bitTrees;
+	//		return bitTrees;
+	//	}
 
 	/**
 	 * Recursively traverses a tree to extract all unique clades.
@@ -276,7 +277,7 @@ public class BitTreeSystem {
 	 * @param bitSets - list of all the clades that make up the tree
 	 * @return reconstructed tree object
 	 */
-	public SimpleRootedTree reconstructTree(BitTree bitTree) {
+	public SimpleRootedTree reconstructTree(BitTree bitTree, BitSet highlights) {
 		//Pay attention to order and size of all the various Lists.
 
 		//sort bitSets in ascending cardinality(number of bits set)
@@ -296,7 +297,7 @@ public class BitTreeSystem {
 		Node[] externalNodes = new Node[taxaA.length];
 
 
-		// !!! Problems arise in writer if there is a tree with a different sent of taxa in it.
+		// !!! Problems arise in writer if there is a tree with a different set of taxa in it.
 
 		//build the tree from bottom up
 		//first create all tips
@@ -323,6 +324,20 @@ public class BitTreeSystem {
 			internalNodes[i] = tree.createInternalNode(nodes);
 		}
 		tree.setAttribute("W", bitTree.getWeight());	//should the attribute be named W or weight?
+
+		if (highlights != null) {
+			for(Node node : getNodes(externalNodes, highlights)) {
+				Color color = Color.red;
+				node.setAttribute("!color", color);
+				//begin code to highlight the path from the tip to root
+				Node parent = tree.getParent(node);
+				while(parent != null) {
+					parent.setAttribute("!color", color);
+					parent = tree.getParent(parent);
+				}
+			}
+		}
+
 		return tree;
 	}
 

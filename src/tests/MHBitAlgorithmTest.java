@@ -28,11 +28,11 @@ public class MHBitAlgorithmTest {
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
-												"simple.trees";
+//												"simple.trees";
 				//				"carnivores.trprobs";
 //								"snowflake-48d.trees";
 //								"carnivores_edited.trprobs";
-//				"carnivores5k.trprobs";
+				"carnivores1k.trprobs";
 
 		TreeReader reader = new TreeReader(test);
 		BitTreeSystem bts = new BitTreeSystem();
@@ -63,6 +63,12 @@ public class MHBitAlgorithmTest {
 //			tree.add(prunedTrees.get(i));
 //			writer.writeTrees(tree);
 //		}
+		
+		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
+		NexusWriter writer = new NexusWriter("Highlighted.trees");
+		writer.writeTrees(prunedTrees);
+		
+		
 		
 		
 		System.out.print("Final Pruned taxa: ");
