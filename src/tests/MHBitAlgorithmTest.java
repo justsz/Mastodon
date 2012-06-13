@@ -4,6 +4,7 @@
 package tests;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import algorithms.MHAlgorithm;
@@ -26,9 +27,9 @@ public class MHBitAlgorithmTest {
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
-//												"simple.trees";
+												"simple.trees";
 				//				"carnivores.trprobs";
-								"snowflake-48d.trees";
+//								"snowflake-48d.trees";
 //								"carnivores_edited.trprobs";
 //				"carnivores1k.trprobs";
 
@@ -50,12 +51,19 @@ public class MHBitAlgorithmTest {
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.5f, 10, 10000);
+		mh.setLimits(0.97f, 3, 10000);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
-		//NexusWriter writer = new NexusWriter("MHed.trees");
-		//writer.writeTrees(mh.getOutputTrees());
+		List<MutableRootedTree> prunedTrees = mh.getPrunedMapTrees();
+		for(int i = 0; i < prunedTrees.size(); i++) {
+			NexusWriter writer = new NexusWriter("MHed" + i + ".trees");
+			List<MutableRootedTree> tree = new ArrayList<MutableRootedTree>();
+			tree.add(prunedTrees.get(i));
+			writer.writeTrees(tree);
+		}
+		
+		
 		System.out.print("Final Pruned taxa: ");
 		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
 			for (Taxon taxon : taxaList) {

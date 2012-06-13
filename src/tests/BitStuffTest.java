@@ -33,11 +33,12 @@ public class BitStuffTest {
 		List<MutableRootedTree> trees = reader.readMutableRootedTrees();
 		
 
-		BitTreeSystem bs = new BitTreeSystem(trees);
+		BitTreeSystem bs = new BitTreeSystem();
+		bs.addTrees(trees);
 		Map<BitSet, Integer> clades = bs.getClades();
 		
 
-		List<BitTree> bitTrees = bs.makeBits();
+		List<BitTree> bitTrees = bs.getBitTrees();
 		System.out.println(clades);
 
 		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();

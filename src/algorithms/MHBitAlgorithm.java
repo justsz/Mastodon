@@ -30,6 +30,7 @@ public class MHBitAlgorithm implements Algorithm{
 	float tolerance;
 	int maxPrunedSpeciesCount;
 	int totalIterations;
+	int mapTreeIndex;
 
 	public void setTrees(BitTreeSystem bts, List<BitTree> bitTrees) {
 		this.bts = bts;
@@ -46,7 +47,7 @@ public class MHBitAlgorithm implements Algorithm{
 	public void run() {
 		BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
 
-		int mapTreeIndex = bts.getMapTreeIndex();
+		mapTreeIndex = bts.getMapTreeIndex();
 		float[] notPrunedScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 
 		System.out.println("Map tree: " + mapTreeIndex);
@@ -225,7 +226,6 @@ public class MHBitAlgorithm implements Algorithm{
 	}
 	
 	public Map<ArrayList<Taxon>, float[]> getTaxa() {
-		ArrayList<Taxon> names = new ArrayList<Taxon>();
 		Map<ArrayList<Taxon>, float[]> output = new HashMap<ArrayList<Taxon>, float[]>();
 		
 		Object[] keys = taxa.keySet().toArray();
@@ -234,5 +234,15 @@ public class MHBitAlgorithm implements Algorithm{
 		}
 		
 		return output;
+	}
+	
+	public List<MutableRootedTree> getPrunedMapTrees() {
+		List<MutableRootedTree> trs = new ArrayList<MutableRootedTree>();
+		for(BitSet bs : taxa.keySet()) {
+			BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+			mapTree.pruneTree(bs);
+			trs.add(bts.reconstructTree(mapTree));
+		}				
+		return trs;
 	}
 }

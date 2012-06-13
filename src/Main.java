@@ -51,13 +51,13 @@ public class Main {
 				reader.setFile(fileName);
 				inputOk = true;
 			} catch (IOException e) {
-				System.out.println("File not found.");
+				System.out.println("File not found. Try again.");
 				inputOk = false;
 			}
 		}
 
-
-		System.out.println("Processing trees...");
+		System.out.println("----");
+		System.out.println("Loading trees...");
 		int treeCounter = 0;
 		List<MutableRootedTree> trees;		
 		do {
@@ -68,7 +68,6 @@ public class Main {
 				System.out.println(treeCounter + "..");
 		} while (trees.size() == 100);
 		trees = null;
-		System.out.println("Processing done.");
 		System.out.println("----");
 
 		System.out.println("Found " + bts.getBitTrees().size() + " trees with " + bts.getTaxaCount() + " unique taxa.");
@@ -88,30 +87,30 @@ public class Main {
 					minScore = Float.parseFloat(input);
 
 					if(minScore < 0.0 || minScore > 1.0) {
-						System.out.println("Invalid range.");
+						System.out.println("Invalid range. Try again.");
 					} else {
 						inputOk = true;
 					}
 				} catch (Exception e) {
-					System.out.println("Invalid input. Decimal required.");
+					System.out.println("Invalid input. Decimal required. Try again.");
 				}
 			}
 
 
 			inputOk = false;
-			System.out.println("Maximum number of taxa to prune (1 - all taxa): ");
+			System.out.println("Maximum number of taxa to prune (1 - " + bts.getTaxaCount() + "): ");
 			while (!inputOk) {
 				try {
 					String input = scanner.nextLine();
 					maxPrune = Integer.parseInt(input);
 
 					if(maxPrune < 1 || maxPrune > bts.getTaxaCount()) {
-						System.out.println("Invalid range.");
+						System.out.println("Invalid range. Try again.");
 					} else {
 						inputOk = true;
 					}
 				} catch (Exception e) {
-					System.out.println("Invalid input. Decimal required.");
+					System.out.println("Invalid input. Decimal required. Try again.");
 				}
 			}
 
@@ -124,12 +123,12 @@ public class Main {
 					maxIterations = Integer.parseInt(input);
 
 					if(maxIterations < 1) {
-						System.out.println("Invalid range.");
+						System.out.println("Invalid range. Try again.");
 					} else {
 						inputOk = true;
 					}
 				} catch (Exception e) {
-					System.out.println("Invalid input. Decimal required.");
+					System.out.println("Invalid input. Decimal required. Try again.");
 				}
 			}
 
@@ -151,6 +150,7 @@ public class Main {
 			}
 
 			out.close();
+			System.out.println("Output saved as run" + runCounter + ".txt");
 
 			System.out.println("Would you like to run the algothim again? y/n : ");
 			inputOk = false;
@@ -164,11 +164,6 @@ public class Main {
 					inputOk = true;
 				}
 			}
-
 		}
-
-
-
 	}
-
 }
