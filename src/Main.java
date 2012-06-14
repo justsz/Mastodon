@@ -6,19 +6,16 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.MutableRootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
 import algorithms.*;
 import core.*;
-import scoreCalculators.*;
 /**
  * @author justs
  *
@@ -35,7 +32,7 @@ public class Main {
 		TreeReader reader = new TreeReader();
 		BitTreeSystem bts = new BitTreeSystem();
 		MHBitAlgorithm algorithm = new MHBitAlgorithm();
-		boolean inputOk = false;
+		boolean inputOk = false;	//used in input-validation loops
 		float minScore = 0;
 		int maxPrune = 0;
 		int maxIterations = 0;
@@ -43,9 +40,8 @@ public class Main {
 
 		System.out.println("Welcome to MASTadon.");
 		System.out.println("----");
+		
 		System.out.print("Please input filename for tree set: ");
-
-
 		while (!inputOk) {
 			String fileName = scanner.nextLine();
 			try {
@@ -56,8 +52,8 @@ public class Main {
 				inputOk = false;
 			}
 		}
-
 		System.out.println("----");
+		
 		System.out.println("Loading trees...");
 		int treeCounter = 0;
 		List<SimpleRootedTree> trees;		
@@ -70,13 +66,11 @@ public class Main {
 		} while (trees.size() == 100);
 		trees = null;
 		System.out.println("----");
-
 		System.out.println("Found " + bts.getBitTrees().size() + " trees with " + bts.getTaxaCount() + " unique taxa.");
-
 
 		System.out.println("Please input the following parameters:");
 
-		boolean anotherRun = true;
+		boolean anotherRun = true;	//used to let the user do multiple runs with same data set
 		int runCounter = 0;
 		while(anotherRun) {
 			runCounter++;
@@ -151,9 +145,14 @@ public class Main {
 			}
 
 			out.close();
-			System.out.println("Output saved as run" + runCounter + ".txt");
+			
+			List<SimpleRootedTree> prunedTrees = algorithm.getHighlightedPrunedMapTrees();
+			NexusWriter writer = new NexusWriter("prunedTrees" + runCounter + ".trees");
+			writer.writeTrees(prunedTrees);
+			
+			System.out.println("Output saved as run" + runCounter + ".txt and prunedTrees" + runCounter + ".trees");
 
-			System.out.println("Would you like to run the algothim again? y/n : ");
+			System.out.println("Would you like to run the algorithm again? y/n : ");
 			inputOk = false;
 			while (!inputOk) {
 				String choice = scanner.nextLine();

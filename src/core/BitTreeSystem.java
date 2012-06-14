@@ -51,6 +51,13 @@ public class BitTreeSystem {
 		//			taxa.addAll(tree.getTaxa());
 		//		}
 	}
+	
+	/**
+	 * Converts the input RootedTrees to BitTrees.
+	 * Creates a central Map of all unique clades and their frequencies of appearance in the set of trees. Returns a List of Lists of BitSets that are linked to the central 
+	 * Map of clades and represent the tree set.
+	 * @param trees - trees to convert
+	 */
 
 	public void addTrees(List<? extends RootedTree> trees) {
 		//need to do this for every tree? Can it be assumed that all trees have the same taxa list?
@@ -59,7 +66,10 @@ public class BitTreeSystem {
 		}
 
 		for(RootedTree tree : trees) {
+			double start = System.currentTimeMillis();
 			addClades(tree, tree.getRootNode());
+			System.out.print (System.currentTimeMillis() - start);
+			System.out.println("\t" + clades.size());
 			float weight = -1;	//signifies unweighted tree
 			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
 				if(!weighted) {
@@ -77,38 +87,21 @@ public class BitTreeSystem {
 			}
 			bitTrees.add(new BitTree(bitTree, weight));
 			newTree = false;
+			
 		}
 
 		treeCount += trees.size();
 	}
-
+	
+	/**
+	 * Returns the list of BitTrees in this system.
+	 * @return list of stored BitTrees
+	 */
 	public List<BitTree> getBitTrees() {
 		//System.out.println("treeCount=" + treeCount + "\tbitTrees=" + bitTrees.size() + "\ttaxaCount=" + taxa.size());
 		return bitTrees;
 	}
 
-	/**
-	 * Creates a central Map of all unique clades and their frequencies of appearance in the set of trees. Returns a List of Lists of BitSets that are linked to the central 
-	 * Map of clades and represent the tree set.
-	 * @return list of BitSet representation of trees
-	 */
-	//Deprecated
-	//	public List<BitTree> makeBits() {
-	//		List<BitTree> bitTrees = new ArrayList<BitTree>(treeCount);
-	//		for(RootedTree tree : trees) {
-	//			addClades(tree, tree.getRootNode());
-	//			float weight;
-	//			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
-	//				weight = (Float) tree.getAttribute("weight");
-	//			} else {
-	//				weight = 1.0f / treeCount;
-	//			}
-	//			bitTrees.add(new BitTree(bitTree, weight));
-	//			newTree = false;
-	//		}
-	//		this.bitTrees = bitTrees;
-	//		return bitTrees;
-	//	}
 
 	/**
 	 * Recursively traverses a tree to extract all unique clades.
@@ -149,6 +142,7 @@ public class BitTreeSystem {
 			newTree = true;
 		}
 
+//		double start = System.currentTimeMillis();
 		Integer bset = clades.get(bits);
 		if (bset == null) {
 			clades.put(bits, 1);
@@ -158,10 +152,13 @@ public class BitTreeSystem {
 
 		//this makes sure all trees' clades are referenced to the central list of unique clades
 		for(BitSet s : clades.keySet()) {
-			if(s.equals((BitSet)(bits))) {
+			if(s.equals(bits)) {	//removed a cast to BitSet on bits. Check it didn't break anything.
 				bitTree.add(s);
 			}
 		}
+//		double timer = System.currentTimeMillis() - start;
+//		if (timer > 3)
+//		System.out.println(timer);
 	}
 
 	/**
@@ -250,6 +247,10 @@ public class BitTreeSystem {
 		return clades;
 	}
 
+	/**
+	 * Returns the number of unique taxa in this system.
+	 * @return number of unique taxa in system
+	 */
 	public int getTaxaCount() {
 		return taxa.size();
 	}
@@ -273,8 +274,9 @@ public class BitTreeSystem {
 
 
 	/**
-	 * Reconstructs a tree from a list of all clades of the tree. Must be called from the same BitStuff object that created the BitTree representation in the first place.
-	 * @param bitSets - list of all the clades that make up the tree
+	 * Reconstructs a RootedTree from a BitTree. Must be called from the same BitTreeSystem object that created the BitTree representation in the first place.
+	 * @param bitTree - BitTree to reconstruct
+	 * @param highlights - leaves that should be colored
 	 * @return reconstructed tree object
 	 */
 	public SimpleRootedTree reconstructTree(BitTree bitTree, BitSet highlights) {
@@ -293,7 +295,7 @@ public class BitTreeSystem {
 		SimpleRootedTree tree = new SimpleRootedTree();
 		//BitSet of all taxa in this tree, not necessarily in all trees
 		BitSet allTaxa = bitSets.get(bitSets.size()-1);
-		int numberOfTaxaInTree = allTaxa.cardinality();
+		//int numberOfTaxaInTree = allTaxa.cardinality();
 		Node[] externalNodes = new Node[taxaA.length];
 
 
@@ -329,7 +331,7 @@ public class BitTreeSystem {
 			for(Node node : getNodes(externalNodes, highlights)) {
 				Color color = Color.red;
 				node.setAttribute("!color", color);
-				//begin code to highlight the path from the tip to root
+				//begin code for highlighting the path from the tip to root
 				Node parent = tree.getParent(node);
 				while(parent != null) {
 					parent.setAttribute("!color", color);
@@ -348,24 +350,15 @@ public class BitTreeSystem {
 	 * @return List of filters used in pruning. Pass to unPrune to undo pruning.
 	 */
 	public List<BitSet> prune(BitSet a){
-		///Need to deal with clades that become equal to existing ones(add up frequency)
+		//Might have to deal with clades that become equal to existing ones(add up frequency)
 
 		List<BitSet> filters = new ArrayList<BitSet>();
 		for(BitSet key : clades.keySet()) {
 
-			//int val = clades.get(key);
 			BitSet filter = (BitSet) a.clone();
 			filter.and(key);
 			filters.add(filter);
-			key.xor(filter);	//for some reason it also works with a simple XOR, with out the AND; but then the clades are misleading...
-
-
-			//BitSet rep = key.xor(a);
-			//if (clades.get(key) != null) {
-			//	val += clades.get(key);
-			//}
-
-			//clades.put(key, val);
+			key.xor(filter);	
 		}
 
 

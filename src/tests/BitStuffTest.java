@@ -43,7 +43,7 @@ public class BitStuffTest {
 
 		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
-			SimpleRootedTree tr = bs.reconstructTree(bitTree);
+			SimpleRootedTree tr = bs.reconstructTree(bitTree, null);
 			trs.add(tr);
 		}
 
@@ -78,7 +78,7 @@ public class BitStuffTest {
 		
 		trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
-			SimpleRootedTree tr = bs.reconstructTree(bitTree);
+			SimpleRootedTree tr = bs.reconstructTree(bitTree, null);
 			trs.add(tr);
 		}
 

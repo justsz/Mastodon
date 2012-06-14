@@ -3,10 +3,8 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.util.ArithmeticUtils;
@@ -19,8 +17,8 @@ import core.*;
 import jebl.math.Random;
 
 /**
+ * A BitTree implementation of a Metropolis-Hastings (MH) algorithm for pruning trees.
  * @author justs
- *
  */
 public class MHBitAlgorithm implements Algorithm{
 
@@ -65,7 +63,7 @@ public class MHBitAlgorithm implements Algorithm{
 		/////////////
 
 		BitSet toPrune = new BitSet();
-		//I think I want to allow picking the same combination of Taxa!
+		//I think I want to allow picking the same combination of Taxa.
 		//List<ArrayList<Taxon>> triedCombinations = new ArrayList<ArrayList<Taxon>>();
 
 		for(int e = 0; e < prunedSpeciesCount; e++) {
@@ -81,10 +79,6 @@ public class MHBitAlgorithm implements Algorithm{
 		BitSet bestChoice = (BitSet) toPrune.clone();
 
 
-		//		System.out.print("pruning: ");
-		//		System.out.println(toPrune);
-		//		System.out.println();
-
 		List<BitSet> filters = bts.prune(toPrune);
 		float[] bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 		bts.unPrune(filters);
@@ -96,6 +90,7 @@ public class MHBitAlgorithm implements Algorithm{
 		/////////////
 		boolean repeat = true;
 
+		//choose how many iterations to allocate to each "round" of pruning
 		double[] iterations = new double[maxPrunedSpeciesCount];
 		for(int i = 0; i < maxPrunedSpeciesCount; i++) {
 			iterations[i] = ArithmeticUtils.binomialCoefficientLog(taxaCount, i+1);
@@ -104,7 +99,6 @@ public class MHBitAlgorithm implements Algorithm{
 		for (double d : iterations) {
 			sum += d;
 		}
-
 
 		if ((iterations[0] / sum * totalIterations) > taxaCount) {
 			iterations[0] = taxaCount;		 
@@ -130,6 +124,7 @@ public class MHBitAlgorithm implements Algorithm{
 
 
 				if(prunedSpeciesCount == 1 && iterations[0] == taxaCount) {
+					//just prune each taxon in turn
 					toPrune.clear();
 					toPrune.set(i);					
 				} else {
@@ -166,18 +161,13 @@ public class MHBitAlgorithm implements Algorithm{
 				}
 
 
-				//				System.out.print("pruning: ");
-				//				System.out.println(toPrune);
-				//				System.out.println();
-
-
 				filters = bts.prune(toPrune);
 				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 				bts.unPrune(filters);
 
 
 
-				if (score[0] > maxScore[0]) {	//new optimum
+				if (score[0] > maxScore[0]) {	//set new optimum
 					maxScore = score;
 					maxTaxa.clear();
 					maxTaxa.put((BitSet) toPrune.clone(), score);
@@ -186,13 +176,9 @@ public class MHBitAlgorithm implements Algorithm{
 				}
 
 				if (score[0]/bestScore[0] > Random.nextFloat()) {
-					//					System.out.println("Accepted.");
 					bestChoice = toPrune; 
 					bestScore = score;
-				} else {
-					//do nothing
-				}
-
+				} //try different pruning otherwise
 			}
 			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {

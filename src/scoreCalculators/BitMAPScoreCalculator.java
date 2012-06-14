@@ -1,23 +1,26 @@
 
 package scoreCalculators;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
+import java.util.List;
 import core.BitTree;
 
-import jebl.evolution.trees.RootedTreeUtils;
-import jebl.evolution.trees.RootedTree;
 
 /**
+ * Used to calculate the MAP score of a given tree with respect to all trees in set.
  * @author justs
  *
  */
 public class BitMAPScoreCalculator {
 
+	/**
+	 * Calculates the map score and number of matching trees. 
+	 * Weighted trees: adds up the weights for trees matching the map tree.
+	 * Un-weighted trees: assumes all trees are of equal probability and does as for weighted.
+	 * @param MAPTree - tree which to score
+	 * @param trees - all trees to compare against
+	 * @return {map score, numbers of trees matched}
+	 */
 	public float[] getMAPScore(BitTree MAPTree, List<BitTree> trees) {
 		float[] result = new float[2];
 		float sum = 0;

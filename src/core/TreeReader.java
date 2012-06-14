@@ -128,8 +128,8 @@ public class TreeReader {
 
 
 	/**
-	 * Reads the next 100 trees in the file file and converts to a list of MutableRootedTree objects.
-	 * @return list of MutableRootedTree objects
+	 * Reads the next 100 trees in the file file and converts to a list of SimpleRootedTree objects.
+	 * @return list of SimpleRootedTree objects
 	 * @throws IOException
 	 * @throws ImportException
 	 */
@@ -151,12 +151,19 @@ public class TreeReader {
 		return trees;
 	}
 	
-	public MutableRootedTree getTree(int index) throws IOException, ImportException {
+	/**
+	 * Reads in only the tree at the specified position in the file.
+	 * @param index - position of desired tree in file
+	 * @return the tree at index
+	 * @throws IOException
+	 * @throws ImportException
+	 */
+	public SimpleRootedTree getTree(int index) throws IOException, ImportException {
 		reset();
-		MutableRootedTree tree = new MutableRootedTree((RootedTree) imp.importNextTree());
+		SimpleRootedTree tree = (SimpleRootedTree) imp.importNextTree();
 		while (index > 0) {
 			//this can give null pointer exception if you give index too large. 
-			tree = new MutableRootedTree((RootedTree) imp.importNextTree());
+			tree = (SimpleRootedTree) imp.importNextTree();
 			index--;
 		}
 		return tree;
