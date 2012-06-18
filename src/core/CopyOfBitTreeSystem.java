@@ -26,10 +26,10 @@ import jebl.evolution.trees.RootedTree;
  * @author justs
  *
  */
-public class BitTreeSystem {
+public class CopyOfBitTreeSystem {
 	//	private List<? extends RootedTree> trees;
 	private Set<Taxon> taxa;	//Set of all unique taxa
-	private Map<BitSet, Clade> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
+	private Map<BitSet, Integer> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
 	private boolean newTree = false;	//used to mark the beginning of a new tree during the search for unique clades
 	private List<BitSet> bitTree;	//temporary storage for BitSet representation of individual trees
 	private List<BitTree> bitTrees;
@@ -40,11 +40,11 @@ public class BitTreeSystem {
 	/**
 	 * Object will hold all information about the set of trees needed for their analysis.
 	 */
-	public BitTreeSystem() {
+	public CopyOfBitTreeSystem() {
 		treeCount = 0;
 		weighted = true;
 		this.taxa = new LinkedHashSet<Taxon>();
-		this.clades = new HashMap<BitSet, Clade>();
+		this.clades = new HashMap<BitSet, Integer>();
 		this.bitTrees = new ArrayList<BitTree>();
 
 		//construct full set of taxa
@@ -52,7 +52,7 @@ public class BitTreeSystem {
 		//			taxa.addAll(tree.getTaxa());
 		//		}
 	}
-
+	
 	/**
 	 * Converts the input RootedTrees to BitTrees.
 	 * Creates a central Map of all unique clades and their frequencies of appearance in the set of trees. Returns a List of Lists of BitSets that are linked to the central 
@@ -67,7 +67,10 @@ public class BitTreeSystem {
 		}
 
 		for(RootedTree tree : trees) {
+			//double start = System.currentTimeMillis();
 			addClades(tree, tree.getRootNode());
+			//System.out.print (System.currentTimeMillis() - start);
+			//System.out.println("\t" + clades.size());
 			float weight = -1;	//signifies unweighted tree
 			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
 				if(!weighted) {
@@ -83,17 +86,14 @@ public class BitTreeSystem {
 				}
 				weighted = false;
 			}
-			BitTree tr = new BitTree(bitTree, weight);
-			tr.order();
-			//bitTrees.add(new BitTree(bitTree, weight));
-			bitTrees.add(tr);
+			bitTrees.add(new BitTree(bitTree, weight));
 			newTree = false;
-
+			
 		}
 
 		treeCount += trees.size();
 	}
-
+	
 	/**
 	 * Returns the list of BitTrees in this system.
 	 * @return list of stored BitTrees
@@ -143,15 +143,36 @@ public class BitTreeSystem {
 			newTree = true;
 		}
 
-		Clade bset = clades.get(bits);
+//		double start = System.currentTimeMillis();
+		Integer bset = clades.get(bits);
 		if (bset == null) {
-			//this cloning is still up for debate. Might change depending on how other features will be implemented
-			clades.put(bits, new Clade((BitSet) bits.clone()));
+//		if (!clades.containsKey(bits)) {
+			clades.put(bits, 1);
 		} else {
-			bset.incrementCount();
+			clades.put(bits, clades.get(bits) + 1);
 		}
 
-		bitTree.add(clades.get(bits).getCladeBits());
+		
+//		for(BitSet s : clades.keySet()) {
+//			if(s.equals(bits)) {	//removed a cast to BitSet on bits. Check it didn't break anything.
+//				bitTree.add(s);
+//				break;
+//			}
+//		}
+		
+		//this makes sure all trees' clades are referenced to the central list of unique clades
+		for (Map.Entry<BitSet, Integer> entry : clades.entrySet()) {
+			if(entry.getKey().equals(bits)) {
+				bitTree.add(entry.getKey());
+				break;
+			}
+        }
+		
+		
+//		bitTree.add(bits);
+//		double timer = System.currentTimeMillis() - start;
+//		if (timer > 3)
+//		System.out.println(timer);
 	}
 
 	/**
@@ -169,17 +190,17 @@ public class BitTreeSystem {
 					index = i;
 				}
 			}
-		} 
-		else {
+		} else {
 
 			long[] scores = new long[treeCount];
 			for(int i = 0; i < scores.length; i++) {
 				long score = 0;
 				BitTree tree = bitTrees.get(i);
-				for(BitSet bs : tree.getBits()) {
-					Clade clade = clades.get(bs);
-					if (clade != null) {
-						score += clade.getFrequency();
+				for(BitSet bs1 : tree.getBits()) {
+					for(Map.Entry<BitSet, Integer> bs2 : clades.entrySet()) {
+						if (bs1.equals(bs2.getKey())) {
+							score += bs2.getValue();
+						}
 					}
 				}
 				scores[i] = score;
@@ -236,7 +257,7 @@ public class BitTreeSystem {
 	 * Returns Map of all unique clades in set of trees.
 	 * @return Map of all unique clades in set of trees.
 	 */
-	public Map<BitSet, Clade> getClades() {
+	public Map<BitSet, Integer> getClades() {
 		return clades;
 	}
 
@@ -325,11 +346,11 @@ public class BitTreeSystem {
 				Color color = Color.red;
 				node.setAttribute("!color", color);
 				//begin code for highlighting the path from the tip to root
-				//				Node parent = tree.getParent(node);
-				//				while(parent != null) {
-				//					parent.setAttribute("!color", color);
-				//					parent = tree.getParent(parent);
-				//				}
+				Node parent = tree.getParent(node);
+				while(parent != null) {
+					parent.setAttribute("!color", color);
+					parent = tree.getParent(parent);
+				}
 			}
 		}
 
@@ -339,26 +360,29 @@ public class BitTreeSystem {
 
 	/**
 	 * Prune the taxa flagged in the input BitSet in set of all trees 
-	 * @param pruner - taxa to prune
+	 * @param a - taxa to prune
 	 * @return List of filters used in pruning. Pass to unPrune to undo pruning.
 	 */
-	public Map<BitSet, BitSet> prune(BitSet pruner){
+	public List<BitSet> prune(BitSet a){
 		//Might have to deal with clades that become equal to existing ones(add up frequency)
 
-		//List<BitSet> filters = new ArrayList<BitSet>();
-		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
-
-
-
-		for (Map.Entry<BitSet, Clade> entry : clades.entrySet()) {
-			BitSet cladeBits = entry.getValue().getCladeBits();
-			if(cladeBits.intersects(pruner)) {
-				BitSet filter = (BitSet) pruner.clone();
-				filter.and(cladeBits);
-				filters.put(entry.getKey(), filter);
-				cladeBits.xor(filter);
-			}
-		}
+		List<BitSet> filters = new ArrayList<BitSet>();
+//		for(BitSet key : clades.keySet()) {
+//			BitSet filter = (BitSet) a.clone();
+//			filter.and(key);
+//			filters.add(filter);
+//			key.xor(filter);	
+//		}
+		
+		
+		
+		for (Map.Entry<BitSet, Integer> entry : clades.entrySet()) {
+			BitSet key = entry.getKey();
+			BitSet filter = (BitSet) a.clone();
+			filter.and(key);
+			filters.add(filter);
+			key.xor(filter);
+        }
 
 
 		//
@@ -382,22 +406,17 @@ public class BitTreeSystem {
 
 	/**
 	 * UnPrune trees to previous state.
-	 * @param filters - list of filters used in original pruning of trees
+	 * @param a - list of filters used in original pruning of trees
 	 */
-	public void unPrune(Map<BitSet, BitSet> filters) {
-		//Object[] values = clades.values().toArray();
-		//		Iterator<BitSet> keys = clades.keySet().iterator();
-		//		for(int i = 0; i < filters.size(); i++) {
-		//			((Clade) values[i]).getCladeBits().xor(filters.get(i));
-		//		}
-
-		for(Map.Entry<BitSet, BitSet> filter : filters.entrySet()) {
-			clades.get(filter.getKey()).getCladeBits().xor(filter.getValue());
+	public void unPrune(List<BitSet> filters) {
+//		Object[] keys = clades.keySet().toArray();
+		Iterator<BitSet> keys = clades.keySet().iterator();
+//		for(int i = 0; i < keys.length; i++) {
+//			((BitSet) keys[i]).xor(filters.get(i));
+//		}
+		for(BitSet bs : filters) {
+			keys.next().xor(bs);
 		}
-
-		//		for(BitSet bs : filters) {
-		//			keys.next().xor(bs);
-		//		}
-
+		
 	}
 }

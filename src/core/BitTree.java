@@ -2,6 +2,8 @@ package core;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +41,32 @@ public class BitTree {
 	public float getWeight() {
 		return weight;
 	}
+
+	/**
+	 * NOT JAVADOCCED
+	 * 
+	 * 
+	 */
+	public void order() {
+		Comparator<BitSet> c = new Comparator<BitSet>() {
+			public int compare(BitSet b1, BitSet b2) {
+				//return ((Integer)b1.cardinality()).compareTo(b2.cardinality());
+				return ((Integer)b1.hashCode()).compareTo(b2.hashCode());
+			}
+		};
+
+		Collections.sort(treeClades, c);
+
+	}
+
+	//ascending cardinality
+	//	Comparator<BitSet> c = new Comparator<BitSet>() {
+	//		public int compare(BitSet b1, BitSet b2) {
+	//			return ((Integer)b1.cardinality()).compareTo(b2.cardinality());
+	//		}
+	//	};
+	//	List<BitSet> bitSets = bitTree.getBits();
+	//	Collections.sort(bitSets, c);
 
 	/**
 	 * Prune an individual tree. The called tree is modified.
@@ -109,7 +137,71 @@ public class BitTree {
 				}
 			}
 			output[i] = set1.equals(set2) ? true : false;
+			//			output[i] = set1.hashCode() == set2.hashCode() ? true : false;
 		}		
 		return output;		
+	}
+
+	public boolean[] equalsList2(List<BitTree> trees) {
+		boolean[] output = new boolean[trees.size()];
+
+		this.order();
+		for(int i = 0; i < trees.size(); i++) {
+			output[i] = this.equals2(trees.get(i));
+		}
+
+		return output;
+	}
+
+	public boolean equals2(BitTree tree) {
+		tree.order();
+
+		if (this == tree) {
+			//System.out.println("x");
+			return true;
+		} else {
+			//			for(BitSet bs1 : this.getBits()) {
+			//				if (bs1.cardinality() > 1)
+			//			}
+			int index1 = 0;
+			int index2 = 0;
+			List<BitSet> list1 = this.getBits();
+			List<BitSet> list2 = tree.getBits();
+
+			while (index1 < list1.size() && index2 < list2.size()) {
+				while (list1.get(index1).cardinality() < 2) {
+					index1++;
+					if (index1 == list1.size()) {
+						//System.out.println("a");
+						return false;
+					}
+				}
+				while (list2.get(index2).cardinality() < 2) {
+					index2++;
+					if (index2 == list2.size()) {
+						//System.out.println("b");
+						return false;
+					}
+				}
+				BitSet b1 = list1.get(index1);
+				BitSet b2 = list2.get(index2);
+
+				if (b1 == null || b2 == null) {
+					System.out.println("c");
+					return true;
+				} else {
+					if (b1.equals(b2)) {
+						index1++;
+						index2++;
+						//System.out.println("d");
+					} else {
+						//System.out.println("e");
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
 	}
 }

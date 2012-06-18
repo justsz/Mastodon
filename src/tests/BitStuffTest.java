@@ -35,7 +35,7 @@ public class BitStuffTest {
 
 		BitTreeSystem bs = new BitTreeSystem();
 		bs.addTrees(trees);
-		Map<BitSet, Integer> clades = bs.getClades();
+		Map<BitSet, Clade> clades = bs.getClades();
 		
 
 		List<BitTree> bitTrees = bs.getBitTrees();
@@ -64,7 +64,7 @@ public class BitStuffTest {
 		BitSet a = new BitSet();
 		a.set(0);
 		a.set(2);
-		List<BitSet> filters = bs.prune(a);
+		Map<BitSet, BitSet> filters = bs.prune(a);
 		System.out.println(clades);
 		bs.unPrune(filters);
 		System.out.println(clades);

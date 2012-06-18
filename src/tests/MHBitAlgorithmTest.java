@@ -28,12 +28,12 @@ public class MHBitAlgorithmTest {
 	 */
 	public static void main(String[] args) throws Throwable {
 		String test = 
-//				"simple.trees";
+				"simple.trees";
 //				"carnivores.trprobs";
 //				"snowflake-48d500.trees";
 //				"carnivores500.trprobs";
 //				"H3N2_1441_tips.500.trees";
-				"H3N2_1968-2011.338_tips.10K.trees";
+//				"H3N2_1968-2011.338_tips.500.trees";
 
 		TreeReader reader = new TreeReader(test);
 		BitTreeSystem bts = new BitTreeSystem();
@@ -54,7 +54,7 @@ public class MHBitAlgorithmTest {
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.90f, 10, 10000);
+		mh.setLimits(0.97f, 3, 10000);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 

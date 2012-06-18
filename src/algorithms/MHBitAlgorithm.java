@@ -49,7 +49,7 @@ public class MHBitAlgorithm implements Algorithm{
 		float[] notPrunedScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 
 		System.out.println("Map tree: " + mapTreeIndex);
-		int prunedSpeciesCount = 1;
+		int prunedSpeciesCount = 2;
 
 		float[] maxScore = {0, 0};
 		Map<BitSet, float[]> maxTaxa = new HashMap<BitSet, float[]>();
@@ -78,10 +78,30 @@ public class MHBitAlgorithm implements Algorithm{
 		//triedCombinations.add((ArrayList<Taxon>) toPrune);
 		BitSet bestChoice = (BitSet) toPrune.clone();
 
+		for (BitTree bt : bts.getBitTrees()) {
+			for (BitSet bs : bt.getBits()) {
+				System.out.println(bs);
+			}
+			System.out.println("----");
+		}
 
-		List<BitSet> filters = bts.prune(toPrune);
-		float[] bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
+		//double star = System.currentTimeMillis();
+		Map<BitSet, BitSet> filters = bts.prune(toPrune);
+		for (BitTree bt : bts.getBitTrees()) {
+			for (BitSet bs : bt.getBits()) {
+				System.out.println(bs);
+			}
+			System.out.println("----");
+		}
+		//System.out.println(System.currentTimeMillis() - star);
+		//star = System.currentTimeMillis();
+		float[] bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
+		System.out.println(bestScore[1]);
+		//System.out.println(System.currentTimeMillis() - star);
+		//star = System.currentTimeMillis();
 		bts.unPrune(filters);
+		//System.out.println(System.currentTimeMillis() - star);
+		
 
 		maxTaxa.put(bestChoice, bestScore);
 
@@ -201,7 +221,7 @@ public class MHBitAlgorithm implements Algorithm{
 
 	public List<SimpleRootedTree> getOutputTrees() {
 		//might need to change the interface for this one
-		List<BitSet> filters = bts.prune(taxa.keySet().iterator().next());
+		Map<BitSet, BitSet> filters = bts.prune(taxa.keySet().iterator().next());
 		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
 		for(BitTree bitTree : bitTrees) {
 			SimpleRootedTree tr = bts.reconstructTree(bitTree, null);
