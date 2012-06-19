@@ -1,3 +1,4 @@
+package entryPoints;
 /**
  * 
  */
@@ -20,7 +21,7 @@ import core.*;
  * @author justs
  *
  */
-public class Main {
+public class MainInteractive {
 
 	/**
 	 * @param args

@@ -1,3 +1,4 @@
+package entryPoints;
 /**
  * 
  */
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+
 
 import org.apache.commons.cli.*;
 
@@ -99,10 +100,6 @@ public class MainCLI {
 			System.out.println("Invalid MAP score. Decimal required.");
 			System.exit(1);
 		}
-
-
-
-
 
 
 		try {

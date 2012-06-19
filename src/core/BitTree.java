@@ -97,7 +97,7 @@ public class BitTree {
 	 * @param treeClades2 - tree to compare this one to
 	 * @return true if the trees are equal
 	 */
-	public boolean equals(List<BitSet> treeClades2) {
+	public boolean equals(BitTree treeClades2) {
 		Set<BitSet> set1 = new HashSet<BitSet>();
 		for(BitSet bs : treeClades) {
 			if(bs.cardinality() > 1) {	
@@ -106,7 +106,7 @@ public class BitTree {
 		}
 
 		Set<BitSet> set2 = new HashSet<BitSet>();
-		for(BitSet bs : treeClades2) {
+		for(BitSet bs : treeClades2.getBits()) {
 			if(bs.cardinality() > 1) {	
 				set2.add(bs);
 			}
@@ -136,7 +136,7 @@ public class BitTree {
 					set2.add(bs);
 				}
 			}
-			output[i] = set1.equals(set2) ? true : false;
+			output[i] = set1.equals(set2);
 			//			output[i] = set1.hashCode() == set2.hashCode() ? true : false;
 		}		
 		return output;		
@@ -145,19 +145,19 @@ public class BitTree {
 	public boolean[] equalsList2(List<BitTree> trees) {
 		boolean[] output = new boolean[trees.size()];
 
-		this.order();
+		//this.order();
 		for(int i = 0; i < trees.size(); i++) {
-			output[i] = this.equals2(trees.get(i));
+			output[i] = equals2(trees.get(i));
 		}
 
 		return output;
 	}
 
 	public boolean equals2(BitTree tree) {
-		tree.order();
+		//tree.order();
 
 		if (this == tree) {
-			//System.out.println("x");
+//			System.out.println("x");
 			return true;
 		} else {
 			//			for(BitSet bs1 : this.getBits()) {
@@ -181,7 +181,7 @@ public class BitTree {
 					if (index2 == list2.size()) {
 						//System.out.println("b");
 						return false;
-					}
+					} 
 				}
 				BitSet b1 = list1.get(index1);
 				BitSet b2 = list2.get(index2);

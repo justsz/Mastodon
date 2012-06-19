@@ -6,7 +6,6 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +82,10 @@ public class BitTreeSystem {
 				}
 				weighted = false;
 			}
-			BitTree tr = new BitTree(bitTree, weight);
-			tr.order();
-			//bitTrees.add(new BitTree(bitTree, weight));
-			bitTrees.add(tr);
+//			BitTree tr = new BitTree(bitTree, weight);
+//			tr.order();
+//			bitTrees.add(tr);
+			bitTrees.add(new BitTree(bitTree, weight));			
 			newTree = false;
 
 		}

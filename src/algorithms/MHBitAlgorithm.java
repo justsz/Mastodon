@@ -48,8 +48,8 @@ public class MHBitAlgorithm implements Algorithm{
 		mapTreeIndex = bts.getMapTreeIndex();
 		float[] notPrunedScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 
-		System.out.println("Map tree: " + mapTreeIndex);
-		int prunedSpeciesCount = 2;
+		System.out.println("Map tree: " + (mapTreeIndex+1));
+		int prunedSpeciesCount = 1;
 
 		float[] maxScore = {0, 0};
 		Map<BitSet, float[]> maxTaxa = new HashMap<BitSet, float[]>();
@@ -78,25 +78,25 @@ public class MHBitAlgorithm implements Algorithm{
 		//triedCombinations.add((ArrayList<Taxon>) toPrune);
 		BitSet bestChoice = (BitSet) toPrune.clone();
 
-		for (BitTree bt : bts.getBitTrees()) {
-			for (BitSet bs : bt.getBits()) {
-				System.out.println(bs);
-			}
-			System.out.println("----");
-		}
+//		for (BitTree bt : bts.getBitTrees()) {
+//			for (BitSet bs : bt.getBits()) {
+//				System.out.println(bs);
+//			}
+//			System.out.println("----");
+//		}
 
 		//double star = System.currentTimeMillis();
 		Map<BitSet, BitSet> filters = bts.prune(toPrune);
-		for (BitTree bt : bts.getBitTrees()) {
-			for (BitSet bs : bt.getBits()) {
-				System.out.println(bs);
-			}
-			System.out.println("----");
-		}
+//		for (BitTree bt : bts.getBitTrees()) {
+//			for (BitSet bs : bt.getBits()) {
+//				System.out.println(bs);
+//			}
+//			System.out.println("----");
+//		}
 		//System.out.println(System.currentTimeMillis() - star);
 		//star = System.currentTimeMillis();
 		float[] bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
-		System.out.println(bestScore[1]);
+//		System.out.println(bestScore[1]);
 		//System.out.println(System.currentTimeMillis() - star);
 		//star = System.currentTimeMillis();
 		bts.unPrune(filters);
@@ -133,7 +133,7 @@ public class MHBitAlgorithm implements Algorithm{
 
 
 		while(repeat) {
-			double start = System.currentTimeMillis();
+			//double start = System.currentTimeMillis();
 			double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0)
 			if (prunedSpeciesCount > 1) {
 				mean = 0.5 * (prunedSpeciesCount - 1);
@@ -200,7 +200,7 @@ public class MHBitAlgorithm implements Algorithm{
 					bestScore = score;
 				} //try different pruning otherwise
 			}
-			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
+			//System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
 				prunedSpeciesCount++;
 			} else {
