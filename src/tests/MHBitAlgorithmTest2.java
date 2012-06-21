@@ -32,8 +32,8 @@ public class MHBitAlgorithmTest2 {
 //				"simple.trees";
 //				"carnivores.trprobs";
 //				"snowflake-48d500.trees";
-				"carnivores10k.trprobs";
-//				"H3N2_1441_tips.500.trees";
+//				"carnivores500.trprobs";
+				"H3N2_1441_tips.500.trees";
 //				"H3N2_1968-2011.338_tips.500.trees";
 
 		TreeReader reader = new TreeReader(test);
@@ -55,7 +55,7 @@ public class MHBitAlgorithmTest2 {
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.97f,3, 1000);
+		mh.setLimits(0.97f, 10, 10000);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 

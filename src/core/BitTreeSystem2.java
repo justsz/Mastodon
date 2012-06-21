@@ -84,10 +84,10 @@ public class BitTreeSystem2 {
 				}
 				weighted = false;
 			}
-			//			BitTree tr = new BitTree(bitTree, weight);
-			//			tr.order();
-			//			bitTrees.add(tr);
-			bitTrees.add(new BitTree(bitTree, weight));			
+			BitTree tr = new BitTree(bitTree, weight);
+			tr.order();
+			bitTrees.add(tr);
+//			bitTrees.add(new BitTree(bitTree, weight));			
 			newTree = false;
 
 		}
@@ -410,14 +410,15 @@ public class BitTreeSystem2 {
 
 	public int prune2(BitSet pruner, BitTree mapTree) {
 		int subTreeCount = 1;
-		List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
+		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
 		//List<Clade2> mapClades = new ArrayList<Clade2>(mapTree.getBits().size());
 
 		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
-		Map<BitSet, Clade2> prunedClades = new HashMap<BitSet, Clade2>(clades.size());
+		Map<BitSet, List<Integer>> prunedClades = new HashMap<BitSet, List<Integer>>(clades.size());
 
 		//Clade2 cl = new Clade2(new BitSet());	//just a placeholder
 		//System.out.println(cl);
+		//double start = System.currentTimeMillis();
 		for (Map.Entry<BitSet, Clade2> entry : clades.entrySet()) {
 			BitSet cladeBits = entry.getValue().getCladeBits();
 			if(cladeBits.intersects(pruner)) {
@@ -426,26 +427,25 @@ public class BitTreeSystem2 {
 				filters.put(entry.getKey(), filter);
 				cladeBits.xor(filter);
 			}
-			if (cladeBits.cardinality() > 1) {
-				Clade2 cl = prunedClades.get(cladeBits);
+			if (cladeBits.cardinality() > 1) {	//not very needed, might be some performance benefit			
+				List<Integer> cl = prunedClades.get(cladeBits);
 				if(cl == null) {
-					prunedClades.put(cladeBits, entry.getValue().lightClone());
+					prunedClades.put(cladeBits, new ArrayList<Integer>(entry.getValue().getCladeToTrees()));
 				} else {
-					cl.addTrees(entry.getValue().getCladeToTrees());
+					cl.addAll(entry.getValue().getCladeToTrees());
 				}
 			}
 		}
+		//System.out.println(System.currentTimeMillis() - start);
 
-		//probably need to make this more rigid in case of null "cl"
-		//System.out.println(cl);
 		HashSet<Integer> runningIntersection = new HashSet<Integer>();
 		for(BitSet bs : mapTree.getBits()) {  
 			if (bs.cardinality() > 1) {
-				Clade2 clade = prunedClades.get(bs);
+				List<Integer> clade = prunedClades.get(bs);
 				if (runningIntersection.size() == 0) {
-					runningIntersection.addAll(clade.getCladeToTrees());
+					runningIntersection.addAll(clade);
 				} else {
-					runningIntersection.retainAll(clade.getCladeToTrees());
+					runningIntersection.retainAll(clade);
 				}
 				//System.out.println(bs + " " + clade.getCladeToTrees());
 				//subTrees.add(clade.getCladeToTrees());
@@ -515,20 +515,20 @@ public class BitTreeSystem2 {
 		//		List<HashSet<Integer>> middleMan = new ArrayList<HashSet<Integer>>(subTrees);
 
 
-//		Comparator<HashSet> c = new Comparator<HashSet>() {
-//			public int compare(HashSet b1, HashSet b2) {
-//				return ((Integer)b2.size()).compareTo(b1.size());
-//			}
-//		};
-//
-//		Collections.sort(subTrees, c);
-//		HashSet<Integer> intersection = new HashSet<Integer>(subTrees.get(0));
-//		for(HashSet s : subTrees) {
-//			//			System.out.println(s);
-//			intersection.retainAll(s);
-//		}
-//		subTreeCount = intersection.size();
-		
+		//		Comparator<HashSet> c = new Comparator<HashSet>() {
+		//			public int compare(HashSet b1, HashSet b2) {
+		//				return ((Integer)b2.size()).compareTo(b1.size());
+		//			}
+		//		};
+		//
+		//		Collections.sort(subTrees, c);
+		//		HashSet<Integer> intersection = new HashSet<Integer>(subTrees.get(0));
+		//		for(HashSet s : subTrees) {
+		//			//			System.out.println(s);
+		//			intersection.retainAll(s);
+		//		}
+		//		subTreeCount = intersection.size();
+
 		subTreeCount = runningIntersection.size();
 
 		unPrune(filters);

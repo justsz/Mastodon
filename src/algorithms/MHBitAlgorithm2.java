@@ -134,7 +134,7 @@ public class MHBitAlgorithm2 implements Algorithm{
 
 
 		while(repeat) {
-			//double start = System.currentTimeMillis();
+			double start = System.currentTimeMillis();
 			double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0)
 			if (prunedSpeciesCount > 1) {
 				mean = 0.5 * (prunedSpeciesCount - 1);
@@ -182,22 +182,25 @@ public class MHBitAlgorithm2 implements Algorithm{
 				}
 
 
-//				System.out.println("Pruning: " + toPrune);
-				double start1 = System.currentTimeMillis();
-				filters = bts.prune(toPrune);
-				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
-				bts.unPrune(filters);
-				System.out.println("Prune1: " + (System.currentTimeMillis() - start1));				
+				//System.out.println("Pruning: " + toPrune);
+				//double start1 = System.currentTimeMillis();
+//				filters = bts.prune(toPrune);
+//				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
+//				bts.unPrune(filters);
+				//System.out.println("Prune1: " + (System.currentTimeMillis() - start1));				
 				
-				double start2 = System.currentTimeMillis();
+				//double start2 = System.currentTimeMillis();
 				int prune2Output = bts.prune2(toPrune, bitTrees.get(mapTreeIndex));
-				System.out.println("Prune2: " + (System.currentTimeMillis() - start2));
+				float[] score = {((float)prune2Output)/bitTrees.size(), prune2Output};
+				//System.out.println("Prune2: " + (System.currentTimeMillis() - start2));
 				
-				if(prune2Output != score[1]) {
-					System.out.println("Fail!");
-					System.out.println(score[1] + " " + prune2Output);
-					System.exit(2);
-				}
+				
+				//check if both pruning implementations return the same result
+//				if(prune2Output != score[1]) {
+//					System.out.println("Fail!");
+//					System.out.println(score[1] + " " + prune2Output);
+//					System.exit(2);
+//				}
 
 
 
@@ -214,7 +217,7 @@ public class MHBitAlgorithm2 implements Algorithm{
 					bestScore = score;
 				} //try different pruning otherwise
 			}
-			//System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
+			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
 				prunedSpeciesCount++;
 			} else {
