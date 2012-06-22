@@ -184,23 +184,23 @@ public class MHBitAlgorithm2 implements Algorithm{
 
 				//System.out.println("Pruning: " + toPrune);
 				//double start1 = System.currentTimeMillis();
-				filters = bts.prune(toPrune);
-				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
-				bts.unPrune(filters);
+//				filters = bts.prune(toPrune);
+//				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
+//				bts.unPrune(filters);
 				//System.out.println("Prune1: " + (System.currentTimeMillis() - start1));				
 				
 //				double start2 = System.currentTimeMillis();
 				int prune2Output = bts.prune2(toPrune, bitTrees.get(mapTreeIndex));
-//				float[] score = {((float)prune2Output)/bitTrees.size(), prune2Output};
+				float[] score = {((float)prune2Output)/bitTrees.size(), prune2Output};
 //				System.out.println("Prune2: " + (System.currentTimeMillis() - start2));
 				
 				
 				//check if both pruning implementations return the same result
-				if(prune2Output != score[1]) {
-					System.out.println("Fail!");
-					System.out.println(score[1] + " " + prune2Output);
-					System.exit(2);
-				}
+//				if(prune2Output != score[1]) {
+//					System.out.println("Fail!");
+//					System.out.println(score[1] + " " + prune2Output);
+//					System.exit(2);
+//				}
 
 
 

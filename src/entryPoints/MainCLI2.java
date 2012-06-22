@@ -38,10 +38,10 @@ public class MainCLI2 {
 
 		List<Option> options = new ArrayList<Option>();
 		options.add(new Option("help", "display this page"));
-		options.add(new StringOption("f", "s", "*filename of dataset to analyse"));
-		options.add(new RealOption("s", 0.0, 1.0, "*desired minimum MAP score"));
-		options.add(new IntegerOption("p", "*maximum number of taxa to prune"));
-		options.add(new IntegerOption("i", 1, Integer.MAX_VALUE, "*maximum number of iterations"));
+		options.add(new StringOption("n", "s", "stem of output files. Default is stem of input file"));
+		options.add(new RealOption("s", 0.0, 1.0, "*desired minimum MAP score [0.0 - 1.0]"));
+		options.add(new IntegerOption("p", "*maximum number of taxa to prune [1+]"));
+		options.add(new IntegerOption("i", 1, Integer.MAX_VALUE, "*maximum number of iterations[1+]"));
 
 		Option[] optsArray = new Option[options.size()];
 		for(int i = 0; i < options.size(); i++) {
@@ -50,23 +50,17 @@ public class MainCLI2 {
 
 		Arguments cmd = new Arguments(optsArray);
 		cmd.parseArguments(args);
-		
+
 		if(cmd.hasOption("help")) {
 			cmd.printUsage("java -jar MASTodon.jar", "\nStarred entries are required.");
+			System.out.println("Example:  java -jar MASTodon.jar -s 0.8 -p 10 -i 20000 carnivores.trees");
 			System.exit(0);
 		}
-		
-		if(!cmd.hasOption("f") || !cmd.hasOption("s") || !cmd.hasOption("p") || !cmd.hasOption("i")) {
+
+		if(!cmd.hasOption("s") || !cmd.hasOption("p") || !cmd.hasOption("i")) {
 			System.out.println("One or more required flags missing. Please refer to -help.");
 			System.exit(1);
 		}
-	
-		
-
-//		System.out.println(cmd.getStringOption("f"));
-//		System.out.println(cmd.getRealOption("s"));
-//		System.out.println(cmd.getIntegerOption("p"));
-//		System.out.println(cmd.getIntegerOption("i"));
 
 
 
@@ -78,11 +72,15 @@ public class MainCLI2 {
 		int maxIterations = 0;
 
 
+		String filename = "";
+		if(cmd.getLeftoverArguments() != null) {
+			filename = cmd.getLeftoverArguments()[0];
+		}
 
 		try {
-			reader.setFile(cmd.getStringOption("f"));
+			reader.setFile(filename);
 		} catch (IOException e) {
-			System.out.println("File not found.");
+			System.out.println("File " + filename + " not found.");
 			System.exit(1);
 		}		
 		System.out.println("Loading trees...");
@@ -100,7 +98,7 @@ public class MainCLI2 {
 		System.out.println("Found " + bts.getBitTrees().size() + " trees with " + bts.getTaxaCount() + " unique taxa.");
 
 		minScore = (float) cmd.getRealOption("s");
-		
+
 		maxPrune = cmd.getIntegerOption("p");
 		if (maxPrune > bts.getTaxaCount()) {
 			System.out.println("Cannot prune more taxa than there are in total.");
@@ -114,18 +112,30 @@ public class MainCLI2 {
 		algorithm.setLimits(minScore, maxPrune, maxIterations);
 		algorithm.run();
 
+		System.out.println();	//new line after progress report
+
 		Map<ArrayList<Taxon>, float[]> result = algorithm.getTaxa();
-		
-		String prefix = cmd.getStringOption("f").split("\\.")[0];
-		
+
+		String prefix = "";
+
+		if (cmd.hasOption("n")) {
+			prefix = cmd.getStringOption("n");
+		} else {
+			String[] parts = filename.split("/");
+			prefix = parts[parts.length - 1].split("\\.")[0];
+		}
+
 		BufferedWriter out = new BufferedWriter(new FileWriter(prefix + "PrunedTaxa.txt"));
 		out.write("Pruned taxa\t[MAP score for this pruning, number of matching subtrees]\n----\n");
+		System.out.println("Pruned taxa\t[MAP score for this pruning, number of matching subtrees]\n----");
 
 		for(ArrayList<Taxon> taxaList : result.keySet()) {
 			for (Taxon taxon : taxaList) {
 				out.write(taxon.getName() + ", ");
+				System.out.print(taxon.getName() + ", ");
 			}
 			out.write("[" + result.get(taxaList)[0] + ", " + (int) result.get(taxaList)[1] + "]\n");
+			System.out.print("[" + result.get(taxaList)[0] + ", " + (int) result.get(taxaList)[1] + "]\n");
 		}
 
 		out.close();

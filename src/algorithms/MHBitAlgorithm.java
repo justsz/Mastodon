@@ -109,6 +109,8 @@ public class MHBitAlgorithm implements Algorithm{
 		//ITERATIONS//
 		/////////////
 		boolean repeat = true;
+		int iterationCounter = 0;
+		int increment = totalIterations / 100;
 
 		//choose how many iterations to allocate to each "round" of pruning
 		double[] iterations = new double[maxPrunedSpeciesCount];
@@ -121,9 +123,11 @@ public class MHBitAlgorithm implements Algorithm{
 		}
 
 		if ((iterations[0] / sum * totalIterations) > taxaCount) {
+			double temp = iterations[0];
 			iterations[0] = taxaCount;		 
 			for(int i = 1; i < maxPrunedSpeciesCount; i++) {
-				iterations[i] = iterations[i] / sum * (totalIterations - taxaCount);
+				//need to check if temp gives the correct solution here but it's a "lost hope function" anyway
+				iterations[i] = iterations[i] / (sum - temp) * (totalIterations - taxaCount);
 			}
 		} else {
 			for(int i = 0; i < maxPrunedSpeciesCount; i++) {
@@ -140,8 +144,15 @@ public class MHBitAlgorithm implements Algorithm{
 			}
 			PoissonDistribution pd = new PoissonDistribution(mean);
 			for(int i = 0; i < (int) iterations[prunedSpeciesCount-1]; i++) {
+				
+				//print progress
+				if ((iterationCounter % increment) == 0) {
+					System.out.print("\r" + iterationCounter/increment + "%");
+				}
+				iterationCounter++;
+							
+				
 				toPrune = (BitSet) toPrune.clone();
-
 
 				if(prunedSpeciesCount == 1 && iterations[0] == taxaCount) {
 					//just prune each taxon in turn

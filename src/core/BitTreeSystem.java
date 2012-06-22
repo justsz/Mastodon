@@ -321,8 +321,7 @@ public class BitTreeSystem {
 
 		if (highlights != null) {
 			for(Node node : getNodes(externalNodes, highlights)) {
-				Color color = Color.red;
-				node.setAttribute("!color", color);
+				node.setAttribute("pruned", true);
 				//begin code for highlighting the path from the tip to root
 				//				Node parent = tree.getParent(node);
 				//				while(parent != null) {
