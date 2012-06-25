@@ -43,19 +43,15 @@ public class MHBitAlgorithm implements Algorithm{
 
 
 	public void run() {
-		BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
-
-		mapTreeIndex = bts.getMapTreeIndex();
-		float[] notPrunedScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
+		//BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
+		mapTreeIndex = bts.getMapTreeIndex();		
 
 		System.out.println("Map tree: " + (mapTreeIndex+1));
-		int prunedSpeciesCount = 1;
+		int prunedSpeciesCount = 10;
 
 		float[] maxScore = {0, 0};
-		Map<BitSet, float[]> maxTaxa = new HashMap<BitSet, float[]>();
+		Map<BitSet, float[]> maxScorePruning = new HashMap<BitSet, float[]>();
 
-		//assume that the first tree in the set is the MAP tree for now
-		//final List<Taxon> species = bts.
 		int taxaCount = bts.getTaxaCount();
 
 		///////////////
@@ -63,54 +59,32 @@ public class MHBitAlgorithm implements Algorithm{
 		/////////////
 
 		BitSet toPrune = new BitSet();
-		//I think I want to allow picking the same combination of Taxa.
-		//List<ArrayList<Taxon>> triedCombinations = new ArrayList<ArrayList<Taxon>>();
 
-		for(int e = 0; e < prunedSpeciesCount; e++) {
+		for(int i = 0; i < prunedSpeciesCount; i++) {
 			int choice = 0;
-
 			do {
 				choice = (int) (Random.nextDouble() * taxaCount);
 			} while (toPrune.get(choice));
-
 			toPrune.set(choice);
 		}
-		//triedCombinations.add((ArrayList<Taxon>) toPrune);
-		BitSet bestChoice = (BitSet) toPrune.clone();
+		BitSet prevPruning = (BitSet) toPrune.clone();
 
-//		for (BitTree bt : bts.getBitTrees()) {
-//			for (BitSet bs : bt.getBits()) {
-//				System.out.println(bs);
-//			}
-//			System.out.println("----");
-//		}
 
-		//double star = System.currentTimeMillis();
-		Map<BitSet, BitSet> filters = bts.prune(toPrune);
-//		for (BitTree bt : bts.getBitTrees()) {
-//			for (BitSet bs : bt.getBits()) {
-//				System.out.println(bs);
-//			}
-//			System.out.println("----");
-//		}
-		//System.out.println(System.currentTimeMillis() - star);
-		//star = System.currentTimeMillis();
-		float[] bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
-//		System.out.println(bestScore[1]);
-		//System.out.println(System.currentTimeMillis() - star);
-		//star = System.currentTimeMillis();
-		bts.unPrune(filters);
-		//System.out.println(System.currentTimeMillis() - star);
+//		Map<BitSet, BitSet> filters = bts.prune(toPrune);
+//		float[] bestScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
+//		bts.unPrune(filters);
 		
-
-		maxTaxa.put(bestChoice, bestScore);
+		int matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
+		float[] prevScore = {(float) matches/bitTrees.size(), matches};
+		
+		maxScorePruning.put(prevPruning, prevScore);
 
 		///////////////
 		//ITERATIONS//
 		/////////////
 		boolean repeat = true;
-		int iterationCounter = 0;
-		int increment = totalIterations / 100;
+//		int iterationCounter = 0;
+//		int increment = totalIterations / 100;
 
 		//choose how many iterations to allocate to each "round" of pruning
 		double[] iterations = new double[maxPrunedSpeciesCount];
@@ -137,8 +111,8 @@ public class MHBitAlgorithm implements Algorithm{
 
 
 		while(repeat) {
-			//double start = System.currentTimeMillis();
-			double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0)
+			double start = System.currentTimeMillis();
+			double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0 in PoissonDistribution())
 			if (prunedSpeciesCount > 1) {
 				mean = 0.5 * (prunedSpeciesCount - 1);
 			}
@@ -146,10 +120,10 @@ public class MHBitAlgorithm implements Algorithm{
 			for(int i = 0; i < (int) iterations[prunedSpeciesCount-1]; i++) {
 				
 				//print progress
-				if ((iterationCounter % increment) == 0) {
-					System.out.print("\r" + iterationCounter/increment + "%");
-				}
-				iterationCounter++;
+//				if ((iterationCounter % increment) == 0) {
+//					System.out.print("\r" + iterationCounter/increment + "%");
+//				}
+//				iterationCounter++;
 							
 				
 				toPrune = (BitSet) toPrune.clone();
@@ -182,7 +156,6 @@ public class MHBitAlgorithm implements Algorithm{
 								}
 							}						
 						} while (spot == -1);
-						//int spot = (int) (Random.nextDouble() * prunedSpeciesCount);
 
 						if(toPrune.cardinality() >= prunedSpeciesCount) {
 							toPrune.clear(spot);
@@ -192,30 +165,34 @@ public class MHBitAlgorithm implements Algorithm{
 				}
 
 
-				filters = bts.prune(toPrune);
-				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
-				bts.unPrune(filters);
+//				filters = bts.prune(toPrune);
+//				float[] score = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
+//				bts.unPrune(filters);
+				
+				matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
+				float[] currentScore = {(float) matches/bitTrees.size(), matches};
 
 
 
-				if (score[0] > maxScore[0]) {	//set new optimum
-					maxScore = score;
-					maxTaxa.clear();
-					maxTaxa.put((BitSet) toPrune.clone(), score);
-				} else if (score[0] == maxScore[0] && score[0] != notPrunedScore[0]) { //save variations with same score, but no need to if it produces no results
-					maxTaxa.put((BitSet) toPrune.clone(), score);
+				if (currentScore[0] > maxScore[0]) {	//set new optimum
+					maxScore = currentScore;	//might need a clone here
+					maxScorePruning.clear();
+					maxScorePruning.put((BitSet) toPrune.clone(), currentScore);
+				} else if (currentScore[0] == maxScore[0] && currentScore[1] != 1) { //save variations with same score, but no need to if it produces no results
+					maxScorePruning.put((BitSet) toPrune.clone(), currentScore);
 				}
 
-				if (score[0]/bestScore[0] > Random.nextFloat()) {
-					bestChoice = toPrune; 
-					bestScore = score;
+				if (currentScore[0]/prevScore[0] > Random.nextFloat()) {
+					prevPruning = toPrune; 
+					prevScore = currentScore;
 				} //try different pruning otherwise
 			}
-			//System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
+			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
 				prunedSpeciesCount++;
 			} else {
-				taxa = maxTaxa;
+				taxa = maxScorePruning;
+				System.out.println(maxScore[0] + " " + maxScore[1]);
 				repeat = false;
 			}
 		}

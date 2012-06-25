@@ -1,6 +1,5 @@
 package core;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -26,7 +25,6 @@ import jebl.evolution.trees.RootedTree;
  *
  */
 public class BitTreeSystem {
-	//	private List<? extends RootedTree> trees;
 	private Set<Taxon> taxa;	//Set of all unique taxa
 	private Map<BitSet, Clade> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
 	private boolean newTree = false;	//used to mark the beginning of a new tree during the search for unique clades
@@ -34,6 +32,7 @@ public class BitTreeSystem {
 	private List<BitTree> bitTrees;
 	private int treeCount;
 	private boolean weighted;
+	private int treeNumber;
 
 
 	/**
@@ -41,6 +40,7 @@ public class BitTreeSystem {
 	 */
 	public BitTreeSystem() {
 		treeCount = 0;
+		treeNumber = 0;
 		weighted = true;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Clade>();
@@ -82,10 +82,10 @@ public class BitTreeSystem {
 				}
 				weighted = false;
 			}
-//			BitTree tr = new BitTree(bitTree, weight);
-//			tr.order();
-//			bitTrees.add(tr);
-			bitTrees.add(new BitTree(bitTree, weight));			
+			BitTree tr = new BitTree(bitTree, weight);
+			tr.order();
+			bitTrees.add(tr);
+//			bitTrees.add(new BitTree(bitTree, weight));			
 			newTree = false;
 
 		}
@@ -140,15 +140,21 @@ public class BitTreeSystem {
 		if(!newTree) {
 			bitTree = new ArrayList<BitSet>();
 			newTree = true;
+			treeNumber++;
 		}
 
 		Clade bset = clades.get(bits);
 		if (bset == null) {
 			//this cloning is still up for debate. Might change depending on how other features will be implemented
-			clades.put(bits, new Clade((BitSet) bits.clone()));
+			Clade newClade = new Clade((BitSet) bits.clone());
+			clades.put(bits, newClade);
+			newClade.addTree(treeNumber);
+			//System.out.println(bits);
 		} else {
 			bset.incrementCount();
+			bset.addTree(treeNumber);
 		}
+
 
 		bitTree.add(clades.get(bits).getCladeBits());
 	}
@@ -321,13 +327,7 @@ public class BitTreeSystem {
 
 		if (highlights != null) {
 			for(Node node : getNodes(externalNodes, highlights)) {
-				node.setAttribute("pruned", true);
-				//begin code for highlighting the path from the tip to root
-				//				Node parent = tree.getParent(node);
-				//				while(parent != null) {
-				//					parent.setAttribute("!color", color);
-				//					parent = tree.getParent(parent);
-				//				}
+				node.setAttribute("pruned", 1.0);
 			}
 		}
 
@@ -341,12 +341,7 @@ public class BitTreeSystem {
 	 * @return List of filters used in pruning. Pass to unPrune to undo pruning.
 	 */
 	public Map<BitSet, BitSet> prune(BitSet pruner){
-		//Might have to deal with clades that become equal to existing ones(add up frequency)
-
-		//List<BitSet> filters = new ArrayList<BitSet>();
 		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
-
-
 
 		for (Map.Entry<BitSet, Clade> entry : clades.entrySet()) {
 			BitSet cladeBits = entry.getValue().getCladeBits();
@@ -357,24 +352,6 @@ public class BitTreeSystem {
 				cladeBits.xor(filter);
 			}
 		}
-
-
-		//
-		//Beginning of code that would clean up "clades" of duplicate entries. 
-		//Might be easier to just adjust the probability calculator do take into account duplicates correctly.
-		//
-		//		Object[] keys = clades.keySet().toArray();
-		//		System.out.println();
-		//		for(int i = 0; i < keys.length; i++) {
-		//			for(int e = i+1; e < keys.length - 0; e++) {
-		//				//System.out.println(keys[i].equals(keys[e]));
-		//				//System.out.println(keys[i] + " vs " + keys[e]);
-		//				if(keys[i].equals(keys[e])) {
-		//					clades.put((BitSet) keys[i], clades.get(keys[i]) + clades.get(keys[e]));
-		//				}
-		//				
-		//			}
-		//		}
 		return filters;
 	}
 
@@ -383,19 +360,76 @@ public class BitTreeSystem {
 	 * @param filters - list of filters used in original pruning of trees
 	 */
 	public void unPrune(Map<BitSet, BitSet> filters) {
-		//Object[] values = clades.values().toArray();
-		//		Iterator<BitSet> keys = clades.keySet().iterator();
-		//		for(int i = 0; i < filters.size(); i++) {
-		//			((Clade) values[i]).getCladeBits().xor(filters.get(i));
-		//		}
-
 		for(Map.Entry<BitSet, BitSet> filter : filters.entrySet()) {
 			clades.get(filter.getKey()).getCladeBits().xor(filter.getValue());
 		}
+	}
 
-		//		for(BitSet bs : filters) {
-		//			keys.next().xor(bs);
-		//		}
+	public int pruneFast(BitSet pruner, BitTree mapTree) {
+		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
+		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());
 
+		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
+		Map<BitSet, BitSet> prunedClades = new HashMap<BitSet, BitSet>(clades.size());
+//		List<BitSet> possibleLimiters = new ArrayList<BitSet>(); 
+
+		//Clade3 cl = new Clade3(new BitSet());	//just a placeholder
+		//System.out.println(cl);
+//		double start = System.currentTimeMillis();
+		for (Map.Entry<BitSet, Clade> entry : clades.entrySet()) {
+			BitSet cladeBits = entry.getValue().getCladeBits();
+			if(cladeBits.intersects(pruner)) {
+				BitSet filter = (BitSet) pruner.clone();
+				filter.and(cladeBits);
+				filters.put(entry.getKey(), filter);
+				cladeBits.xor(filter);
+			}
+			if (cladeBits.cardinality() > 1) {	//not very needed, might be some performance benefit			
+				BitSet cl = prunedClades.get(cladeBits);
+				BitSet matchingTrees = (BitSet) entry.getValue().getCladeToTrees().clone();
+				if(cl == null) {
+					prunedClades.put(cladeBits, matchingTrees);
+//					if (matchingTrees.cardinality() == 1 && mapTree.getBits().contains(cladeBits)) {	//mid-processing
+//						System.out.println("possible");
+//						possibleLimiters.add(cladeBits);
+//					}
+				} else {
+					cl.or(matchingTrees);
+				}
+			}
+		}
+		
+		
+		//mid-processing step, might not be very useful
+//		for (BitSet bs : possibleLimiters) {
+//			if (prunedClades.get(bs).size() == 1) {
+//				unPrune(filters);
+//				return 1;
+//			}
+//		}
+		
+//		System.out.println(System.currentTimeMillis() - start);
+
+		BitSet runningIntersection = new BitSet();
+		for(BitSet bs : mapTree.getBits()) {  
+			if (bs.cardinality() > 1) {
+				BitSet clade = prunedClades.get(bs);
+				if (runningIntersection.cardinality() == 0) {
+					runningIntersection.xor(clade);
+				} else {
+					runningIntersection.and(clade);
+				}
+			}
+			if (runningIntersection.cardinality() == 1) {	//a limiting clade has reduced it to only the map tree
+				unPrune(filters);
+				
+				return 1;
+			}
+		}
+
+		int subTreeCount = runningIntersection.cardinality();
+		unPrune(filters);
+
+		return subTreeCount;
 	}
 }

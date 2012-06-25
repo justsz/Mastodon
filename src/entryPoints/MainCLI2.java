@@ -40,8 +40,8 @@ public class MainCLI2 {
 		options.add(new Option("help", "display this page"));
 		options.add(new StringOption("n", "s", "stem of output files. Default is stem of input file"));
 		options.add(new RealOption("s", 0.0, 1.0, "*desired minimum MAP score [0.0 - 1.0]"));
-		options.add(new IntegerOption("p", "*maximum number of taxa to prune [1+]"));
-		options.add(new IntegerOption("i", 1, Integer.MAX_VALUE, "*maximum number of iterations[1+]"));
+		options.add(new IntegerOption("p", 1, Integer.MAX_VALUE, "*maximum number of taxa to prune [1+]"));
+		options.add(new IntegerOption("i", 1, Integer.MAX_VALUE, "*maximum number of iterations [1+]"));
 
 		Option[] optsArray = new Option[options.size()];
 		for(int i = 0; i < options.size(); i++) {
