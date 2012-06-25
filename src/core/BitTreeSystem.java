@@ -252,6 +252,14 @@ public class BitTreeSystem {
 	public int getTaxaCount() {
 		return taxa.size();
 	}
+	
+	/**
+	 * Returns the set of taxa present in all trees.
+	 * @return set of taxa present in all trees
+	 */
+	public Set<Taxon> getAllTaxa() {
+		return taxa;
+	}
 
 	/**
 	 * Creates a list of nodes corresponding to a full list of nodes and BitSet of "active" nodes. 
