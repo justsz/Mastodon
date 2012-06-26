@@ -45,7 +45,7 @@ public class MHBitAlgorithm implements Algorithm{
 	}
 
 
-	public void run() {
+	public void run() {		
 		Map<Integer, Integer> pruningFreq = new HashMap<Integer, Integer>();
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
 			pruningFreq.put(i, 0);
@@ -157,7 +157,7 @@ public class MHBitAlgorithm implements Algorithm{
 					} else {
 						numberToClear = numberToSet;
 					}
-					
+
 
 					BitSet bitsToSet = new BitSet();
 					BitSet bitsToClear = new BitSet();
@@ -170,26 +170,24 @@ public class MHBitAlgorithm implements Algorithm{
 								break;
 							}
 						}
-						bitsToSet.set(choice);
+						bitsToSet.set(choice);						
 					}
 
 
 					for(int e = 0; e < numberToClear; e++) {
-						int spot = -1;
-						do {
-							for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
-								if (Random.nextDouble() > 0.5 && !bitsToClear.get(a)) {
-									spot = a;
-									break;
-								}
-							}						
-						} while (spot == -1);
-						bitsToClear.set(spot);
+						int choice = 0;
+						while (true) {
+							choice = (int) (Random.nextDouble() * taxaCount);
+							if (toPrune.get(choice) && !bitsToClear.get(choice)) {
+								break;
+							}
+						}	
+						bitsToClear.set(choice);
 					}
 
 					toPrune.or(bitsToSet);
 					toPrune.xor(bitsToClear);
-					
+
 				}
 
 
@@ -200,19 +198,19 @@ public class MHBitAlgorithm implements Algorithm{
 				matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
 				float[] currentScore = {(float) matches/bitTrees.size(), matches};
 
-				if (currentScore[0] > prevScore[0]) {
-					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
-						pruningFreq.put(a, pruningFreq.get(a) + 1);
-					}
+				//				if (currentScore[0] > prevScore[0]) {
+				//					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
+				//						pruningFreq.put(a, pruningFreq.get(a) + 1);
+				//					}
 
-					if (currentScore[0] > maxScore[0]) {	//set new optimum
-						maxScore = currentScore;	//might need a clone here
-						maxScorePruning.clear();
-						maxScorePruning.put((BitSet) toPrune.clone(), currentScore.clone());
-					} else if (currentScore[0] == maxScore[0] && currentScore[1] != 1) { //save variations with same score, but no need to if it produces no results
-						maxScorePruning.put((BitSet) toPrune.clone(), currentScore.clone());
-					}
+				if (currentScore[0] > maxScore[0]) {	//set new optimum
+					maxScore = currentScore;	//might need a clone here
+					maxScorePruning.clear();
+					maxScorePruning.put((BitSet) toPrune.clone(), currentScore.clone());
+				} else if (currentScore[0] == maxScore[0] && currentScore[1] != 1) { //save variations with same score, but no need to if it produces no results
+					maxScorePruning.put((BitSet) toPrune.clone(), currentScore.clone());
 				}
+				//				}
 
 				if (currentScore[0]/prevScore[0] > Random.nextFloat()) {
 					prevPruning = (BitSet) toPrune.clone(); 
@@ -228,20 +226,20 @@ public class MHBitAlgorithm implements Algorithm{
 
 				//extra experimental and progress-tracking stuff
 				System.out.println(maxScore[0] + " " + maxScore[1]);
-				
-//				List<Map.Entry<Integer, Integer>> entries = new ArrayList<Map.Entry<Integer, Integer>>();
-//				for (Map.Entry<Integer, Integer> e : pruningFreq.entrySet()) {
-//					entries.add(e);
-//				}
-//
-//				Comparator<Map.Entry<Integer, Integer>> c = new Comparator<Map.Entry<Integer, Integer>>() {
-//					public int compare(Entry<Integer, Integer> arg0,
-//							Entry<Integer, Integer> arg1) {
-//						return (Integer)arg1.getValue().compareTo(arg0.getValue());
-//					}
-//				};				
-//
-//				Collections.sort(entries, c);
+
+				//				List<Map.Entry<Integer, Integer>> entries = new ArrayList<Map.Entry<Integer, Integer>>();
+				//				for (Map.Entry<Integer, Integer> e : pruningFreq.entrySet()) {
+				//					entries.add(e);
+				//				}
+				//
+				//				Comparator<Map.Entry<Integer, Integer>> c = new Comparator<Map.Entry<Integer, Integer>>() {
+				//					public int compare(Entry<Integer, Integer> arg0,
+				//							Entry<Integer, Integer> arg1) {
+				//						return (Integer)arg1.getValue().compareTo(arg0.getValue());
+				//					}
+				//				};				
+				//
+				//				Collections.sort(entries, c);
 
 
 			}
