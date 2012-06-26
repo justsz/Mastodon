@@ -53,7 +53,7 @@ public class MHBitAlgorithmTest {
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.90f, 30, 20000);
+		mh.setLimits(0.90f, 30, 100000);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 

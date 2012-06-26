@@ -1,10 +1,14 @@
 
 package algorithms;
+import graphics.DrawFrame;
+import graphics.DrawPanel;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,12 +54,22 @@ public class MHBitAlgorithm implements Algorithm{
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
 			pruningFreq.put(i, 0);
 		}
+		
+		Map<BitSet, Integer> pruningPairFreq = new HashMap<BitSet, Integer>();
+		for(int i = 0; i < bts.getTaxaCount(); i++) {
+			for(int e = 0; e< bts.getTaxaCount(); e++) {
+				BitSet bs = new BitSet();
+				bs.set(i);
+				bs.set(e);
+				pruningPairFreq.put(bs, 0);
+			}
+		}
 
 		//BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
 		mapTreeIndex = bts.getMapTreeIndex();		
 
 		System.out.println("Map tree: " + (mapTreeIndex+1));
-		int prunedSpeciesCount = 1;
+		int prunedSpeciesCount = 20;
 
 		float[] maxScore = {0, 0};
 		Map<BitSet, float[]> maxScorePruning = new HashMap<BitSet, float[]>();
@@ -128,10 +142,10 @@ public class MHBitAlgorithm implements Algorithm{
 			for(int i = 0; i < (int) iterations[prunedSpeciesCount-1]; i++) {
 
 				//print progress
-				//				if ((iterationCounter % increment) == 0) {
-				//					System.out.print("\r" + iterationCounter/increment + "%");
-				//				}
-				//				iterationCounter++;
+				//								if ((iterationCounter % increment) == 0) {
+				//									System.out.print("\r" + iterationCounter/increment + "%");
+				//								}
+				//								iterationCounter++;
 
 
 				//toPrune = (BitSet) toPrune.clone();
@@ -198,10 +212,24 @@ public class MHBitAlgorithm implements Algorithm{
 				matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
 				float[] currentScore = {(float) matches/bitTrees.size(), matches};
 
-				//				if (currentScore[0] > prevScore[0]) {
-				//					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
-				//						pruningFreq.put(a, pruningFreq.get(a) + 1);
-				//					}
+				if (currentScore[0] > prevScore[0]) {
+					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
+						pruningFreq.put(a, pruningFreq.get(a) + 1);
+					}
+					
+					if (prunedSpeciesCount == 2) {
+						pruningPairFreq.put(toPrune, pruningPairFreq.get(toPrune) + 1);
+					} else if (prunedSpeciesCount > 2) {
+						for (int y = toPrune.nextSetBit(0); y >= 0; y = toPrune.nextSetBit(y+1)) {
+							for (int z = y; z >= 0; z = toPrune.nextSetBit(z+1)) {
+								BitSet bbbb = new BitSet();
+								bbbb.set(y);
+								bbbb.set(z);
+								pruningPairFreq.put(bbbb, pruningPairFreq.get(bbbb) + 1);
+							}
+						}
+					}
+				}
 
 				if (currentScore[0] > maxScore[0]) {	//set new optimum
 					maxScore = currentScore;	//might need a clone here
@@ -210,7 +238,7 @@ public class MHBitAlgorithm implements Algorithm{
 				} else if (currentScore[0] == maxScore[0] && currentScore[1] != 1) { //save variations with same score, but no need to if it produces no results
 					maxScorePruning.put((BitSet) toPrune.clone(), currentScore.clone());
 				}
-				//				}
+
 
 				if (currentScore[0]/prevScore[0] > Random.nextFloat()) {
 					prevPruning = (BitSet) toPrune.clone(); 
@@ -226,21 +254,57 @@ public class MHBitAlgorithm implements Algorithm{
 
 				//extra experimental and progress-tracking stuff
 				System.out.println(maxScore[0] + " " + maxScore[1]);
+//				System.out.println(pruningFreq);
+//				System.out.println(pruningPairFreq);
 
-				//				List<Map.Entry<Integer, Integer>> entries = new ArrayList<Map.Entry<Integer, Integer>>();
-				//				for (Map.Entry<Integer, Integer> e : pruningFreq.entrySet()) {
-				//					entries.add(e);
-				//				}
-				//
-				//				Comparator<Map.Entry<Integer, Integer>> c = new Comparator<Map.Entry<Integer, Integer>>() {
-				//					public int compare(Entry<Integer, Integer> arg0,
-				//							Entry<Integer, Integer> arg1) {
-				//						return (Integer)arg1.getValue().compareTo(arg0.getValue());
-				//					}
-				//				};				
-				//
-				//				Collections.sort(entries, c);
+				//picking best singletons
+				List<Map.Entry<Integer, Integer>> entries = new ArrayList<Map.Entry<Integer, Integer>>();
+				for (Map.Entry<Integer, Integer> e : pruningFreq.entrySet()) {
+					entries.add(e);
+				}
 
+				Comparator<Map.Entry<Integer, Integer>> c = new Comparator<Map.Entry<Integer, Integer>>() {
+					public int compare(Entry<Integer, Integer> arg0,
+							Entry<Integer, Integer> arg1) {
+						return (Integer)arg1.getValue().compareTo(arg0.getValue());
+					}
+				};				
+
+				Collections.sort(entries, c);
+				
+				BitSet bits = new BitSet();
+				for (int i = 0; i < maxPrunedSpeciesCount; i++) {
+					bits.set(entries.get(i).getKey());
+				}
+				int topPruning = bts.pruneFast(bits, bitTrees.get(mapTreeIndex));
+				System.out.println("top pruning: " + topPruning);
+
+				//picking best pairs
+//				List<Map.Entry<BitSet, Integer>> pairEntries = new ArrayList<Map.Entry<BitSet, Integer>>();
+//				for (Map.Entry<BitSet, Integer> e : pruningPairFreq.entrySet()) {
+//					pairEntries.add(e);
+//				}
+//
+//				Comparator<Map.Entry<BitSet, Integer>> c2 = new Comparator<Map.Entry<BitSet, Integer>>() {
+//					public int compare(Entry<BitSet, Integer> arg0,
+//							Entry<BitSet, Integer> arg1) {
+//						return (Integer)arg1.getValue().compareTo(arg0.getValue());
+//					}
+//				};				
+//
+//				Collections.sort(pairEntries, c2);
+//				
+//				BitSet pairBS = new BitSet();
+//				Iterator<Entry<BitSet, Integer>> it = pairEntries.iterator();
+//				while(pairBS.cardinality() < maxPrunedSpeciesCount) {
+//					pairBS.or(it.next().getKey());
+//				}
+//				System.out.println("the magic pruner: " + pairBS);
+//				System.out.println(bts.pruneFast(pairBS, bitTrees.get(mapTreeIndex)));
+				
+				DrawFrame frame = new DrawFrame(pruningPairFreq);
+				frame.setVisible(true);
+				
 
 			}
 		}
