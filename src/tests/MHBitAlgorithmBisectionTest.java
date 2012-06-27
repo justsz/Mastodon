@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import algorithms.MHBitAlgorithm;
+import algorithms.MHBitAlgorithmBisection;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
@@ -19,7 +20,7 @@ import core.*;
  * @author justs
  *
  */
-public class MHBitAlgorithmTest {
+public class MHBitAlgorithmBisectionTest {
 
 	/**
 	 * @param args
@@ -49,11 +50,11 @@ public class MHBitAlgorithmTest {
 		
 		List<BitTree> bitTrees = bts.getBitTrees();
 
-		MHBitAlgorithm mh = new MHBitAlgorithm();
+		MHBitAlgorithmBisection mh = new MHBitAlgorithmBisection();
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.9f, 30, 10000);
+		mh.setLimits(0.95f, 10000);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
@@ -64,6 +65,8 @@ public class MHBitAlgorithmTest {
 //			tree.add(prunedTrees.get(i));
 //			writer.writeTrees(tree);
 //		}
+		
+		
 		
 		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
 		NexusWriter writer = new NexusWriter("Highlighted.trees");

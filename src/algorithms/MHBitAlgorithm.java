@@ -164,6 +164,10 @@ public class MHBitAlgorithm implements Algorithm{
 					while(numberToSet == 0 || numberToSet > prunedSpeciesCount) {
 						numberToSet = pd.sample() + 1;
 					} 
+					
+					if (numberToSet > (taxaCount - prunedSpeciesCount)) {
+						numberToSet = taxaCount - prunedSpeciesCount;
+					}
 
 					//if we are pruning by one more species now, clear one species less from the pruning list this time
 					if(toPrune.cardinality() < prunedSpeciesCount) {
