@@ -96,8 +96,7 @@ public class MHBitAlgorithm implements Algorithm{
 		//		float[] prevScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
 		//		bts.unPrune(filters);
 
-		int matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
-		float[] prevScore = {(float) matches/bitTrees.size(), matches};
+		float[] prevScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
 
 		maxScorePruning.put(prevPruning, prevScore);
 
@@ -213,8 +212,7 @@ public class MHBitAlgorithm implements Algorithm{
 				//				float[] currentscore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 				//				bts.unPrune(filters);
 
-				matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
-				float[] currentScore = {(float) matches/bitTrees.size(), matches};
+				float[] currentScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
 
 				if (currentScore[0] > prevScore[0]) {
 					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
@@ -280,8 +278,8 @@ public class MHBitAlgorithm implements Algorithm{
 				for (int i = 0; i < maxPrunedSpeciesCount; i++) {
 					bits.set(entries.get(i).getKey());
 				}
-				int topPruning = bts.pruneFast(bits, bitTrees.get(mapTreeIndex));
-				System.out.println("top pruning: " + topPruning);
+				float[] topPruning = bts.pruneFast(bits, bitTrees.get(mapTreeIndex));
+				System.out.println("top pruning: " + topPruning[1]);
 
 				//picking best pairs
 //				List<Map.Entry<BitSet, Integer>> pairEntries = new ArrayList<Map.Entry<BitSet, Integer>>();

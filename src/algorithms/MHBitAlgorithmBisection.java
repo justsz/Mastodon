@@ -71,7 +71,6 @@ public class MHBitAlgorithmBisection implements Algorithm{
 		Map<BitSet, float[]> maxScorePruning = new HashMap<BitSet, float[]>();
 		BitSet toPrune = new BitSet();
 		BitSet prevPruning = new BitSet();
-		int matches = 0;
 		float[] prevScore = {0, 0};
 
 		while(repeat) {
@@ -100,9 +99,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 				//		float[] prevScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
 				//		bts.unPrune(filters);
 
-				matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
-				prevScore[0] = (float) matches/bitTrees.size();
-				prevScore[1] = matches;
+				prevScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
 
 				maxScorePruning.put(prevPruning, prevScore);
 			}
@@ -178,8 +175,8 @@ public class MHBitAlgorithmBisection implements Algorithm{
 				//				float[] currentscore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 				//				bts.unPrune(filters);
 
-				matches = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
-				float[] currentScore = {(float) matches/bitTrees.size(), matches};
+				float[] currentScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
+				
 
 				if (currentScore[0] > maxScore[0]) {	//set new optimum
 					maxScore = currentScore;	//might need a clone here

@@ -39,8 +39,8 @@ public class BitTreeSystem {
 	 * Object will hold all information about the set of trees needed for their analysis.
 	 */
 	public BitTreeSystem() {
-		treeCount = 0;
-		treeNumber = 0;
+		treeCount = 0;	 
+		treeNumber = -1;	//later incremented to 0 an so on. Start at -1 to match other indexing
 		weighted = true;
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Clade>();
@@ -83,9 +83,13 @@ public class BitTreeSystem {
 				weighted = false;
 			}
 			BitTree tr = new BitTree(bitTree, weight);
-			tr.order();
+			
+			/////Magical but likely useless ordering step/////
+			//tr.order();
+						
+			
 			bitTrees.add(tr);
-//			bitTrees.add(new BitTree(bitTree, weight));			
+			//			bitTrees.add(new BitTree(bitTree, weight));			
 			newTree = false;
 
 		}
@@ -143,16 +147,16 @@ public class BitTreeSystem {
 			treeNumber++;
 		}
 
-		Clade bset = clades.get(bits);
-		if (bset == null) {
+		Clade clade = clades.get(bits);
+		if (clade == null) {
 			//this cloning is still up for debate. Might change depending on how other features will be implemented
 			Clade newClade = new Clade((BitSet) bits.clone());
 			clades.put(bits, newClade);
 			newClade.addTree(treeNumber);
 			//System.out.println(bits);
 		} else {
-			bset.incrementCount();
-			bset.addTree(treeNumber);
+			clade.incrementCount();
+			clade.addTree(treeNumber);
 		}
 
 
@@ -252,7 +256,7 @@ public class BitTreeSystem {
 	public int getTaxaCount() {
 		return taxa.size();
 	}
-	
+
 	/**
 	 * Returns the set of taxa present in all trees.
 	 * @return set of taxa present in all trees
@@ -373,17 +377,18 @@ public class BitTreeSystem {
 		}
 	}
 
-	public int pruneFast(BitSet pruner, BitTree mapTree) {
+	public float[] pruneFast(BitSet pruner, BitTree mapTree) {
+		float[] result = new float[2];
 		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
 		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());
 
 		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
 		Map<BitSet, BitSet> prunedClades = new HashMap<BitSet, BitSet>(clades.size());
-//		List<BitSet> possibleLimiters = new ArrayList<BitSet>(); 
+		//		List<BitSet> possibleLimiters = new ArrayList<BitSet>(); 
 
 		//Clade3 cl = new Clade3(new BitSet());	//just a placeholder
 		//System.out.println(cl);
-//		double start = System.currentTimeMillis();
+		//		double start = System.currentTimeMillis();
 		for (Map.Entry<BitSet, Clade> entry : clades.entrySet()) {
 			BitSet cladeBits = entry.getValue().getCladeBits();
 			if(cladeBits.intersects(pruner)) {
@@ -397,26 +402,26 @@ public class BitTreeSystem {
 				BitSet matchingTrees = (BitSet) entry.getValue().getCladeToTrees().clone();
 				if(cl == null) {
 					prunedClades.put(cladeBits, matchingTrees);
-//					if (matchingTrees.cardinality() == 1 && mapTree.getBits().contains(cladeBits)) {	//mid-processing
-//						System.out.println("possible");
-//						possibleLimiters.add(cladeBits);
-//					}
+					//					if (matchingTrees.cardinality() == 1 && mapTree.getBits().contains(cladeBits)) {	//mid-processing
+					//						System.out.println("possible");
+					//						possibleLimiters.add(cladeBits);
+					//					}
 				} else {
 					cl.or(matchingTrees);
 				}
 			}
 		}
-		
-		
+
+
 		//mid-processing step, might not be very useful
-//		for (BitSet bs : possibleLimiters) {
-//			if (prunedClades.get(bs).size() == 1) {
-//				unPrune(filters);
-//				return 1;
-//			}
-//		}
-		
-//		System.out.println(System.currentTimeMillis() - start);
+		//		for (BitSet bs : possibleLimiters) {
+		//			if (prunedClades.get(bs).size() == 1) {
+		//				unPrune(filters);
+		//				return 1;
+		//			}
+		//		}
+
+		//		System.out.println(System.currentTimeMillis() - start);
 
 		BitSet runningIntersection = new BitSet();
 		for(BitSet bs : mapTree.getBits()) {  
@@ -430,14 +435,30 @@ public class BitTreeSystem {
 			}
 			if (runningIntersection.cardinality() == 1) {	//a limiting clade has reduced it to only the map tree
 				unPrune(filters);
-				
-				return 1;
+				if(weighted) {
+					result[0] = bitTrees.get(runningIntersection.nextSetBit(0)).getWeight();
+				} else {
+					result[0] = 1.0f/bitTrees.size();
+				}
+				result[1] = 1;
+				return result;
 			}
 		}
 
+		
+		//calculate map score based on whether the trees are weighted or not. Might simplify this later if I specialize to unweighted trees
 		int subTreeCount = runningIntersection.cardinality();
+		if(weighted) {
+			for (int i = runningIntersection.nextSetBit(0); i >= 0; i = runningIntersection.nextSetBit(i+1)) {
+				result[0] += bitTrees.get(i).getWeight();
+			}
+		} else {
+			result[0] = (float) subTreeCount/bitTrees.size();
+		}
+		result[1] = subTreeCount;
+
 		unPrune(filters);
 
-		return subTreeCount;
+		return result;
 	}
 }
