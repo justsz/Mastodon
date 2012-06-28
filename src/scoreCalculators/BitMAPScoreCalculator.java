@@ -2,6 +2,7 @@
 package scoreCalculators;
 
 
+import java.util.BitSet;
 import java.util.List;
 import core.BitTree;
 
@@ -12,6 +13,7 @@ import core.BitTree;
  *
  */
 public class BitMAPScoreCalculator {
+	private BitSet forTest = new BitSet();
 
 	/**
 	 * Calculates the map score and number of matching trees. 
@@ -27,11 +29,13 @@ public class BitMAPScoreCalculator {
 		float sum = 0;
 		int count = 0;
 		boolean weighted = true;
+		forTest.clear();
 
 		boolean[] matches = MAPTree.equalsList(trees);
 
 		for (int i = 0; i < matches.length; i++) {	
 			if(matches[i]) {
+				forTest.set(i);
 				count++;
 				float weight = trees.get(i).getWeight();
 				if(weight == -1) {
@@ -44,6 +48,7 @@ public class BitMAPScoreCalculator {
 			}
 		}
 		
+		
 		result[1] = count;
 		if(weighted) {
 			result[0] = sum;
@@ -52,5 +57,9 @@ public class BitMAPScoreCalculator {
 		}
 		//System.out.println(System.currentTimeMillis() - start);
 		return result;
+	}
+	
+	public BitSet getTest() {
+		return forTest;
 	}
 }

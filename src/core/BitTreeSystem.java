@@ -25,7 +25,7 @@ import jebl.evolution.trees.RootedTree;
  *
  */
 public class BitTreeSystem {
-	private Set<Taxon> taxa;	//Set of all unique taxa
+	private LinkedHashSet<Taxon> taxa;	//Set of all unique taxa. LinkedHashSet because order needs to be maintained
 	private Map<BitSet, Clade> clades;	//Map of unique clades and their frequencies of appearence in the set of trees
 	private boolean newTree = false;	//used to mark the beginning of a new tree during the search for unique clades
 	private List<BitSet> bitTree;	//temporary storage for BitSet representation of individual trees
@@ -33,6 +33,7 @@ public class BitTreeSystem {
 	private int treeCount;
 	private boolean weighted;
 	private int treeNumber;
+	private boolean firstTree;
 
 
 	/**
@@ -45,6 +46,8 @@ public class BitTreeSystem {
 		this.taxa = new LinkedHashSet<Taxon>();
 		this.clades = new HashMap<BitSet, Clade>();
 		this.bitTrees = new ArrayList<BitTree>();
+		firstTree = true;
+		
 
 		//construct full set of taxa
 		//		for(RootedTree tree : trees) {
@@ -60,10 +63,19 @@ public class BitTreeSystem {
 	 */
 
 	public void addTrees(List<? extends RootedTree> trees) {
-		//need to do this for every tree? Can it be assumed that all trees have the same taxa list?
-		for(RootedTree tree : trees) {
-			taxa.addAll(tree.getTaxa());
+		if (firstTree) {
+			taxa.addAll(trees.get(0).getTaxa());
+			firstTree = false;
 		}
+		
+		for(RootedTree tree : trees) {
+			if(!taxa.equals(tree.getTaxa())) {
+				System.out.println("Trees don't all contain the same taxa. Exiting.");
+				System.exit(2);
+			}
+		}
+		
+		
 
 		for(RootedTree tree : trees) {
 			addClades(tree, tree.getRootNode());
@@ -95,6 +107,7 @@ public class BitTreeSystem {
 		}
 
 		treeCount += trees.size();
+		
 	}
 
 	/**
@@ -441,6 +454,7 @@ public class BitTreeSystem {
 					result[0] = 1.0f/bitTrees.size();
 				}
 				result[1] = 1;
+				forTest = runningIntersection;
 				return result;
 			}
 		}
@@ -456,9 +470,14 @@ public class BitTreeSystem {
 			result[0] = (float) subTreeCount/bitTrees.size();
 		}
 		result[1] = subTreeCount;
-
+		
 		unPrune(filters);
-
+		forTest = runningIntersection;
 		return result;
+	}
+	private BitSet forTest;
+	
+	public BitSet getTest() {
+		return forTest;
 	}
 }

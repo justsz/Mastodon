@@ -65,7 +65,7 @@ public class MHBitAlgorithm implements Algorithm{
 			}
 		}
 
-		//BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
+		BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
 		mapTreeIndex = bts.getMapTreeIndex();		
 
 		System.out.println("Map tree: " + (mapTreeIndex+1));
@@ -208,11 +208,20 @@ public class MHBitAlgorithm implements Algorithm{
 				}
 
 
-				//				filters = bts.prune(toPrune);
-				//				float[] currentscore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
-				//				bts.unPrune(filters);
+								Map<BitSet, BitSet> filters = bts.prune(toPrune);
+								calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
+								BitSet forTest1 = calc.getTest();
+								bts.unPrune(filters);
 
 				float[] currentScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
+				BitSet forTest2 = bts.getTest();
+				
+				if(!forTest1.equals(forTest2)) {
+					System.out.println("fail!");
+					System.out.println(forTest1);
+					System.out.println(forTest2);
+					System.exit(2);
+				}
 
 				if (currentScore[0] > prevScore[0]) {
 					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
@@ -280,7 +289,47 @@ public class MHBitAlgorithm implements Algorithm{
 				}
 				float[] topPruning = bts.pruneFast(bits, bitTrees.get(mapTreeIndex));
 				System.out.println("top pruning: " + topPruning[1]);
-
+				
+				BitSet paperPruning = new BitSet();
+				paperPruning.set(3);
+				paperPruning.set(4);
+				paperPruning.set(5);
+				paperPruning.set(7);
+				paperPruning.set(65);
+				paperPruning.set(58);
+				paperPruning.set(59);
+				paperPruning.set(50);
+				paperPruning.set(51);
+				paperPruning.set(48);
+				paperPruning.set(54);
+				paperPruning.set(44);
+				paperPruning.set(41);
+				paperPruning.set(43);
+				paperPruning.set(45);
+				paperPruning.set(39);
+				paperPruning.set(37);
+				paperPruning.set(27);
+				paperPruning.set(28);
+				paperPruning.set(11);
+				paperPruning.set(12);
+				paperPruning.set(13);
+				paperPruning.set(14);
+				paperPruning.set(15);
+				paperPruning.set(8);
+				paperPruning.set(17);
+				paperPruning.set(82);
+				
+				System.out.println(paperPruning);
+								
+				for(Taxon t : bts.getTaxa(paperPruning)) {
+					System.out.println(t);
+				}
+				
+				System.out.println("old, paperPruning: " + bts.pruneFast(paperPruning, bitTrees.get(mapTreeIndex))[0]);
+				bts.prune(paperPruning);
+				System.out.println("new, paperPruning: " + calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees)[0]);
+				
+				
 				//picking best pairs
 //				List<Map.Entry<BitSet, Integer>> pairEntries = new ArrayList<Map.Entry<BitSet, Integer>>();
 //				for (Map.Entry<BitSet, Integer> e : pruningPairFreq.entrySet()) {
