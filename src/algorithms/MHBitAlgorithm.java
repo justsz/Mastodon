@@ -69,7 +69,7 @@ public class MHBitAlgorithm implements Algorithm{
 		mapTreeIndex = bts.getMapTreeIndex();		
 
 		System.out.println("Map tree: " + (mapTreeIndex+1));
-		int prunedSpeciesCount = 20;
+		int prunedSpeciesCount = 1;
 
 		float[] maxScore = {0, 0};
 		Map<BitSet, float[]> maxScorePruning = new HashMap<BitSet, float[]>();
@@ -208,20 +208,20 @@ public class MHBitAlgorithm implements Algorithm{
 				}
 
 
-								Map<BitSet, BitSet> filters = bts.prune(toPrune);
-								calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
-								BitSet forTest1 = calc.getTest();
-								bts.unPrune(filters);
+//								Map<BitSet, BitSet> filters = bts.prune(toPrune);
+//								calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
+//								BitSet forTest1 = calc.getTest();
+//								bts.unPrune(filters);
 
 				float[] currentScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
-				BitSet forTest2 = bts.getTest();
+//				BitSet forTest2 = bts.getTest();
 				
-				if(!forTest1.equals(forTest2)) {
-					System.out.println("fail!");
-					System.out.println(forTest1);
-					System.out.println(forTest2);
-					System.exit(2);
-				}
+//				if(!forTest1.equals(forTest2)) {
+//					System.out.println("fail!");
+//					System.out.println(forTest1);
+//					System.out.println(forTest2);
+//					System.exit(2);
+//				}
 
 				if (currentScore[0] > prevScore[0]) {
 					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
@@ -320,14 +320,16 @@ public class MHBitAlgorithm implements Algorithm{
 				paperPruning.set(82);
 				
 				System.out.println(paperPruning);
-								
-				for(Taxon t : bts.getTaxa(paperPruning)) {
-					System.out.println(t);
-				}
 				
-				System.out.println("old, paperPruning: " + bts.pruneFast(paperPruning, bitTrees.get(mapTreeIndex))[0]);
+				System.out.println("new, paperPruning: " + bts.pruneFast(paperPruning, bitTrees.get(mapTreeIndex))[0]);
+//				List<BitSet> blagh = bitTrees.get(11665).getBits();
+//				for (BitSet bl : blagh) {
+//					System.out.println(bl);
+//				}
+				
 				bts.prune(paperPruning);
-				System.out.println("new, paperPruning: " + calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees)[0]);
+				System.out.println("old, paperPruning: " + calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees)[0]);
+				
 				
 				
 				//picking best pairs
@@ -353,8 +355,9 @@ public class MHBitAlgorithm implements Algorithm{
 //				System.out.println("the magic pruner: " + pairBS);
 //				System.out.println(bts.pruneFast(pairBS, bitTrees.get(mapTreeIndex)));
 				
-				DrawFrame frame = new DrawFrame(pruningPairFreq);
-				frame.setVisible(true);
+				//call heatmap display
+//				DrawFrame frame = new DrawFrame(pruningPairFreq);
+//				frame.setVisible(true);
 				
 
 			}

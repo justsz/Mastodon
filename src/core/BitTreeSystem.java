@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTreeUtils;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.RootedTree;
 
@@ -47,7 +49,7 @@ public class BitTreeSystem {
 		this.clades = new HashMap<BitSet, Clade>();
 		this.bitTrees = new ArrayList<BitTree>();
 		firstTree = true;
-		
+
 
 		//construct full set of taxa
 		//		for(RootedTree tree : trees) {
@@ -67,15 +69,15 @@ public class BitTreeSystem {
 			taxa.addAll(trees.get(0).getTaxa());
 			firstTree = false;
 		}
-		
+
 		for(RootedTree tree : trees) {
 			if(!taxa.equals(tree.getTaxa())) {
 				System.out.println("Trees don't all contain the same taxa. Exiting.");
 				System.exit(2);
 			}
 		}
-		
-		
+
+
 
 		for(RootedTree tree : trees) {
 			addClades(tree, tree.getRootNode());
@@ -95,11 +97,11 @@ public class BitTreeSystem {
 				weighted = false;
 			}
 			BitTree tr = new BitTree(bitTree, weight);
-			
+
 			/////Magical but likely useless ordering step/////
 			//tr.order();
-						
-			
+
+
 			bitTrees.add(tr);
 			//			bitTrees.add(new BitTree(bitTree, weight));			
 			newTree = false;
@@ -107,7 +109,7 @@ public class BitTreeSystem {
 		}
 
 		treeCount += trees.size();
-		
+
 	}
 
 	/**
@@ -436,12 +438,13 @@ public class BitTreeSystem {
 
 		//		System.out.println(System.currentTimeMillis() - start);
 
+
 		BitSet runningIntersection = new BitSet();
 		for(BitSet bs : mapTree.getBits()) {  
 			if (bs.cardinality() > 1) {
-				BitSet clade = prunedClades.get(bs);
+				BitSet clade = prunedClades.get(bs); //bad name
 				if (runningIntersection.cardinality() == 0) {
-					runningIntersection.xor(clade);
+					runningIntersection.or(clade);
 				} else {
 					runningIntersection.and(clade);
 				}
@@ -459,8 +462,48 @@ public class BitTreeSystem {
 			}
 		}
 
-		
+
 		//calculate map score based on whether the trees are weighted or not. Might simplify this later if I specialize to unweighted trees
+
+		int cladeCount = 0;
+		Set<BitSet> boop = new HashSet<BitSet>();
+		boolean first = true;
+		for (int i = runningIntersection.nextSetBit(0); i >= 0; i = runningIntersection.nextSetBit(i+1)) {
+			///looking for bug
+			//int c = 0;
+			//Set<BitSet> ble = new HashSet<BitSet>();
+			for(BitSet b : bitTrees.get(i).getBits()) {
+				if(first) {
+					if(b.cardinality() > 1) {
+						boop.add(b);
+					}
+				} else {
+
+					if(b.cardinality() > 1) {
+						if(!boop.contains(b)) {
+							System.out.println(">>>oy");
+							System.out.println(bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i)));
+						}
+						//					c++;
+						//ble.add(b);
+						//need to also check for identical clades..
+						//save first set and then check with contains?
+						
+					}
+				}
+			}
+			first = false;
+			//c = ble.size();
+//			if (first) {
+//				cladeCount = c;
+//				first = false;
+//			}
+//			if(cladeCount != c) {
+//				System.out.println(">>>oy");
+//				System.out.println(bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i)));
+//			}
+		}
+
 		int subTreeCount = runningIntersection.cardinality();
 		if(weighted) {
 			for (int i = runningIntersection.nextSetBit(0); i >= 0; i = runningIntersection.nextSetBit(i+1)) {
@@ -468,15 +511,17 @@ public class BitTreeSystem {
 			}
 		} else {
 			result[0] = (float) subTreeCount/bitTrees.size();
-		}
+		}		
+
 		result[1] = subTreeCount;
-		
+
+
 		unPrune(filters);
 		forTest = runningIntersection;
 		return result;
 	}
-	private BitSet forTest;
-	
+
+	private BitSet forTest;	
 	public BitSet getTest() {
 		return forTest;
 	}
