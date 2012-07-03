@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/93/trunk/src/figtree/treeviewer/decorators
+END
+ContinuousStrokeDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/decorators/ContinuousStrokeDecorator.java
+END
+Decorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/decorators/Decorator.java
+END
+ParsimonyBranchDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/11/trunk/src/figtree/treeviewer/decorators/ParsimonyBranchDecorator.java
+END
+DiscreteColorDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/decorators/DiscreteColorDecorator.java
+END
+AttributableDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/decorators/AttributableDecorator.java
+END
+CompoundDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/decorators/CompoundDecorator.java
+END
+ContinuousColorDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/93/trunk/src/figtree/treeviewer/decorators/ContinuousColorDecorator.java
+END
+ContinousScale.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/93/trunk/src/figtree/treeviewer/decorators/ContinousScale.java
+END

@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/127/trunk/src/figtree/treeviewer/treelayouts
+END
+RectilinearTreeLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/127/trunk/src/figtree/treeviewer/treelayouts/RectilinearTreeLayout.java
+END
+PolarTreeLayoutController.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/treelayouts/PolarTreeLayoutController.java
+END
+AbstractTreeLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/100/trunk/src/figtree/treeviewer/treelayouts/AbstractTreeLayout.java
+END
+TreeLayoutCache.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/118/trunk/src/figtree/treeviewer/treelayouts/TreeLayoutCache.java
+END
+TreeLayoutListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/11/trunk/src/figtree/treeviewer/treelayouts/TreeLayoutListener.java
+END
+RectilinearTreeLayoutController.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/treelayouts/RectilinearTreeLayoutController.java
+END
+RadialTreeLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/123/trunk/src/figtree/treeviewer/treelayouts/RadialTreeLayout.java
+END
+PolarTreeLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/126/trunk/src/figtree/treeviewer/treelayouts/PolarTreeLayout.java
+END
+TreeLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/100/trunk/src/figtree/treeviewer/treelayouts/TreeLayout.java
+END
+RadialTreeLayoutController.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/83/trunk/src/figtree/treeviewer/treelayouts/RadialTreeLayoutController.java
+END

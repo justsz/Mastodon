@@ -465,44 +465,53 @@ public class BitTreeSystem {
 
 		//calculate map score based on whether the trees are weighted or not. Might simplify this later if I specialize to unweighted trees
 
+		
+		//this block checks whether the trees deduced to be equal to the map tree don't have extra clades
 		int cladeCount = 0;
-		Set<BitSet> boop = new HashSet<BitSet>();
+//		Set<BitSet> boop = new HashSet<BitSet>();
 		boolean first = true;
 		for (int i = runningIntersection.nextSetBit(0); i >= 0; i = runningIntersection.nextSetBit(i+1)) {
 			///looking for bug
-			//int c = 0;
-			//Set<BitSet> ble = new HashSet<BitSet>();
+			int c = 0;
+			Set<BitSet> ble = new HashSet<BitSet>();
 			for(BitSet b : bitTrees.get(i).getBits()) {
-				if(first) {
-					if(b.cardinality() > 1) {
-						boop.add(b);
-					}
-				} else {
+//				if(first) {
+//					if(b.cardinality() > 1) {
+//						boop.add(b);
+//					}
+//				} else {
 
 					if(b.cardinality() > 1) {
-						if(!boop.contains(b)) {
-							System.out.println(">>>oy");
-							System.out.println(bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i)));
-						}
-						//					c++;
-						//ble.add(b);
+//						if(!boop.contains(b)) {
+//							System.out.println(">>>oy");
+//							System.out.println(bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i)));
+//						}
+//											c++;
+						ble.add(b);
 						//need to also check for identical clades..
 						//save first set and then check with contains?
 						
 					}
+//				}
+			}
+//			first = false;
+			c = ble.size();
+			if (first) {
+				cladeCount = c;
+				first = false;
+			}
+			if(cladeCount != c) {
+				System.out.println("Are these trees really equal? ");
+				if (bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i))) {
+					System.out.println("True.");
+				} else {
+					runningIntersection.clear(i);
+					System.out.println("False. Tree removed.");
 				}
 			}
-			first = false;
-			//c = ble.size();
-//			if (first) {
-//				cladeCount = c;
-//				first = false;
-//			}
-//			if(cladeCount != c) {
-//				System.out.println(">>>oy");
-//				System.out.println(bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i)));
-//			}
 		}
+		
+		
 
 		int subTreeCount = runningIntersection.cardinality();
 		if(weighted) {

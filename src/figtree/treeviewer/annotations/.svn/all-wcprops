@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/117/trunk/src/figtree/treeviewer/annotations
+END
+AnnotationDefinition.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/87/trunk/src/figtree/treeviewer/annotations/AnnotationDefinition.java
+END
+DefineAnnotationDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/80/trunk/src/figtree/treeviewer/annotations/DefineAnnotationDialog.java
+END
+AnnotationDefinitionsDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/98/trunk/src/figtree/treeviewer/annotations/AnnotationDefinitionsDialog.java
+END
+AnnotationDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/117/trunk/src/figtree/treeviewer/annotations/AnnotationDialog.java
+END
+SelectAnnotationDialog.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/80/trunk/src/figtree/treeviewer/annotations/SelectAnnotationDialog.java
+END

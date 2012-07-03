@@ -30,7 +30,7 @@ public class MHBitAlgorithmTest {
 		String test = 
 //				"simple.trees";
 //				"snowflake-48d500.trees";
-				"carnivores17k.trprobs";
+				"carnivores2.trprobs";
 //				"H3N2_1441_tips.500.trees";
 //				"H3N2_1968-2011.338_tips.500.trees";
 
