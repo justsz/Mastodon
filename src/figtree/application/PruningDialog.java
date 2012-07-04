@@ -65,13 +65,15 @@ public class PruningDialog implements PropertyChangeListener{
 
 		NumberFormat fractionFormat = NumberFormat.getNumberInstance();
 		fractionFormat.setMinimumFractionDigits(1);
-		fractionFormat.setMaximumFractionDigits(10)
-;		minScore = new JFormattedTextField(fractionFormat);
+		fractionFormat.setMaximumFractionDigits(10);
+		minScore = new JFormattedTextField(fractionFormat);
+		
 		
 		minScore.addPropertyChangeListener("value", this);
 
 		minScore.setColumns(10);
 		maxPruning.setColumns(10);
+		minScore.setValue(0);
 		iterations.setColumns(10);
 
 
