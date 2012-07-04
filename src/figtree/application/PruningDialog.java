@@ -14,6 +14,8 @@ import jam.panels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * @author justs
@@ -24,8 +26,7 @@ public class PruningDialog implements PropertyChangeListener{
 	String fileName;
 	JLabel selectedData;
 
-
-	private JFileChooser fileChooser = new JFileChooser();
+	
 	private AbstractAction buttonAction = new AbstractAction("Select Data") {
 		public void actionPerformed(ActionEvent ae) {
 			FileDialog dialog = new FileDialog(frame, "Select Data", FileDialog.LOAD);
@@ -55,8 +56,19 @@ public class PruningDialog implements PropertyChangeListener{
 					minScore.setValue(0);
 				}
 			}
+		} else if (e.getSource() == maxPruning || e.getSource() == iterations) {
+			Object val = ((JFormattedTextField) e.getSource()).getValue();
+			if (val != null) {
+				double value = ((Number) val).intValue();
+				if (value < 0) {
+					((JFormattedTextField) e.getSource()).setValue(-value);
+				} else if (value < 1) {
+					((JFormattedTextField) e.getSource()).setValue(1);
+				}
+			}
 		}
 	}
+	
 
 	public PruningDialog(JFrame frame) {
 		this.frame = frame;
@@ -66,15 +78,20 @@ public class PruningDialog implements PropertyChangeListener{
 		NumberFormat fractionFormat = NumberFormat.getNumberInstance();
 		fractionFormat.setMinimumFractionDigits(1);
 		fractionFormat.setMaximumFractionDigits(10);
-		minScore = new JFormattedTextField(fractionFormat);
+		minScore = new JFormattedTextField(fractionFormat);		
 		
-		
-		minScore.addPropertyChangeListener("value", this);
 
 		minScore.setColumns(10);
 		maxPruning.setColumns(10);
-		minScore.setValue(0);
 		iterations.setColumns(10);
+		
+		minScore.setValue(0.0);
+		maxPruning.setValue(1l);
+		iterations.setValue(1l);
+		
+		minScore.addPropertyChangeListener("value", this);
+		maxPruning.addPropertyChangeListener("value", this);
+		iterations.addPropertyChangeListener("value", this);
 
 
 
@@ -111,7 +128,6 @@ public class PruningDialog implements PropertyChangeListener{
 		}
 
 		if (result == JOptionPane.OK_OPTION) {
-
 		}
 
 		return result;

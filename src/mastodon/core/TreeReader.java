@@ -30,7 +30,7 @@ public class TreeReader {
 	 * Plain constructor. Call setFile afterwards. 
 	 * @throws IOException 
 	 */
-	public TreeReader() throws IOException {
+	public TreeReader() {
 	}
 	
 	/**
@@ -67,6 +67,14 @@ public class TreeReader {
 		} else {
 			imp = new NewickImporter(reader, true);
 		}	  
+	}
+	
+	/**
+	 * Returns the current set filename.
+	 * @return current set filename
+	 */
+	public String getFile() {
+		return fileName;
 	}
 
 

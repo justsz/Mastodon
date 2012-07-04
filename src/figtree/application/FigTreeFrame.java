@@ -11,6 +11,7 @@ import jebl.evolution.alignments.BasicAlignment;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.*;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.util.Attributable;
 import jam.controlpalettes.BasicControlPalette;
@@ -1324,26 +1325,42 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 	//>>>>>>>>>>>>>>>>
 
 	PruningDialog pruningDialog;
+	Launcher launcher;
 	public final void doPruning() throws IOException, ImportException {
 		if (pruningDialog == null) {
 			pruningDialog = new PruningDialog(this);
 		}
 
 		if (pruningDialog.showDialog() == JOptionPane.OK_OPTION) {
-			pruningDialog.setVisible(false);
+			if(pruningDialog.getFile() != null) {
 
-			Launcher launcher = new Launcher(this, 
-					pruningDialog.getFile(), 
-					pruningDialog.getMinScore(), 
-					pruningDialog.getMaxPrunedTaxa(), 
-					pruningDialog.getIterations());
+				pruningDialog.setVisible(false);
 
+				if(launcher == null) {
+					launcher = new Launcher(this, 
+							pruningDialog.getFile(), 
+							pruningDialog.getMinScore(), 
+							pruningDialog.getMaxPrunedTaxa(), 
+							pruningDialog.getIterations());
+				} else {
+					launcher.setFrame(this);
+					launcher.setFileName(pruningDialog.getFile());
+					launcher.setMinScore(pruningDialog.getMinScore());
+					launcher.setMaxPruned(pruningDialog.getMaxPrunedTaxa());
+					launcher.setIterations(pruningDialog.getIterations());
+				}
 
+				List<SimpleRootedTree> trees = launcher.launchMH();
 
-			for(Tree t : launcher.launchMH()) {
-				treeViewer.addTree(t);
+				for(Tree tree : trees) {
+					treeViewer.addTree(tree);
+				}
+				treeViewer.fireTreeChanged();
+			} else {
+				JOptionPane.showMessageDialog(this,
+						"Please select file.", "Error Massage",
+						JOptionPane.ERROR_MESSAGE);
 			}
-			treeViewer.fireTreeChanged();
 
 		}
 	}

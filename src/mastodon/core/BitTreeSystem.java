@@ -501,7 +501,7 @@ public class BitTreeSystem {
 				first = false;
 			}
 			if(cladeCount != c) {
-				System.out.println("Are these trees really equal? ");
+				System.out.println("Are these trees really equal? [Comparing tree " + runningIntersection.nextSetBit(0) + " against tree " + i + "]");
 				if (bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i))) {
 					System.out.println("True.");
 				} else {
