@@ -55,14 +55,13 @@ public class Launcher {
 		dialog.setLocation(500, 500);
 
 
-		//JLabel addingProgress = new JLabel("");
-
-
-		//dialog.add(addingProgress);
+		String progressText = "Processing trees.";
+		JTextArea addingProgress = new JTextArea(progressText);
+		dialog.add(addingProgress);
+		
 		dialog.add(progressBar);
 		dialog.pack();
-		//JOptionPane pane = new JOptionPane();
-
+		
 		dialog.setVisible(true);
 
 		if (!fileName.equals(reader.getFile())) {
@@ -84,9 +83,10 @@ public class Launcher {
 				treeCounter += trees.size();
 				if (trees.size() != 0)
 					System.out.println(treeCounter + "..");
-				//addingProgress.setText("" + treeCounter);
+				progressText += "\n" + treeCounter + "..";
+				addingProgress.setText(progressText);
 				//addingProgress.repaint();
-				frame.repaint();
+				//frame.repaint();
 				dialog.repaint();
 			} while (trees.size() == 100);
 			trees = null;
@@ -122,11 +122,11 @@ public class Launcher {
 			String resultString = "";		
 			for(ArrayList<Taxon> taxaList : result.keySet()) {
 				for (Taxon taxon : taxaList) {
-					resultString += taxon.getName() + ", ";
+					resultString += taxon.getName() + "\n";
 				}
 				resultString += "[" + result.get(taxaList)[0] + ", " + (int) result.get(taxaList)[1] + "]\n";
 			}
-
+			
 			JTextArea text = new JTextArea(resultString);
 			results.add(text);
 			results.pack();
@@ -136,6 +136,7 @@ public class Launcher {
 		}
 
 	}
+	
 
 	private JFrame frame;
 	/**

@@ -142,7 +142,13 @@ public class PruningDialog implements PropertyChangeListener{
 	}
 	
 	public double getMinScore() {
-		return (Double) minScore.getValue();
+		Object value = minScore.getValue();
+		if (value instanceof Double) {
+			return (Double) value;
+		} else {
+			//otherwise it's a long, 0 or 1
+			return ((Long) value).doubleValue();
+		}
 	}
 	
 	public long getMaxPrunedTaxa() {
