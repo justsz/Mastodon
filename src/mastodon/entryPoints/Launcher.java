@@ -27,15 +27,25 @@ public class Launcher {
 
 
 	private String fileName;
-	private double minScore;
-	private long maxPruned;
-	private long iterations;
+	private float minScore;
+	private int maxPruned;
+	private int iterations;
 
 	private TreeReader reader;
 	private BitTreeSystem bts;
 	private MHBitAlgorithm mh;
 
-	public Launcher(JFrame frame, String filename, double minScore, long maxPruned, long iterations) {
+//	public Launcher(JFrame frame, String filename, float minScore, int maxPruned, int iterations) {
+//		setFrame(frame);
+//		setFileName(filename);
+//		setMinScore(minScore);
+//		setMaxPruned(maxPruned);
+//		setIterations(iterations);
+//		reader = new TreeReader();
+//		mh = new MHBitAlgorithm();
+//	}
+	
+	public Launcher(JFrame frame, String filename, String minScore, String maxPruned, String iterations) {
 		setFrame(frame);
 		setFileName(filename);
 		setMinScore(minScore);
@@ -45,7 +55,7 @@ public class Launcher {
 		mh = new MHBitAlgorithm();
 	}
 
-	public List<SimpleRootedTree> launchMH() throws IOException, ImportException {
+	public void launchMH() throws IOException, ImportException {
 		//need to add close actions to frames
 		JDialog dialog = new JDialog(frame, "Progress");
 		JProgressBar progressBar = new JProgressBar(0, 100);
@@ -107,7 +117,7 @@ public class Launcher {
 					"Can't prune more taxa than are present in the tree.", "Error Massage",
 					JOptionPane.ERROR_MESSAGE);
 			
-			return new ArrayList<SimpleRootedTree>();
+			//return new ArrayList<SimpleRootedTree>();
 		} else {
 
 			mh.setTrees(bts, bts.getBitTrees());
@@ -132,9 +142,13 @@ public class Launcher {
 			results.pack();
 			results.setVisible(true);
 
-			return mh.getHighlightedPrunedMapTrees();
+			//return mh.getHighlightedPrunedMapTrees();
 		}
 
+	}
+	
+	public RunResult getResults() {
+		return mh.getRunResult();
 	}
 	
 
@@ -170,42 +184,42 @@ public class Launcher {
 	/**
 	 * @return the minScore
 	 */
-	public double getMinScore() {
+	public float getMinScore() {
 		return minScore;
 	}
 
 	/**
 	 * @param minScore the minScore to set
 	 */
-	public void setMinScore(double minScore) {
-		this.minScore = minScore;
+	public void setMinScore(String minScore) {
+		this.minScore = Float.parseFloat(minScore);
 	}
 
 	/**
 	 * @return the maxPruned
 	 */
-	public long getMaxPruned() {
+	public int getMaxPruned() {
 		return maxPruned;
 	}
 
 	/**
 	 * @param maxPruned the maxPruned to set
 	 */
-	public void setMaxPruned(long maxPruned) {
-		this.maxPruned = maxPruned;
+	public void setMaxPruned(String maxPruned) {
+		this.maxPruned = Integer.parseInt(maxPruned);
 	}
 
 	/**
 	 * @return the iterations
 	 */
-	public long getIterations() {
+	public int getIterations() {
 		return iterations;
 	}
 
 	/**
 	 * @param iterations the iterations to set
 	 */
-	public void setIterations(long iterations) {
-		this.iterations = iterations;
+	public void setIterations(String iterations) {
+		this.iterations = Integer.parseInt(iterations);
 	}
 }

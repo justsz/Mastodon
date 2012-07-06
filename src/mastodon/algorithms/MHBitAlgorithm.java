@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -261,7 +262,7 @@ public class MHBitAlgorithm implements Algorithm{
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
 				prunedSpeciesCount++;
 			} else {
-				taxa = maxScorePruning;
+				taxa = new LinkedHashMap<BitSet, float[]>(maxScorePruning);
 				repeat = false;
 
 				//extra experimental and progress-tracking stuff
@@ -416,6 +417,22 @@ public class MHBitAlgorithm implements Algorithm{
 			trs.add(bts.reconstructTree(mapTree, bs));
 		}
 		return trs;
+	}
+	
+	public RunResult getRunResult() {
+		List<ArrayList<Taxon>> prunedTaxa = new ArrayList<ArrayList<Taxon>>();
+		List<float[]> pruningScores = new ArrayList<float[]>();
+		List<SimpleRootedTree> prunedMapTrees = new ArrayList<SimpleRootedTree>();
+		
+		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+		
+		for(Entry<BitSet, float[]> entry : taxa.entrySet()) {
+			prunedTaxa.add((ArrayList<Taxon>) bts.getTaxa(entry.getKey()));
+			pruningScores.add(entry.getValue());
+			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey()));
+		}
+		
+		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees);
 	}
 
 }

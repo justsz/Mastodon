@@ -1350,9 +1350,9 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 					launcher.setIterations(pruningDialog.getIterations());
 				}
 
-				List<SimpleRootedTree> trees = launcher.launchMH();
+				launcher.launchMH();
 
-				for(Tree tree : trees) {
+				for(Tree tree : launcher.getResults().getPrunedMapTrees()) {
 					treeViewer.addTree(tree);
 				}
 				treeViewer.fireTreeChanged();
