@@ -654,141 +654,141 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
     }
 
     protected void processTraces(final LogFileTraces[] tracesArray) {
-
-        final JFrame frame = this;
-
-        // set default dir to directory of last file
-        setDefaultDir(tracesArray[tracesArray.length - 1].getFile());
-
-        if (tracesArray.length == 1) {
-            try {
-                final LogFileTraces traces = tracesArray[0];
-
-                final String fileName = traces.getName();
-                final ProgressMonitorInputStream in = new ProgressMonitorInputStream(
-                        this,
-                        "Reading " + fileName,
-                        new FileInputStream(traces.getFile()));
-                in.getProgressMonitor().setMillisToDecideToPopup(0);
-                in.getProgressMonitor().setMillisToPopup(0);
-
-                final Reader reader = new InputStreamReader(in);
-
-                Thread readThread = new Thread() {
-                    public void run() {
-                        try {
-                            traces.loadTraces(reader);
-
-                            EventQueue.invokeLater(
-                                    new Runnable() {
-                                        public void run() {
-                                            analyseTraceList(traces);
-                                            addTraceList(traces);
-                                        }
-                                    });
-
-                        } catch (final TraceException te) {
-                            EventQueue.invokeLater(
-                                    new Runnable() {
-                                        public void run() {
-                                            JOptionPane.showMessageDialog(frame, "Problem with trace file: " + te.getMessage(),
-                                                    "Problem with tree file",
-                                                    JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    });
-                        } catch (final InterruptedIOException iioex) {
-                            // The cancel dialog button was pressed - do nothing
-                        } catch (final IOException ioex) {
-                            EventQueue.invokeLater(
-                                    new Runnable() {
-                                        public void run() {
-                                            JOptionPane.showMessageDialog(frame, "File I/O Error: " + ioex.getMessage(),
-                                                    "File I/O Error",
-                                                    JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    });
-//                    } catch (final Exception ex) {
-//                        EventQueue.invokeLater (
-//                                new Runnable () {
-//                                    public void run () {
-//                                        JOptionPane.showMessageDialog(frame, "Fatal exception: " + ex.getMessage(),
-//                                                "Error reading file",
+//
+//        final JFrame frame = this;
+//
+//        // set default dir to directory of last file
+//        setDefaultDir(tracesArray[tracesArray.length - 1].getFile());
+//
+//        if (tracesArray.length == 1) {
+//            try {
+//                final LogFileTraces traces = tracesArray[0];
+//
+//                final String fileName = traces.getName();
+//                final ProgressMonitorInputStream in = new ProgressMonitorInputStream(
+//                        this,
+//                        "Reading " + fileName,
+//                        new FileInputStream(traces.getFile()));
+//                in.getProgressMonitor().setMillisToDecideToPopup(0);
+//                in.getProgressMonitor().setMillisToPopup(0);
+//
+//                final Reader reader = new InputStreamReader(in);
+//
+//                Thread readThread = new Thread() {
+//                    public void run() {
+//                        try {
+//                            traces.loadTraces(reader);
+//
+//                            EventQueue.invokeLater(
+//                                    new Runnable() {
+//                                        public void run() {
+//                                            analyseTraceList(traces);
+//                                            addTraceList(traces);
+//                                        }
+//                                    });
+//
+//                        } catch (final TraceException te) {
+//                            EventQueue.invokeLater(
+//                                    new Runnable() {
+//                                        public void run() {
+//                                            JOptionPane.showMessageDialog(frame, "Problem with trace file: " + te.getMessage(),
+//                                                    "Problem with tree file",
+//                                                    JOptionPane.ERROR_MESSAGE);
+//                                        }
+//                                    });
+//                        } catch (final InterruptedIOException iioex) {
+//                            // The cancel dialog button was pressed - do nothing
+//                        } catch (final IOException ioex) {
+//                            EventQueue.invokeLater(
+//                                    new Runnable() {
+//                                        public void run() {
+//                                            JOptionPane.showMessageDialog(frame, "File I/O Error: " + ioex.getMessage(),
+//                                                    "File I/O Error",
+//                                                    JOptionPane.ERROR_MESSAGE);
+//                                        }
+//                                    });
+////                    } catch (final Exception ex) {
+////                        EventQueue.invokeLater (
+////                                new Runnable () {
+////                                    public void run () {
+////                                        JOptionPane.showMessageDialog(frame, "Fatal exception: " + ex.getMessage(),
+////                                                "Error reading file",
+////                                                JOptionPane.ERROR_MESSAGE);
+////                                    }
+////                                });
+//                        }
+//
+//                    }
+//                };
+//                readThread.start();
+//
+//            } catch (FileNotFoundException fnfe) {
+//                JOptionPane.showMessageDialog(this, "Unable to open file: File not found",
+//                        "Unable to open file",
+//                        JOptionPane.ERROR_MESSAGE);
+//            } catch (IOException ioex) {
+//                JOptionPane.showMessageDialog(this, "File I/O Error: " + ioex,
+//                        "File I/O Error",
+//                        JOptionPane.ERROR_MESSAGE);
+//            } catch (Exception ex) {
+//                JOptionPane.showMessageDialog(this, "Fatal exception: " + ex,
+//                        "Error reading file",
+//                        JOptionPane.ERROR_MESSAGE);
+//            }
+//
+//        } else {
+//            Thread readThread = new Thread() {
+//                public void run() {
+//                    try {
+//                        for (final LogFileTraces traces : tracesArray) {
+//                            final Reader reader = new FileReader(traces.getFile());
+//                            traces.loadTraces(reader);
+//
+//                            EventQueue.invokeLater(
+//                                    new Runnable() {
+//                                        public void run() {
+//                                            analyseTraceList(traces);
+//                                            addTraceList(traces);
+//                                        }
+//                                    });
+//                        }
+//
+//                    } catch (final TraceException te) {
+//                        EventQueue.invokeLater(
+//                                new Runnable() {
+//                                    public void run() {
+//                                        JOptionPane.showMessageDialog(frame, "Problem with trace file: " + te.getMessage(),
+//                                                "Problem with tree file",
 //                                                JOptionPane.ERROR_MESSAGE);
 //                                    }
 //                                });
-                        }
-
-                    }
-                };
-                readThread.start();
-
-            } catch (FileNotFoundException fnfe) {
-                JOptionPane.showMessageDialog(this, "Unable to open file: File not found",
-                        "Unable to open file",
-                        JOptionPane.ERROR_MESSAGE);
-            } catch (IOException ioex) {
-                JOptionPane.showMessageDialog(this, "File I/O Error: " + ioex,
-                        "File I/O Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Fatal exception: " + ex,
-                        "Error reading file",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-
-        } else {
-            Thread readThread = new Thread() {
-                public void run() {
-                    try {
-                        for (final LogFileTraces traces : tracesArray) {
-                            final Reader reader = new FileReader(traces.getFile());
-                            traces.loadTraces(reader);
-
-                            EventQueue.invokeLater(
-                                    new Runnable() {
-                                        public void run() {
-                                            analyseTraceList(traces);
-                                            addTraceList(traces);
-                                        }
-                                    });
-                        }
-
-                    } catch (final TraceException te) {
-                        EventQueue.invokeLater(
-                                new Runnable() {
-                                    public void run() {
-                                        JOptionPane.showMessageDialog(frame, "Problem with trace file: " + te.getMessage(),
-                                                "Problem with tree file",
-                                                JOptionPane.ERROR_MESSAGE);
-                                    }
-                                });
-                    } catch (final InterruptedIOException iioex) {
-                        // The cancel dialog button was pressed - do nothing
-                    } catch (final IOException ioex) {
-                        EventQueue.invokeLater(
-                                new Runnable() {
-                                    public void run() {
-                                        JOptionPane.showMessageDialog(frame, "File I/O Error: " + ioex.getMessage(),
-                                                "File I/O Error",
-                                                JOptionPane.ERROR_MESSAGE);
-                                    }
-                                });
-//                    } catch (final Exception ex) {
-//                        EventQueue.invokeLater (
-//                                new Runnable () {
-//                                    public void run () {
-//                                        JOptionPane.showMessageDialog(frame, "Fatal exception: " + ex.getMessage(),
-//                                                "Error reading file",
+//                    } catch (final InterruptedIOException iioex) {
+//                        // The cancel dialog button was pressed - do nothing
+//                    } catch (final IOException ioex) {
+//                        EventQueue.invokeLater(
+//                                new Runnable() {
+//                                    public void run() {
+//                                        JOptionPane.showMessageDialog(frame, "File I/O Error: " + ioex.getMessage(),
+//                                                "File I/O Error",
 //                                                JOptionPane.ERROR_MESSAGE);
 //                                    }
 //                                });
-                    }
-
-                }
-            };
-            readThread.start();
-
-        }
+////                    } catch (final Exception ex) {
+////                        EventQueue.invokeLater (
+////                                new Runnable () {
+////                                    public void run () {
+////                                        JOptionPane.showMessageDialog(frame, "Fatal exception: " + ex.getMessage(),
+////                                                "Error reading file",
+////                                                JOptionPane.ERROR_MESSAGE);
+////                                    }
+////                                });
+//                    }
+//
+//                }
+//            };
+//            readThread.start();
+//
+//        }
     }
 
     protected boolean readFromFile(File file) throws IOException {
