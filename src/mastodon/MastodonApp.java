@@ -6,9 +6,6 @@ import jam.framework.*;
 
 import javax.swing.*;
 
-import figtree.application.FigTreeApplication;
-import figtree.application.FigTreeFrame;
-
 import java.awt.*;
 import java.io.File;
 import java.util.Locale;

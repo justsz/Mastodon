@@ -17,8 +17,8 @@ import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
 import mastodon.trace.*;
 import figtree.application.PruningDialog;
-import figtree.panel.FigTreePanel;
 import figtree.treeviewer.ExtendedTreeViewer;
+import figtree.treeviewer.TreeViewerListener;
 import jam.framework.DocumentFrame;
 import jam.panels.ActionPanel;
 import jam.table.TableRenderer;
@@ -58,6 +58,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private TraceTableModel traceTableModel = null;
 	private JSplitPane splitPane1 = null;
 	private JPanel topPanel = null;
+	
+	private JPanel cardPanel;
+	
+	private TopToolbar topToolbar;
 
 	private JTable resultTable = null;
 	private ResultTableModel resultTableModel = null;
@@ -71,7 +75,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private final List<LogFileTraces> traceLists = new ArrayList<LogFileTraces>();
 	//private final List<Layer> layers = new ArrayList<Layer>();
 	private RunResult runResult;
-	private int currentTree;
+	private JLabel score;
 
 	String message = "";
 	private int dividerLocation = -1;
@@ -103,7 +107,20 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		setExportAction(exportDataAction);
 
 		setAnalysesEnabled(false);
+		
 	}
+	
+	TreeViewerListener scoreListner = new TreeViewerListener() {
+		public void treeChanged() {
+			//TreeViewer treeViewer = figTreePanel.getTreeViewer();
+			float[] scores = runResult.getPruningScores().get(figTreePanel.getTreeViewer().getCurrentTreeIndex());
+			score.setText("Map score: " + scores[0] + " Found in " + (int)scores[1] + " trees.");
+		}
+
+		public void treeSettingsChanged() {
+			// nothing to do
+		}
+	};
 
 	public void initializeComponents() {
 
@@ -111,6 +128,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		figTreePanel = new FigTreePanel(FigTreePanel.Style.DEFAULT);
 		figTreePanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 6, 12, 12)));
+		figTreePanel.getTreeViewer().addTreeViewerListener(scoreListner);
 
 		traceTableModel = new TraceTableModel();
 		traceTable = new JTable(traceTableModel);
@@ -131,6 +149,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		scrollPane1 = new JScrollPane(traceTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+		
+		//the little plus/minus sign under top right table?
 		ActionPanel actionPanel1 = new ActionPanel(false);
 		actionPanel1.setAddAction(getImportAction());
 		actionPanel1.setRemoveAction(getRemoveTraceAction());
@@ -145,7 +165,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		topPanel.add(scrollPane1, BorderLayout.CENTER);
 		topPanel.add(controlPanel1, BorderLayout.SOUTH);
 
-		resultTableModel = new ResultTableModel();
+		resultTableModel = new ResultTableModel(null, figTreePanel);
 		resultTable = new JTable(resultTableModel) {
 			//Implement table header tool tips.
 			protected JTableHeader createDefaultTableHeader() {
@@ -197,12 +217,30 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		progressPanel.add(progressLabel, BorderLayout.NORTH);
 		progressPanel.add(progressBar, BorderLayout.CENTER);
 		progressPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
+		
+		JPanel scorePanel = new JPanel(new BorderLayout(0, 0));
+		score = new JLabel("");
+		scorePanel.add(score);
+		scorePanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
+		
+		cardPanel = new JPanel(new CardLayout());
+		cardPanel.add(progressPanel, "progress");
+		cardPanel.add(scorePanel, "score");		
+		cardPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
 
 		leftPanel.add(splitPane1, BorderLayout.CENTER);
-		leftPanel.add(progressPanel, BorderLayout.SOUTH);
+		leftPanel.add(cardPanel, BorderLayout.SOUTH);
 		leftPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
+		
+		topToolbar = new TopToolbar((SimpleTreeViewer) figTreePanel.getTreeViewer(), resultTable);
+		JPanel rightPanel = new JPanel(new BorderLayout(0,0));
+		rightPanel.add(topToolbar.getToolbar(), BorderLayout.NORTH);
+		rightPanel.add(figTreePanel, BorderLayout.CENTER);
+		rightPanel.setBackground(new Color(231, 237, 246));
+		rightPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
+		
 
-		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, leftPanel, figTreePanel);
+		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, leftPanel, rightPanel);
 		splitPane2.setBorder(null);
 		splitPane2.setDividerLocation(350);
 
@@ -624,12 +662,20 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 					runResult = launcher.getResults();
 
 					//temporary implementations
-					currentTree = 0;
 
-					for(Tree tree : runResult.getPrunedMapTrees()) {
-						//((ExtendedTreeViewer)figTreePanel.getTreeViewer()).addTree(tree);
-						figTreePanel.setTree(tree);
-					}
+//					for(Tree tree : runResult.getPrunedMapTrees()) {
+//						//((ExtendedTreeViewer)figTreePanel.getTreeViewer()).addTree(tree);
+//						figTreePanel.setTree(tree);
+//					}
+					
+					figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());
+					resultTableModel.setRunResult(runResult);
+					figTreePanel.setColourBy("pruned");
+					resultTableModel.fireTableDataChanged();
+					
+					//switch from progress bar to score panel
+					((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+					//topToolbar.fireTreesChanged();
 					//((ExtendedTreeViewer)figTreePanel.getTreeViewer()).fireTreeChanged();
 				}
 			} else {
@@ -881,45 +927,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		public boolean isCellEditable(int row, int col) {
 			return col == 2 && row < traceLists.size();
-		}
-	}
-
-	class ResultTableModel extends AbstractTableModel {
-		final String[] columnNames = {"Taxon name"};
-
-		public int getColumnCount() {
-			return columnNames.length;
-		}
-
-		public int getRowCount() {
-			if(runResult == null) {
-				return 0;
-			}
-			return runResult.getPrunedTaxa().get(currentTree).size();
-		}
-
-		public String getColumnName(int col) {
-			return columnNames[col];
-		}
-
-		public Object getValueAt(int row, int col) {
-			Taxon taxon = runResult.getPrunedTaxa().get(currentTree).get(row);
-
-			if (col == 0) return taxon.getName();
-			//if (col == 1) return layer.getType().toString();
-
-			return "";
-		}
-
-		public boolean isCellEditable(int row, int col) {
-			return false;
-		}
-
-		public Class getColumnClass(int c) {
-			if (getRowCount() == 0) {
-				return Object.class;
-			}
-			return getValueAt(0, c).getClass();
 		}
 	}
 
