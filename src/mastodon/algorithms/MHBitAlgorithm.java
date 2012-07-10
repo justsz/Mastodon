@@ -38,6 +38,7 @@ public class MHBitAlgorithm implements Algorithm{
 	int maxPrunedSpeciesCount;
 	int totalIterations;
 	int mapTreeIndex;
+	int iterationCounter;
 
 	public void setTrees(BitTreeSystem bts, List<BitTree> bitTrees) {
 		this.bts = bts;
@@ -106,7 +107,7 @@ public class MHBitAlgorithm implements Algorithm{
 		//ITERATIONS//
 		/////////////
 		boolean repeat = true;
-		//		int iterationCounter = 0;
+				iterationCounter = 0;
 		//		int increment = totalIterations / 100;
 
 		//choose how many iterations to allocate to each "round" of pruning
@@ -146,7 +147,7 @@ public class MHBitAlgorithm implements Algorithm{
 				//								if ((iterationCounter % increment) == 0) {
 				//									System.out.print("\r" + iterationCounter/increment + "%");
 				//								}
-				//								iterationCounter++;
+				iterationCounter++;
 
 
 				//toPrune = (BitSet) toPrune.clone();
@@ -433,6 +434,14 @@ public class MHBitAlgorithm implements Algorithm{
 		}
 		
 		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees);
+	}
+	
+	public int getIterationCounter() {
+		return iterationCounter;
+	}
+	
+	public void setIterationCounter(int i) {
+		iterationCounter = i;
 	}
 
 }

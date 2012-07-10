@@ -44,6 +44,8 @@ public abstract class LongTask {
 				return null;
 			}
         };
+        
+        //I think start() is deprecated
         worker.execute();
         //worker.start();
     }

@@ -58,9 +58,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private TraceTableModel traceTableModel = null;
 	private JSplitPane splitPane1 = null;
 	private JPanel topPanel = null;
-	
+
 	private JPanel cardPanel;
-	
+
 	private TopToolbar topToolbar;
 
 	private JTable resultTable = null;
@@ -107,9 +107,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		setExportAction(exportDataAction);
 
 		setAnalysesEnabled(false);
-		
+
 	}
-	
+
 	TreeViewerListener scoreListner = new TreeViewerListener() {
 		public void treeChanged() {
 			//TreeViewer treeViewer = figTreePanel.getTreeViewer();
@@ -149,7 +149,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		scrollPane1 = new JScrollPane(traceTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-		
+
 		//the little plus/minus sign under top right table?
 		ActionPanel actionPanel1 = new ActionPanel(false);
 		actionPanel1.setAddAction(getImportAction());
@@ -214,15 +214,16 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		JPanel progressPanel = new JPanel(new BorderLayout(0, 0));
 		progressLabel = new JLabel("");
 		progressBar = new JProgressBar();
+		progressBar.setBorderPainted(true);
 		progressPanel.add(progressLabel, BorderLayout.NORTH);
 		progressPanel.add(progressBar, BorderLayout.CENTER);
 		progressPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
-		
+
 		JPanel scorePanel = new JPanel(new BorderLayout(0, 0));
 		score = new JLabel("");
 		scorePanel.add(score);
 		scorePanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
-		
+
 		cardPanel = new JPanel(new CardLayout());
 		cardPanel.add(progressPanel, "progress");
 		cardPanel.add(scorePanel, "score");		
@@ -231,14 +232,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		leftPanel.add(splitPane1, BorderLayout.CENTER);
 		leftPanel.add(cardPanel, BorderLayout.SOUTH);
 		leftPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
-		
+
 		topToolbar = new TopToolbar((SimpleTreeViewer) figTreePanel.getTreeViewer(), resultTable);
 		JPanel rightPanel = new JPanel(new BorderLayout(0,0));
 		rightPanel.add(topToolbar.getToolbar(), BorderLayout.NORTH);
 		rightPanel.add(figTreePanel, BorderLayout.CENTER);
 		rightPanel.setBackground(new Color(231, 237, 246));
 		rightPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
-		
+
 
 		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, leftPanel, rightPanel);
 		splitPane2.setBorder(null);
@@ -423,6 +424,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	AnalyseTraceTask analyseTask = null;
 
+
 	class AnalyseTraceTask extends LongTask {
 
 		class AnalysisStack<T> {
@@ -506,10 +508,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 						ex.printStackTrace();
 						//                        EventQueue.invokeLater (
-								//								new Runnable () {
-									//									public void run () {
-										//										JOptionPane.showMessageDialog(TracerFrame.this, "Fatal exception: " + ex.getMessage(),
-												//												"Error reading file",
+						//								new Runnable () {
+						//									public void run () {
+						//										JOptionPane.showMessageDialog(TracerFrame.this, "Fatal exception: " + ex.getMessage(),
+						//												"Error reading file",
 						//												JOptionPane.ERROR_MESSAGE);
 						//									}
 						//								});
@@ -627,6 +629,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	PruningDialog pruningDialog;
 	Launcher launcher;
+	javax.swing.Timer timer;
 	public final void doPruning() throws IOException, ImportException {
 		if (pruningDialog == null) {
 			pruningDialog = new PruningDialog(this);
@@ -639,10 +642,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				String maxPruning = pruningDialog.getMaxPrunedTaxa();
 				String iterations = pruningDialog.getIterations();
 
-
 				if(GUIInputVerifier.verifyMHAlgorithmInput(minScore, maxPruning, iterations)) {
 
-					pruningDialog.setVisible(false);
+					//pruningDialog.setVisible(false);
 
 					if(launcher == null) {
 						launcher = new Launcher(this, 
@@ -658,26 +660,27 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 						launcher.setIterations(iterations);
 					}
 
-					launcher.launchMH();
-					runResult = launcher.getResults();
+					((CardLayout)cardPanel.getLayout()).show(cardPanel, "progress");
+					progressBar.setMaximum(launcher.getIterations());
+					progressBar.setValue(0);					
+					progressBar.setString("");
+					progressBar.setStringPainted(true);
+					timer = new javax.swing.Timer(1000, new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+							System.out.println(launcher.getCurrentIterations());
+							if (launcher.getCurrentIterations() > 0) {
+								progressBar.setStringPainted(false);
+								progressBar.setValue(launcher.getCurrentIterations());
+							} else {
+								progressBar.setString(launcher.getTreeCounter() + " trees loaded");
+							}
+						}
+					});
 
-					//temporary implementations
-
-//					for(Tree tree : runResult.getPrunedMapTrees()) {
-//						//((ExtendedTreeViewer)figTreePanel.getTreeViewer()).addTree(tree);
-//						figTreePanel.setTree(tree);
-//					}
-					
-					figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());
-					resultTableModel.setRunResult(runResult);
-					figTreePanel.setColourBy("pruned");
-					resultTableModel.fireTableDataChanged();
-					
-					//switch from progress bar to score panel
-					((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-					//topToolbar.fireTreesChanged();
-					//((ExtendedTreeViewer)figTreePanel.getTreeViewer()).fireTreeChanged();
-				}
+					new PruningWorker().execute();
+					timer.start();
+				}//the input verifier will display the input validation error if required
+				
 			} else {
 				JOptionPane.showMessageDialog(this,
 						"Please select file.", "Error Massage",
@@ -686,6 +689,28 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		}
 	}
+
+	class PruningWorker extends SwingWorker<Void, Void> {
+		protected Void doInBackground() throws Exception {
+			launcher.launchMH();
+			return null;
+		}
+
+		protected void done() {
+			timer.stop();
+			runResult = launcher.getResults();
+			figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());
+			resultTableModel.setRunResult(runResult);
+			figTreePanel.setColourBy("pruned");
+			resultTableModel.fireTableDataChanged();
+			
+			//switch from progress bar to score panel
+			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+		}
+
+	}
+
+
 
 	public Action getPruningOptionAction() {
 		return pruningOptionAction;
@@ -696,10 +721,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			try {
 				doPruning();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ImportException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

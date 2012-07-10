@@ -34,6 +34,7 @@ public class Launcher {
 	private TreeReader reader;
 	private BitTreeSystem bts;
 	private MHBitAlgorithm mh;
+	private int treeCounter;
 
 //	public Launcher(JFrame frame, String filename, float minScore, int maxPruned, int iterations) {
 //		setFrame(frame);
@@ -57,23 +58,6 @@ public class Launcher {
 
 	public void launchMH() throws IOException, ImportException {
 		//need to add close actions to frames
-		JDialog dialog = new JDialog(frame, "Progress");
-		JProgressBar progressBar = new JProgressBar(0, 100);
-		progressBar.setValue(0);
-		progressBar.setIndeterminate(true);
-		progressBar.setStringPainted(true);
-		dialog.setLocation(500, 500);
-
-
-		String progressText = "Processing trees.";
-		JTextArea addingProgress = new JTextArea(progressText);
-		dialog.add(addingProgress);
-		
-		dialog.add(progressBar);
-		dialog.pack();
-		
-		dialog.setVisible(true);
-
 		if (!fileName.equals(reader.getFile())) {
 			bts = new BitTreeSystem();
 
@@ -85,7 +69,8 @@ public class Launcher {
 			}	
 
 
-			int treeCounter = 0;
+			treeCounter = 0;
+			mh.setIterationCounter(0);
 			List<SimpleRootedTree> trees;		
 			do {
 				trees = reader.read100Trees();
@@ -93,62 +78,30 @@ public class Launcher {
 				treeCounter += trees.size();
 				if (trees.size() != 0)
 					System.out.println(treeCounter + "..");
-				progressText += "\n" + treeCounter + "..";
-				addingProgress.setText(progressText);
-				//addingProgress.repaint();
-				//frame.repaint();
-				dialog.repaint();
 			} while (trees.size() == 100);
 			trees = null;
 		}
 
-		progressBar.setIndeterminate(false);
 		//check that not pruning more than possible
-
-		if (bts.getAllTaxa().size() <= maxPruned) {
-			dialog.setVisible(false);
-			
-//			JOptionPane warn = new JOptionPane("Can't prune more taxa than are present in the tree.", JOptionPane.ERROR_MESSAGE);
-//			JDialog warning = warn.createDialog("Error");
-//			warning.setVisible(true);
-			
-			
+		if (bts.getAllTaxa().size() <= maxPruned) {			
 			JOptionPane.showMessageDialog(frame,
 					"Can't prune more taxa than are present in the tree.", "Error Massage",
 					JOptionPane.ERROR_MESSAGE);
-			
-			//return new ArrayList<SimpleRootedTree>();
 		} else {
 
 			mh.setTrees(bts, bts.getBitTrees());
 			mh.setLimits((float) minScore, (int) maxPruned, (int) iterations);
 			mh.run();
-
-			dialog.setVisible(false);
-
-			Map<ArrayList<Taxon>, float[]> result = mh.getTaxa();
-			JDialog results = new JDialog(frame, "Results");
-
-			String resultString = "";		
-			for(ArrayList<Taxon> taxaList : result.keySet()) {
-				for (Taxon taxon : taxaList) {
-					resultString += taxon.getName() + "\n";
-				}
-				resultString += "[" + result.get(taxaList)[0] + ", " + (int) result.get(taxaList)[1] + "]\n";
-			}
-			
-			JTextArea text = new JTextArea(resultString);
-			results.add(text);
-			results.pack();
-			results.setVisible(true);
-
-			//return mh.getHighlightedPrunedMapTrees();
 		}
 
 	}
 	
 	public RunResult getResults() {
 		return mh.getRunResult();
+	}
+	
+	public int getTreeCounter() {
+		return treeCounter;
 	}
 	
 
@@ -221,5 +174,9 @@ public class Launcher {
 	 */
 	public void setIterations(String iterations) {
 		this.iterations = Integer.parseInt(iterations);
+	}
+	
+	public int getCurrentIterations() {
+		return mh.getIterationCounter();
 	}
 }
