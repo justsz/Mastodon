@@ -1,7 +1,6 @@
 package mastodon;
 
 import mastodon.util.OSType;
-import mastodon.trace.LogFileTraces;
 import jam.framework.*;
 
 import javax.swing.*;

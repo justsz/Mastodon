@@ -6,17 +6,15 @@ import com.lowagie.text.pdf.DefaultFontMapper;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
-import mastodon.app.gui.Layer;
 import mastodon.app.gui.MapperPanel;
 import mastodon.app.gui.FileDrop;
 import mastodon.app.gui.ChartRuntimeException;
 import mastodon.app.gui.TableEditorStopper;
-import mastodon.app.gui.LongTask;
 import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
-import mastodon.trace.*;
 import figtree.application.PruningDialog;
+import figtree.treeviewer.DefaultTreeViewer;
 import figtree.treeviewer.ExtendedTreeViewer;
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.DocumentFrame;
@@ -72,8 +70,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private JLabel progressLabel;
 	private JProgressBar progressBar;
 
-	private final List<LogFileTraces> traceLists = new ArrayList<LogFileTraces>();
-	//private final List<Layer> layers = new ArrayList<Layer>();
 	private List<RunResult> runResults;
 	private int selectedRun;
 	private JLabel score;
@@ -110,7 +106,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		setAnalysesEnabled(false);
 		
 		runResults = new ArrayList<RunResult>();
-
 	}
 
 	TreeViewerListener scoreListner = new TreeViewerListener() {
@@ -152,11 +147,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 
-		//the little plus/minus sign under top right table?
+		//the little plus/minus sign under top left table
 		ActionPanel actionPanel1 = new ActionPanel(false);
 		actionPanel1.setAddAction(getPruningOptionAction());
-		actionPanel1.setRemoveAction(getRemoveTraceAction());
-		getRemoveTraceAction().setEnabled(false);
+		actionPanel1.setRemoveAction(getRemoveRunAction());
+		getRemoveRunAction().setEnabled(false);
 
 		JPanel controlPanel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		controlPanel1.add(actionPanel1);
@@ -183,14 +178,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		};
 		resultTable.getColumnModel().getColumn(0).setPreferredWidth(150);
 		resultTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
-		//        layerTable.getColumnModel().getColumn(1).setPreferredWidth(70);
-		//        layerTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
-		//        layerTable.getColumnModel().getColumn(2).setPreferredWidth(70);
-		//        layerTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
-		//        ComboBoxRenderer comboBoxRenderer = new ComboBoxRenderer(TraceFactory.TraceType.values());
-		//        comboBoxRenderer.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
-		//        layerTable.getColumnModel().getColumn(3).setPreferredWidth(20);
-		//        layerTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
 		resultTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 		resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -290,260 +277,69 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		getCopyAction().setEnabled(true);
 	}
 
-//	public void addTraceList(LogFileTraces traceList) {
-//
-//		int[] selRows = traceTable.getSelectedRows();
-//
-//		traceLists.add(traceList);
-//
-//		setAnalysesEnabled(true);
-//
-//		//traceTableModel.fireTableDataChanged();
-//
-//		int newRow = traceLists.size() - 1;
-//		traceTable.getSelectionModel().setSelectionInterval(newRow, newRow);
-//		if (selRows.length > 1) {
-//			for (int row : selRows) {
-//				if (row == traceLists.size() - 1) {
-//					row = traceLists.size();
-//				}
-//				traceTable.getSelectionModel().addSelectionInterval(row, row);
-//			}
-//		}
-//
+	
+	private void removeRun() {
+		int selRow = runTable.getSelectedRow();
+		
+		if (selRow < 0) {
+			return;
+		}
+		
+		runResults.remove(selRow);
+		int prevRow = selRow - 1;
+		if (prevRow < 0) {
+			getRemoveRunAction().setEnabled(false);
+			prevRow = 0;
+		}
+		selectedRun = prevRow;
+		runTableModel.fireTableDataChanged();
+		runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
 //		setupDividerLocation();
-//	}
+	}
 
 	
-//	private void removeTraceList() {
-//		int[] selRows = traceTable.getSelectedRows();
-//
-//		LogFileTraces[] tls = new LogFileTraces[selRows.length];
-//		int i = 0;
-//		for (int row : selRows) {
-//			tls[i] = traceLists.get(row);
-//			i++;
-//		}
-//		for (LogFileTraces tl : tls) {
-//			traceLists.remove(tl);
-//		}
-//
-//		//traceTableModel.fireTableDataChanged();
-//		resultTableModel.fireTableDataChanged();
-//
-//		if (traceLists.size() == 0) {
-//			getRemoveTraceAction().setEnabled(false);
-//
-//			setAnalysesEnabled(false);
-//
-//			resultTableModel.fireTableDataChanged();
-//		}
-//
-//
-//		if (traceLists.size() > 0) {
-//			int row = selRows[0];
-//			if (row >= traceLists.size()) {
-//				row = traceLists.size() - 1;
-//			}
-//			traceTable.getSelectionModel().addSelectionInterval(row, row);
-//		}
-//		setupDividerLocation();
-//	}
-
-	
-//	public void setBurnIn(int index, int burnIn) {
-//		LogFileTraces trace = traceLists.get(index);
-//		trace.setBurnIn(burnIn);
-//		analyseTraceList(trace);
-//		updateTraceTables();
-//	}
-
-//	public void updateTraceTables() {
-//		int[] selectedTraces = traceTable.getSelectedRows();
-//		int[] selectedStatistics = resultTable.getSelectedRows();
-//
-//		//traceTableModel.fireTableDataChanged();
-//		resultTableModel.fireTableDataChanged();
-//
-//		traceTable.getSelectionModel().clearSelection();
-//		for (int row : selectedTraces) {
-//			traceTable.getSelectionModel().addSelectionInterval(row, row);
-//		}
-//
-//		resultTable.getSelectionModel().clearSelection();
-//		for (int row : selectedStatistics) {
-//			resultTable.getSelectionModel().addSelectionInterval(row, row);
-//		}
-//	}
 
 	public void runTableSelectionChanged() {
 		int selRow = runTable.getSelectedRow();
 
 		//needed?
 		if (selRow < 0) {
-			getRemoveTraceAction().setEnabled(false);
+			getRemoveRunAction().setEnabled(false);
 			setAnalysesEnabled(false);
 			return;
 		}
+		//
 
 		setAnalysesEnabled(true);
-		getRemoveTraceAction().setEnabled(true);
-		
-		
-
-		//int[] rows = resultTable.getSelectedRows();
+		getRemoveRunAction().setEnabled(true);
 		selectedRun = selRow;
-		resultTableModel.setRunResult(runResults.get(selectedRun));
-		figTreePanel.getTreeViewer().setTrees(runResults.get(selectedRun).getPrunedMapTrees());
-		figTreePanel.getTreeViewer().showTree(0);
+		updateDataDisplay();
+
+	}
+	
+	public void updateDataDisplay() {
+		RunResult runResult;
+		if(runResults.size() > 0) {
+			runResult = runResults.get(selectedRun);
+		} else {
+			runResult = null;
+		}
+		resultTableModel.setRunResult(runResult);
+		if (runResult == null) {
+			score.setText("");
+			((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(null);
+		} else {
+			figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());			
+		}
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
 
-//		if (rows.length > 0) {
-//			for (int row : rows) {
-//				resultTable.getSelectionModel().addSelectionInterval(row, row);
-//			}
-//		} else {
-//			resultTable.getSelectionModel().setSelectionInterval(0, 0);
-//		}
+				
 	}
 
 
 	public void resultTableSelectionChanged() {
 
-	}
-
-	public void analyseTraceList(TraceList job) {
-
-		if (analyseTask == null) {
-			analyseTask = new AnalyseTraceTask();
-
-			javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					progressBar.setMaximum(analyseTask.getLengthOfTask());
-					progressBar.setValue(analyseTask.getCurrent());
-				}
-			});
-
-			analyseTask.go();
-			timer.start();
-		}
-
-		analyseTask.add(job);
-	}
-
-	AnalyseTraceTask analyseTask = null;
-
-
-	class AnalyseTraceTask extends LongTask {
-
-		class AnalysisStack<T> {
-			private final java.util.List<T> jobs = new ArrayList<T>();
-
-			public synchronized void add(T job) {
-				jobs.add(job);
-			}
-
-			public synchronized int getCount() {
-				return jobs.size();
-			}
-
-			public synchronized T get(int index) {
-				return jobs.get(index);
-			}
-
-			public synchronized void remove(int index) {
-				jobs.remove(index);
-			}
-		}
-
-		private final AnalysisStack<TraceList> analysisStack = new AnalysisStack<TraceList>();
-
-		public AnalyseTraceTask() {
-		}
-
-		public void add(TraceList job) {
-			analysisStack.add(job);
-			current = 0;
-		}
-
-		public int getCurrent() {
-			return current;
-		}
-
-		public int getLengthOfTask() {
-			int count = 0;
-			for (int i = 0; i < analysisStack.getCount(); i++) {
-				count += analysisStack.get(i).getTraceCount();
-			}
-			return count;
-		}
-
-		public void stop() {
-		}
-
-		public boolean done() {
-			return false;
-		}
-
-		public String getDescription() {
-			return "Analysing Trace File...";
-		}
-
-		public String getMessage() {
-			return null;
-		}
-
-		public Object doWork() {
-
-			current = 0;
-			boolean textCleared = true;
-
-			do {
-				if (analysisStack.getCount() > 0) {
-					Object job = analysisStack.get(0);
-					TraceList tl = (TraceList) job;
-
-					try {
-						for (int i = 0; i < tl.getTraceCount(); i++) {
-							progressLabel.setText("Analysing " + tl.getName() + ":");
-							textCleared = false;
-							tl.analyseTrace(i);
-							repaint();
-							current += 1;
-						}
-					} catch (final Exception ex) {
-						// do nothing. An exception is sometimes fired when burnin is changed whilst in the
-						// middle of an analysis. This doesn't seem to matter as the analysis is restarted.
-
-						ex.printStackTrace();
-						//                        EventQueue.invokeLater (
-						//								new Runnable () {
-						//									public void run () {
-						//										JOptionPane.showMessageDialog(TracerFrame.this, "Fatal exception: " + ex.getMessage(),
-						//												"Error reading file",
-						//												JOptionPane.ERROR_MESSAGE);
-						//									}
-						//								});
-					}
-					analysisStack.remove(0);
-				} else {
-					if (!textCleared) {
-						progressLabel.setText("");
-						textCleared = true;
-					}
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException ie) {
-						// do nothing
-					}
-				}
-			} while (true);
-		}
-
-		//private int lengthOfTask = 0;
-		private int current = 0;
-		//private String message;
 	}
 
 	public final void doExportData() {
@@ -710,6 +506,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			runTableModel.fireTableDataChanged();
 			resultTableModel.fireTableDataChanged();
 			
+			//highlight current run in runTable
+			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+			
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getPruningOptionAction().setEnabled(true);
@@ -746,10 +545,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	}
 
-	protected void processTraces(final LogFileTraces[] tracesArray) {
-		//deleted
-	}
-
 	protected boolean readFromFile(File file) throws IOException {
 		throw new RuntimeException("Cannot read file - use import instead");
 	}
@@ -767,6 +562,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		return figTreePanel.getTreeViewer();
 	}
 
+	
 	class RunTableModel extends AbstractTableModel {
 		final String[] columnNames = {"Run", "Score"};
 
@@ -790,7 +586,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			if (runResults.size() == 0) {
 				switch (col) {
 				case 0:
-					return "No run done yet";
+					return "No runs available";
 				case 1:
 					return "";
 				}
@@ -798,7 +594,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				runResult = runResults.get(row);
 				switch (col) {
 				case 0:
-					return "Run " + row;
+					return runResult.getName();
 				case 1:
 					//justification for .get(0) : 
 					//all runs will have at least 1 tree; all scores in the maxima list are equal, though the number of matching trees could be different
@@ -820,13 +616,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	}
 
 
-	public Action getRemoveTraceAction() {
-		return removeTraceAction;
+	public Action getRemoveRunAction() {
+		return removeRunAction;
 	}
 
-	private final AbstractAction removeTraceAction = new AbstractAction() {
+	private final AbstractAction removeRunAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent ae) {
-			//removeTraceList();
+			removeRun();
 		}
 	};
 

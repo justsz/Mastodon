@@ -91,5 +91,5 @@ public class SimpleTreeViewer extends DefaultTreeViewer implements StatusProvide
 	public void setStatusText(String statusText) {
 		statusHelper.fireStatusChanged(0, statusText);
 	}
-
+	
 }

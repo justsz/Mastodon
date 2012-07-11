@@ -39,6 +39,7 @@ public class MHBitAlgorithm implements Algorithm{
 	int totalIterations;
 	int mapTreeIndex;
 	int iterationCounter;
+	int runCounter = 0;
 
 	public void setTrees(BitTreeSystem bts, List<BitTree> bitTrees) {
 		this.bts = bts;
@@ -263,6 +264,7 @@ public class MHBitAlgorithm implements Algorithm{
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
 				prunedSpeciesCount++;
 			} else {
+				runCounter++;
 				taxa = new LinkedHashMap<BitSet, float[]>(maxScorePruning);
 				repeat = false;
 
@@ -433,7 +435,8 @@ public class MHBitAlgorithm implements Algorithm{
 			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey()));
 		}
 		
-		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees);
+		String name = "MH run " + runCounter;
+		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees, name);
 	}
 	
 	public int getIterationCounter() {

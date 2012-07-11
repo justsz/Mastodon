@@ -71,8 +71,12 @@ public class DefaultTreeViewer extends TreeViewer {
 
     public void setTree(Tree tree) {
         trees.clear();
-        addTree(tree);
-        showTree(0);
+        if (tree == null) {
+        	treePane.setTree((RootedTree)tree);
+        } else {
+        	addTree(tree);
+        	showTree(0);
+        }
     }
 
     public void setTrees(Collection<? extends Tree> trees) {
@@ -85,7 +89,7 @@ public class DefaultTreeViewer extends TreeViewer {
 
     public void addTree(Tree tree) {
         this.trees.add(tree);
-
+        
         if (treePane.getTipLabelPainter() != null) {
             treePane.getTipLabelPainter().setupAttributes(trees);
         }
@@ -147,7 +151,7 @@ public class DefaultTreeViewer extends TreeViewer {
         } else {
             treePane.setTree(Utils.rootTheTree(tree));
         }
-
+    	
         currentTreeIndex = index;
         fireTreeChanged();
     }
