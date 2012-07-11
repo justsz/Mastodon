@@ -38,9 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jebl.evolution.io.ImportException;
-import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
 
 /**
  * @author Just Zarins
