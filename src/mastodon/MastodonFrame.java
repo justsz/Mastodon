@@ -14,8 +14,6 @@ import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
 import figtree.application.PruningDialog;
-import figtree.treeviewer.DefaultTreeViewer;
-import figtree.treeviewer.ExtendedTreeViewer;
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.DocumentFrame;
 import jam.panels.ActionPanel;
