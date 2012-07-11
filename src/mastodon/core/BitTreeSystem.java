@@ -393,6 +393,7 @@ public class BitTreeSystem {
 	}
 
 	public float[] pruneFast(BitSet pruner, BitTree mapTree) {
+		weighted = false;
 		float[] result = new float[2];
 		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
 		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());
@@ -485,12 +486,12 @@ public class BitTreeSystem {
 				first = false;
 			}
 			if(cladeCount != c) {
-				System.out.println("Are these trees really equal? [Comparing tree " + runningIntersection.nextSetBit(0) + " against tree " + i + "]");
+				//System.out.println("Are these trees really equal? [Comparing tree " + runningIntersection.nextSetBit(0) + " against tree " + i + "]");
 				if (bitTrees.get(runningIntersection.nextSetBit(0)).equals(bitTrees.get(i))) {
-					System.out.println("True.");
+				//	System.out.println("True.");
 				} else {
 					runningIntersection.clear(i);
-					System.out.println("False. Tree removed.");
+					//System.out.println("False. Tree removed.");
 				}
 			}
 		}

@@ -13,7 +13,7 @@ import mastodon.app.gui.TableEditorStopper;
 import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
-import figtree.application.PruningDialog;
+import figtree.application.PruningDialog;	
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.DocumentFrame;
 import jam.panels.ActionPanel;
@@ -241,7 +241,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		getContentPane().add(splitPane2, BorderLayout.CENTER);
 
 		splitPane1.setDividerLocation(2000);
-
 	}
 
 	public void setVisible(boolean b) {
@@ -329,7 +328,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
 
-				
+		figTreePanel.setColourBy("pruned");
 	}
 
 
@@ -493,15 +492,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		protected void done() {
 			timer.stop();
 			runResults.add(launcher.getResults());
-			selectedRun = runResults.size() - 1;
-			RunResult runResult = runResults.get(selectedRun);
-			figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());
-			resultTableModel.setRunResult(runResult);
-			figTreePanel.setColourBy("pruned");
+			selectedRun = runResults.size() - 1;			
 			runTableModel.fireTableDataChanged();
-			resultTableModel.fireTableDataChanged();
 			
-			//highlight current run in runTable
+			//highlight current run in runTable and update display
 			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
 			
 			//switch from progress bar to score panel

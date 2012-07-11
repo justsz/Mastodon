@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mastodon.algorithms.MHBitAlgorithm;
-import mastodon.algorithms.MHBitAlgorithmBisection;
+import mastodon.algorithms.SABitAlgorithm;
 import mastodon.core.*;
 
 
@@ -21,7 +21,7 @@ import jebl.evolution.trees.SimpleRootedTree;
  * @author justs
  *
  */
-public class MHBitAlgorithmBisectionTest {
+public class SABitAlgorithmTest {
 
 	/**
 	 * @param args
@@ -51,11 +51,11 @@ public class MHBitAlgorithmBisectionTest {
 		
 		List<BitTree> bitTrees = bts.getBitTrees();
 
-		MHBitAlgorithmBisection mh = new MHBitAlgorithmBisection();
+		SABitAlgorithm mh = new SABitAlgorithm();
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.233f, 2000);
+		mh.setLimits(0.5f, 35, 500, 10, 0.001);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
@@ -67,11 +67,9 @@ public class MHBitAlgorithmBisectionTest {
 //			writer.writeTrees(tree);
 //		}
 		
-		
-		
-		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
-		NexusWriter writer = new NexusWriter("Highlighted.trees");
-		writer.writeTrees(prunedTrees);
+//		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
+//		NexusWriter writer = new NexusWriter("Highlighted.trees");
+//		writer.writeTrees(prunedTrees);
 		
 		
 		
