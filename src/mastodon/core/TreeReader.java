@@ -1,10 +1,17 @@
 package mastodon.core;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.ProgressMonitorInputStream;
+
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NewickImporter;
 import jebl.evolution.io.NexusImporter;
@@ -21,7 +28,7 @@ import jebl.evolution.trees.Tree;
  *
  */
 public class TreeReader {
-	private FileReader reader;
+	private Reader reader;
 	private TreeImporter imp;	 
 	private String fileName;	//Currently used filename.	
 
@@ -59,7 +66,7 @@ public class TreeReader {
 		bufferedReader.close();
 
 		boolean isNexus = (line != null && line.toUpperCase().contains("#NEXUS"));
-
+		
 		reader = new FileReader(fileName);
 
 		if (isNexus) {

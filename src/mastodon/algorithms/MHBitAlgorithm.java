@@ -68,6 +68,22 @@ public class MHBitAlgorithm implements Algorithm{
 				pruningPairFreq.put(bs, 0);
 			}
 		}
+		
+		
+		Map<Integer, Integer> pruningFreq2 = new HashMap<Integer, Integer>();
+		for(int i = 0; i < bts.getTaxaCount(); i++) {
+			pruningFreq2.put(i, 0);
+		}
+		
+		Map<BitSet, Integer> pruningPairFreq2 = new HashMap<BitSet, Integer>();
+		for(int i = 0; i < bts.getTaxaCount(); i++) {
+			for(int e = 0; e< bts.getTaxaCount(); e++) {
+				BitSet bs = new BitSet();
+				bs.set(i);
+				bs.set(e);
+				pruningPairFreq2.put(bs, 0);
+			}
+		}
 
 		BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
 		mapTreeIndex = bts.getMapTreeIndex();		
@@ -258,6 +274,23 @@ public class MHBitAlgorithm implements Algorithm{
 				if (currentScore[0]/prevScore[0] > Random.nextFloat()) {
 					prevPruning = (BitSet) toPrune.clone(); 
 					prevScore = currentScore.clone();
+					
+					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
+						pruningFreq2.put(a, pruningFreq2.get(a) + 1);
+					}
+					
+					if (prunedSpeciesCount == 2) {
+						pruningPairFreq2.put(toPrune, pruningPairFreq2.get(toPrune) + 1);
+					} else if (prunedSpeciesCount > 2) {
+						for (int y = toPrune.nextSetBit(0); y >= 0; y = toPrune.nextSetBit(y+1)) {
+							for (int z = y; z >= 0; z = toPrune.nextSetBit(z+1)) {
+								BitSet bbbb = new BitSet();
+								bbbb.set(y);
+								bbbb.set(z);
+								pruningPairFreq2.put(bbbb, pruningPairFreq2.get(bbbb) + 1);
+							}
+						}
+					}
 				} //try different pruning otherwise
 			}
 			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
@@ -270,8 +303,12 @@ public class MHBitAlgorithm implements Algorithm{
 
 				//extra experimental and progress-tracking stuff
 				System.out.println(maxScore[0] + " " + maxScore[1]);
-//				System.out.println(pruningFreq);
-//				System.out.println(pruningPairFreq);
+				System.out.println("Only better");
+				System.out.println(pruningFreq);
+				//System.out.println(pruningPairFreq);
+				System.out.println("Landscape");
+				System.out.println(pruningFreq2);
+				//System.out.println(pruningPairFreq2);
 
 				//picking best singletons
 				List<Map.Entry<Integer, Integer>> entries = new ArrayList<Map.Entry<Integer, Integer>>();

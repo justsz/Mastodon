@@ -6,6 +6,7 @@ import jam.framework.Application;
 import jam.framework.MenuBarFactory;
 
 import javax.swing.*;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 
@@ -31,6 +32,11 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
         item = new JMenuItem(application.getNewAction());
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuBarFactory.MENU_MASK));
         menu.add(item);
+        
+		item = new JMenuItem(application.getOpenAction());
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MenuBarFactory.MENU_MASK));
+		item.setEnabled(true);
+		menu.add(item);
 
         // On Windows and Linux platforms, each window has its own menu so items which are not needed
         // are simply missing. In contrast, on Mac, the menu is for the application so items should

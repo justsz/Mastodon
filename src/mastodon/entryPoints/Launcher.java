@@ -3,6 +3,9 @@
  */
 package mastodon.entryPoints;
 
+import jam.framework.Application;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,32 +58,67 @@ public class Launcher {
 		reader = new TreeReader();
 		mh = new MHBitAlgorithm();
 	}
+	
+	public Launcher(JFrame frame) {
+		setFrame(frame);
+	}
+	
+	public boolean processFile() throws IOException, ImportException{
+		if(reader == null) {
+			reader = new TreeReader();
+		}
+		
+		
+		bts = new BitTreeSystem();
+		
+		reader.setFile(fileName);
+		
+		treeCounter = 0;
+		
+		List<SimpleRootedTree> trees;		
+		do {
+			trees = reader.read100Trees();
+			if (trees.size() < 1) {
+				//mostly to check for empty file
+				break;
+			}
+			bts.addTrees(trees);
+			treeCounter += trees.size();
+		} while (trees.size() == 100);
+		
+		//mark for garbage collection
+		boolean success = treeCounter != 0;
+		trees = null;
+		reader = null;
+		
+		return success;
+	}
 
 	public void launchMH() throws IOException, ImportException {
 		//need to add close actions to frames
-		if (!fileName.equals(reader.getFile())) {
-			bts = new BitTreeSystem();
-
-			try {
-				reader.setFile(fileName);
-			} catch (IOException e) {
-				System.out.println("File " + fileName + " not found.");
-				System.exit(1);
-			}	
-
-
-			treeCounter = 0;
-			mh.setIterationCounter(0);
-			List<SimpleRootedTree> trees;		
-			do {
-				trees = reader.read100Trees();
-				bts.addTrees(trees);
-				treeCounter += trees.size();
-				if (trees.size() != 0)
-					System.out.println(treeCounter + "..");
-			} while (trees.size() == 100);
-			trees = null;
-		}
+//		if (!fileName.equals(reader.getFile())) {
+//			bts = new BitTreeSystem();
+//
+//			try {
+//				reader.setFile(fileName);
+//			} catch (IOException e) {
+//				System.out.println("File " + fileName + " not found.");
+//				System.exit(1);
+//			}	
+//
+//
+//			treeCounter = 0;
+//			mh.setIterationCounter(0);
+//			List<SimpleRootedTree> trees;		
+//			do {
+//				trees = reader.read100Trees();
+//				bts.addTrees(trees);
+//				treeCounter += trees.size();
+//				if (trees.size() != 0)
+//					System.out.println(treeCounter + "..");
+//			} while (trees.size() == 100);
+//			trees = null;
+//		}
 
 		//check that not pruning more than possible
 		if (bts.getAllTaxa().size() <= maxPruned) {			
@@ -88,13 +126,20 @@ public class Launcher {
 					"Can't prune more taxa than are present in the tree.", "Error Massage",
 					JOptionPane.ERROR_MESSAGE);
 		} else {
+			if (mh == null) {
+				mh = new MHBitAlgorithm();
+			}
 
+			
 			mh.setTrees(bts, bts.getBitTrees());
 			mh.setLimits((float) minScore, (int) maxPruned, (int) iterations);
+			mh.setIterationCounter(0);
 			mh.run();
 		}
 
 	}
+	
+	
 	
 	public RunResult getResults() {
 		return mh.getRunResult();

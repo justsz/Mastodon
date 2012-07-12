@@ -15,7 +15,9 @@ import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
 import figtree.application.PruningDialog;	
 import figtree.treeviewer.TreeViewerListener;
+import jam.framework.Application;
 import jam.framework.DocumentFrame;
+import jam.framework.MultiDocApplication;
 import jam.panels.ActionPanel;
 import jam.table.TableRenderer;
 
@@ -34,6 +36,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import jebl.evolution.io.ImportException;
 
@@ -99,7 +102,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		setExportAction(exportDataAction);
 
 		setAnalysesEnabled(false);
-		
+
 		runResults = new ArrayList<RunResult>();
 	}
 
@@ -271,14 +274,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		getCopyAction().setEnabled(true);
 	}
 
-	
+
 	private void removeRun() {
 		int selRow = runTable.getSelectedRow();
-		
+
 		if (selRow < 0) {
 			return;
 		}
-		
+
 		runResults.remove(selRow);
 		int prevRow = selRow - 1;
 		if (prevRow < 0) {
@@ -288,10 +291,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		selectedRun = prevRow;
 		runTableModel.fireTableDataChanged();
 		runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-//		setupDividerLocation();
+		//		setupDividerLocation();
 	}
 
-	
+
 
 	public void runTableSelectionChanged() {
 		int selRow = runTable.getSelectedRow();
@@ -310,7 +313,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		updateDataDisplay();
 
 	}
-	
+
 	public void updateDataDisplay() {
 		RunResult runResult;
 		if(runResults.size() > 0) {
@@ -400,7 +403,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	}
 
-
 	public final void doImport() {
 		final JFileChooser chooser = new JFileChooser(openDefaultDirectory);
 		chooser.setMultiSelectionEnabled(true);
@@ -431,6 +433,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	Launcher launcher;
 	javax.swing.Timer timer;
 	public final void doPruning() throws IOException, ImportException {
+		//((MultiDocApplication) Application.getApplication()).getUpperDocumentFrame().requestClose();
 		if (pruningDialog == null) {
 			pruningDialog = new PruningDialog(this);
 		}
@@ -473,7 +476,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 					new PruningWorker().execute();
 					timer.start();
 				}//the input verifier will display the input validation error if required
-				
+
 			} else {
 				JOptionPane.showMessageDialog(this,
 						"Please select file.", "Error Massage",
@@ -494,10 +497,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			runResults.add(launcher.getResults());
 			selectedRun = runResults.size() - 1;			
 			runTableModel.fireTableDataChanged();
-			
+
 			//highlight current run in runTable and update display
 			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-			
+
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getPruningOptionAction().setEnabled(true);
@@ -535,7 +538,52 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	}
 
 	protected boolean readFromFile(File file) throws IOException {
-		throw new RuntimeException("Cannot read file - use import instead");
+		if (launcher == null) {
+			launcher = new Launcher(this);
+		}
+		//		boolean success = false;
+		launcher.setFileName(file.getAbsolutePath());
+
+		timer = new javax.swing.Timer(1000, new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				progressBar.setStringPainted(true);
+				progressBar.setString(launcher.getTreeCounter() + " trees loaded");
+			}
+		});
+		new ReadFileWorker().execute();
+		timer.start();
+		//		try {
+		//			success = launcher.processFile();
+		//		} catch (ImportException e) {
+		//			e.printStackTrace();
+		//		}
+		return true;
+		//throw new RuntimeException("Cannot read file - use import instead");
+	}
+
+	class ReadFileWorker extends SwingWorker<Void, Void> {
+		boolean close;
+		DocumentFrame frame;
+
+		protected Void doInBackground() throws Exception {
+			launcher.processFile();
+			return null;
+		}
+
+		protected void done() {
+			timer.stop();
+			//			runResults.add(launcher.getResults());
+			//			selectedRun = runResults.size() - 1;			
+			//			runTableModel.fireTableDataChanged();
+			//
+			//			//highlight current run in runTable and update display
+			//			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+			//
+			//			//switch from progress bar to score panel
+						((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+			//			getPruningOptionAction().setEnabled(true);
+		}
+
 	}
 
 	protected boolean writeToFile(File file) {
@@ -551,7 +599,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		return figTreePanel.getTreeViewer();
 	}
 
-	
+
 	class RunTableModel extends AbstractTableModel {
 		final String[] columnNames = {"Run", "Score"};
 
@@ -593,7 +641,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 			return null;
 		}
-		
+
 	}
 
 	public Action getExportDataAction() {

@@ -22,6 +22,16 @@ public class MastodonApp extends MultiDocApplication {
 
         addPreferencesSection(new GeneralPreferencesSection());
     }
+    
+    public DocumentFrame doOpenFile(File file) {
+        DocumentFrame documentFrame = getUpperDocumentFrame();
+        if (documentFrame != null && documentFrame.getFile() == null) {
+            documentFrame.openFile(file);
+            return documentFrame;
+        } else {
+            return super.doOpenFile(file);
+        }
+    }
 
     // Main entry point
     static public void main(String[] args) {
