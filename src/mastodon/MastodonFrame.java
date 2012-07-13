@@ -13,7 +13,6 @@ import mastodon.app.gui.TableEditorStopper;
 import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
-import figtree.application.PruningDialog;	
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.Application;
 import jam.framework.DocumentFrame;
@@ -147,7 +146,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		//the little plus/minus sign under top left table
 		ActionPanel actionPanel1 = new ActionPanel(false);
-		actionPanel1.setAddAction(getPruningOptionAction());
+		actionPanel1.setAddAction(getAlgorithmAction());
 		actionPanel1.setRemoveAction(getRemoveRunAction());
 		getRemoveRunAction().setEnabled(false);
 
@@ -525,6 +524,80 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}
 		}
 	};
+	
+	public Action getAlgorithmAction() {
+		return algorithmAction;
+	}
+
+	protected AbstractAction algorithmAction = new AbstractAction("Run...") {
+		public void actionPerformed(ActionEvent ae) {
+			try {
+				doAlgorithm();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ImportException e) {
+				e.printStackTrace();
+			}
+		}
+	};
+	
+	AlgorithmDialog algorithmDialog;
+	
+	public final void doAlgorithm() throws IOException, ImportException {
+		//((MultiDocApplication) Application.getApplication()).getUpperDocumentFrame().requestClose();
+		if (algorithmDialog == null) {
+			algorithmDialog = new AlgorithmDialog(this);
+		}
+
+		if (algorithmDialog.showDialog() == JOptionPane.OK_OPTION) {
+//			if(pruningDialog.getFile() != null) {
+//				String file = pruningDialog.getFile();
+//				String minScore = pruningDialog.getMinScore();
+//				String maxPruning = pruningDialog.getMaxPrunedTaxa();
+//				String iterations = pruningDialog.getIterations();
+//
+//				if(GUIInputVerifier.verifyMHAlgorithmInput(minScore, maxPruning, iterations)) {
+//					if(launcher == null) {
+//						launcher = new Launcher(this, file, minScore, maxPruning, iterations);
+//					} else {
+//						launcher.setFrame(this);
+//						launcher.setFileName(file);
+//						launcher.setMinScore(minScore);
+//						launcher.setMaxPruned(maxPruning);
+//						launcher.setIterations(iterations);
+//					}
+//
+//					((CardLayout)cardPanel.getLayout()).show(cardPanel, "progress");
+//					progressBar.setMaximum(launcher.getIterations());
+//					progressBar.setValue(0);					
+//					progressBar.setString("");
+//					progressBar.setStringPainted(true);
+//					timer = new javax.swing.Timer(1000, new ActionListener() {
+//						public void actionPerformed(ActionEvent evt) {
+//							if (launcher.getCurrentIterations() > 0) {
+//								progressBar.setStringPainted(false);
+//								progressBar.setValue(launcher.getCurrentIterations());
+//							} else {
+//								progressBar.setString(launcher.getTreeCounter() + " trees loaded");
+//							}
+//						}
+//					});
+//
+//					getPruningOptionAction().setEnabled(false);
+//					new PruningWorker().execute();
+//					timer.start();
+//				}//the input verifier will display the input validation error if required
+//
+//			} else {
+//				JOptionPane.showMessageDialog(this,
+//						"Please select file.", "Error Massage",
+//						JOptionPane.ERROR_MESSAGE);
+//			}
+
+		}
+	}
+	
+	
 
 	private File openDefaultDirectory = null;
 
@@ -552,19 +625,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		});
 		new ReadFileWorker().execute();
 		timer.start();
-		//		try {
-		//			success = launcher.processFile();
-		//		} catch (ImportException e) {
-		//			e.printStackTrace();
-		//		}
 		return true;
-		//throw new RuntimeException("Cannot read file - use import instead");
 	}
 
 	class ReadFileWorker extends SwingWorker<Void, Void> {
-		boolean close;
-		DocumentFrame frame;
-
 		protected Void doInBackground() throws Exception {
 			launcher.processFile();
 			return null;
@@ -572,16 +636,23 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		protected void done() {
 			timer.stop();
-			//			runResults.add(launcher.getResults());
-			//			selectedRun = runResults.size() - 1;			
-			//			runTableModel.fireTableDataChanged();
-			//
-			//			//highlight current run in runTable and update display
-			//			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-			//
-			//			//switch from progress bar to score panel
-						((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-			//			getPruningOptionAction().setEnabled(true);
+			if(launcher.getTreeCounter() < 1) {
+				JOptionPane.showMessageDialog(launcher.getFrame(), "File " + launcher.getFileName() + " contains no trees.",
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
+				((DocumentFrame) launcher.getFrame()).doCloseWindow();
+			} else {
+				//			runResults.add(launcher.getResults());
+				//			selectedRun = runResults.size() - 1;			
+				//			runTableModel.fireTableDataChanged();
+				//
+				//			//highlight current run in runTable and update display
+				//			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+				//
+				//			//switch from progress bar to score panel
+				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+				//			getPruningOptionAction().setEnabled(true);
+			}
 		}
 
 	}
