@@ -21,7 +21,7 @@ import jebl.evolution.taxa.Taxon;
 		}
 		
 		
-		final String[] columnNames = {"Taxon name"};
+		final String[] columnNames = {"#", "Taxon name"};
 
 		public int getColumnCount() {
 			return columnNames.length;
@@ -43,8 +43,8 @@ import jebl.evolution.taxa.Taxon;
 			int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
 			Taxon taxon = runResult.getPrunedTaxa().get(currentTree).get(row);
 
-			if (col == 0) return taxon.getName();
-			//if (col == 1) return layer.getType().toString();
+			if (col == 0) return row + 1;
+			if (col == 1) return taxon.getName();			
 
 			return "";
 		}

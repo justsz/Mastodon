@@ -38,7 +38,7 @@ public class MHBitAlgorithm implements Algorithm{
 	int maxPrunedSpeciesCount;
 	int totalIterations;
 	int mapTreeIndex;
-	int iterationCounter;
+	int iterationCounter = 0;
 	int runCounter = 0;
 
 	public void setTrees(BitTreeSystem bts, List<BitTree> bitTrees) {

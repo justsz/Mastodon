@@ -31,53 +31,44 @@ public class AlgorithmDialog {
 	JLabel selectedData;
 	JPanel cardPanel;
 
-	
-	private AbstractAction buttonAction = new AbstractAction("Select Data") {
-		public void actionPerformed(ActionEvent ae) {
-			FileDialog dialog = new FileDialog(frame, "Select Data", FileDialog.LOAD);
-			dialog.setVisible(true);
-			String file = dialog.getFile();
-			if (file != null) {
-				fileName = dialog.getDirectory() + file;
-			}
-			selectedData.setText(file);
-		}
-	};
+	int selection = 1;
 	
 	private AbstractAction bisectionAction = new AbstractAction("Bisection") {
 		public void actionPerformed(ActionEvent ae) {
-			//add a check to see if you're already on the bisection view?
+			selection = 1;
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "bisection");
-		}
-	};
-	
-	private AbstractAction MHAction = new AbstractAction("Metropolis Hastings") {
-		public void actionPerformed(ActionEvent ae) {
-			//add a check to see if you're already on the bisection view?
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "MH");
 		}
 	};
 	
 	private AbstractAction SAAction = new AbstractAction("Simulated Annealing") {
 		public void actionPerformed(ActionEvent ae) {
-			//add a check to see if you're already on the bisection view?
+			selection = 2;
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "SA");
 		}
 	};
+	
+	private AbstractAction MHAction = new AbstractAction("Metropolis Hastings") {
+		public void actionPerformed(ActionEvent ae) {
+			selection = 3;
+			((CardLayout)cardPanel.getLayout()).show(cardPanel, "MH");
+		}
+	};
+	
+	
 
 	private final JDialog dialog;
 	private final JOptionPane optionPane;
 
-	private JButton openButton = new JButton(buttonAction);
+	
 	
 	JTextField minBisectionScore = new JTextField("0.0");	
 	JTextField bisectionIterations = new JTextField("1");
 	
 	JTextField minSAScore = new JTextField("0.0");
 	JTextField numberToPrune = new JTextField("1");
-	JTextField SAIterations = new JTextField("1");
 	JTextField initialTemp = new JTextField("1");
 	JTextField minTemp = new JTextField("1");
+	JTextField SAIterations = new JTextField("1");
 	
 	JTextField minMHScore = new JTextField("0.0");
 	JTextField maxPruning = new JTextField("1");
@@ -106,9 +97,10 @@ public class AlgorithmDialog {
 		
 		minSAScore.setColumns(10);
 		numberToPrune.setColumns(10);
-		SAIterations.setColumns(10);
 		initialTemp.setColumns(10);
 		minTemp.setColumns(10);
+		SAIterations.setColumns(10);
+		
 		
 		minMHScore.setColumns(10);
 		maxPruning.setColumns(10);
@@ -125,8 +117,11 @@ public class AlgorithmDialog {
 		group.add(MHButton);
 		group.add(SAButton);
 		buttonsPanel.add(bisectionButton);
-		buttonsPanel.add(MHButton);
 		buttonsPanel.add(SAButton);
+		buttonsPanel.add(MHButton);
+		
+		
+		
 		
 		
 		bisectionOptions.addComponentWithLabel("Minimum MAP score[fraction]", minBisectionScore);
@@ -134,9 +129,9 @@ public class AlgorithmDialog {
 
 		SAOptions.addComponentWithLabel("Minimum MAP score[fraction]", minSAScore);
 		SAOptions.addComponentWithLabel("Number of taxa to prune[1+]", numberToPrune);
-		SAOptions.addComponentWithLabel("Maximum number of iterations[1+]", SAIterations);
 		SAOptions.addComponentWithLabel("Initial temperature[0+]", initialTemp);
 		SAOptions.addComponentWithLabel("Minimum temperature[0+]", minTemp);
+		SAOptions.addComponentWithLabel("Maximum number of iterations[1+]", SAIterations);
 		
 		MHOptions.addComponentWithLabel("Minimum MAP score[fraction]", minMHScore);
 		MHOptions.addComponentWithLabel("Maximum number of taxa to prune[1+]", maxPruning);
@@ -170,7 +165,6 @@ public class AlgorithmDialog {
 
 	public int showDialog() {
 		dialog.setVisible(true);
-
 		int result = JOptionPane.CANCEL_OPTION;
 		Integer value = (Integer)optionPane.getValue();
 		if (value != null && value.intValue() != -1) {
@@ -203,5 +197,35 @@ public class AlgorithmDialog {
 		return MHIterations.getText();
 		
 	}
+	
+	public int getSelection() {
+		return selection;
+	}
+	
+	public String[] getBisectionInput() {
+		String[] input = new String[2];
+		input[0] = minBisectionScore.getText();
+		input[1] = bisectionIterations.getText();
+		return input;
+	}
+	
+	public String[] getSAInput() {
+		String[] input = new String[5];
+		input[0] = minSAScore.getText();
+		input[1] = numberToPrune.getText();
+		input[2] = initialTemp.getText();
+		input[3] = minTemp.getText();
+		input[4] = SAIterations.getText();		
+		return input;
+	}
+	
+	public String[] getMHInput() {
+		String[] input = new String[3];
+		input[0] = minMHScore.getText();
+		input[1] = maxPruning.getText();
+		input[2] = MHIterations.getText();
+		return input;
+	}
+	
 
 }

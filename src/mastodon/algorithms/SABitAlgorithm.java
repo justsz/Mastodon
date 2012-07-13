@@ -311,7 +311,7 @@ public class SABitAlgorithm implements Algorithm{
 			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey()));
 		}
 
-		String name = "MH run " + runCounter;
+		String name = "SA run " + runCounter;
 		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees, name);
 	}
 

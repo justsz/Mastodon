@@ -36,6 +36,8 @@ public class MHBitAlgorithmBisection implements Algorithm{
 	float tolerance;
 	int stepIterations;
 	int mapTreeIndex;
+	int runCounter = 0;
+	int iterationCounter = 0;
 
 	public void setTrees(BitTreeSystem bts, List<BitTree> bitTrees) {
 		this.bts = bts;
@@ -115,6 +117,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 			}
 			PoissonDistribution pd = new PoissonDistribution(mean);
 			for(int i = 0; i < stepIterations; i++) {
+				iterationCounter++;
 
 
 				//toPrune = (BitSet) toPrune.clone();
@@ -206,6 +209,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 			if ((kRight - kLeft) < 2) {
 				lastAdjustment = true;
 				if (maxScore[0] > tolerance) {
+					runCounter++;
 					taxa = maxScorePruning;					
 					repeat = false;
 				}
@@ -264,6 +268,31 @@ public class MHBitAlgorithmBisection implements Algorithm{
 			trs.add(bts.reconstructTree(mapTree, bs));
 		}
 		return trs;
+	}
+	
+	public RunResult getRunResult() {
+		List<ArrayList<Taxon>> prunedTaxa = new ArrayList<ArrayList<Taxon>>();
+		List<float[]> pruningScores = new ArrayList<float[]>();
+		List<SimpleRootedTree> prunedMapTrees = new ArrayList<SimpleRootedTree>();
+		
+		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+		
+		for(Entry<BitSet, float[]> entry : taxa.entrySet()) {
+			prunedTaxa.add((ArrayList<Taxon>) bts.getTaxa(entry.getKey()));
+			pruningScores.add(entry.getValue());
+			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey()));
+		}
+		
+		String name = "Bisection run " + runCounter;
+		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees, name);
+	}
+	
+	public int getIterationCounter() {
+		return iterationCounter;
+	}
+	
+	public void setIterationCounter(int i) {
+		iterationCounter = i;
 	}
 
 }
