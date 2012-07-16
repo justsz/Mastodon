@@ -108,7 +108,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	TreeViewerListener scoreListner = new TreeViewerListener() {
 		public void treeChanged() {
 			//TreeViewer treeViewer = figTreePanel.getTreeViewer();
-			float[] scores = runResults.get(selectedRun).getPruningScores().get(figTreePanel.getTreeViewer().getCurrentTreeIndex());
+			float[] scores;
+			try {	//likely a temporary solution
+				scores = runResults.get(selectedRun).getPruningScores().get(figTreePanel.getTreeViewer().getCurrentTreeIndex());
+			} catch (IndexOutOfBoundsException e) {
+				scores = new float[2];
+				scores[0] = 0;
+				scores[1] = 0;
+			}
 			score.setText("Map score: " + scores[0] + " Found in " + (int)scores[1] + " trees.");
 		}
 
@@ -726,9 +733,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				//			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
 				//
 				//			//switch from progress bar to score panel
+				((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(launcher.getMapTree());
 				getAlgorithmAction().setEnabled(true);
 				progressBar.setString("");
 				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+				
 				//			getPruningOptionAction().setEnabled(true);
 			}
 		}

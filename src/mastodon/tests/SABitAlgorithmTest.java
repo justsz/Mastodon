@@ -55,7 +55,7 @@ public class SABitAlgorithmTest {
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.5f, 35, 500, 10, 0.001);
+		mh.setLimits(0.5f, 43, 10000, 100000, 0.000001);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 

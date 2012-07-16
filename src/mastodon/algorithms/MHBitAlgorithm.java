@@ -89,7 +89,7 @@ public class MHBitAlgorithm implements Algorithm{
 		mapTreeIndex = bts.getMapTreeIndex();		
 
 		System.out.println("Map tree: " + (mapTreeIndex+1));
-		int prunedSpeciesCount = 1;
+		int prunedSpeciesCount = 43;
 
 		float[] maxScore = {0, 0};
 		Map<BitSet, float[]> maxScorePruning = new HashMap<BitSet, float[]>();
@@ -150,7 +150,7 @@ public class MHBitAlgorithm implements Algorithm{
 			}
 		}
 
-
+		int mhcounter = 0;
 		while(repeat) {
 			double start = System.currentTimeMillis();
 			double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0 in PoissonDistribution())
@@ -180,7 +180,7 @@ public class MHBitAlgorithm implements Algorithm{
 					int numberToSet = 0;
 					int numberToClear = 0;
 
-					while(numberToSet == 0 || numberToSet > prunedSpeciesCount) {
+					while(numberToSet < 1 || numberToSet > prunedSpeciesCount) {
 						numberToSet = pd.sample() + 1;
 					} 
 					
@@ -275,6 +275,8 @@ public class MHBitAlgorithm implements Algorithm{
 					prevPruning = (BitSet) toPrune.clone(); 
 					prevScore = currentScore.clone();
 					
+					mhcounter++;
+					
 					for (int a = toPrune.nextSetBit(0); a >= 0; a = toPrune.nextSetBit(a+1)) {
 						pruningFreq2.put(a, pruningFreq2.get(a) + 1);
 					}
@@ -292,6 +294,8 @@ public class MHBitAlgorithm implements Algorithm{
 						}
 					}
 				} //try different pruning otherwise
+				
+				
 			}
 			System.out.println(prunedSpeciesCount + " pruned taxa running time: " + (System.currentTimeMillis() - start));
 			if (maxScore[0] < tolerance && prunedSpeciesCount < maxPrunedSpeciesCount) {
@@ -309,6 +313,7 @@ public class MHBitAlgorithm implements Algorithm{
 				System.out.println("Landscape");
 				System.out.println(pruningFreq2);
 				//System.out.println(pruningPairFreq2);
+				System.out.println("mhiters" + mhcounter);
 
 				//picking best singletons
 				List<Map.Entry<Integer, Integer>> entries = new ArrayList<Map.Entry<Integer, Integer>>();

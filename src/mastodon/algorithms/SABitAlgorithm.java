@@ -1,6 +1,7 @@
 
 package mastodon.algorithms;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -114,9 +115,14 @@ public class SABitAlgorithm implements Algorithm{
 		boolean repeat = true;
 		iterationCounter = 0;
 		
-		//int stepIterations = (int) (totalIterations / (Math.log(temperature / minTemperature) / Math.log(2)));
-		int stepIterations = totalIterations;
-		
+		double coolingRate = 0.7;
+
+		int stepIterations = (int) - (totalIterations / (Math.log(temperature / minTemperature) / Math.log1p(coolingRate - 1))); 
+				//Math.log(coolingRate)));
+		System.out.println("step iterations: " + stepIterations);
+		//int stepIterations = totalIterations;
+		//		double temperatureDecrement = temperature / totalIterations;
+
 		double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0 in PoissonDistribution())
 		if (prunedSpeciesCount > 1) {
 			mean = 0.5 * (prunedSpeciesCount - 1);
@@ -124,10 +130,19 @@ public class SABitAlgorithm implements Algorithm{
 		PoissonDistribution pd = new PoissonDistribution(mean);
 		//		int increment = totalIterations / 100;
 
-
+		java.io.FileWriter fstream;
+		int outputCounter = 0;
+		try {
+			fstream = new java.io.FileWriter("out.txt");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			fstream = null;
+			e1.printStackTrace();
+		}
+		java.io.BufferedWriter out = new java.io.BufferedWriter(fstream);
 		while(repeat) {
 			for(int i = 0; i < stepIterations; i++) {
-		
+
 				//print progress
 				//								if ((iterationCounter % increment) == 0) {
 				//									System.out.print("\r" + iterationCounter/increment + "%");
@@ -142,7 +157,7 @@ public class SABitAlgorithm implements Algorithm{
 				int numberToSet = 0;
 				int numberToClear = 0;
 
-				while(numberToSet == 0 || numberToSet > prunedSpeciesCount) {
+				while(numberToSet < 1 || numberToSet > prunedSpeciesCount) {
 					numberToSet = pd.sample() + 1;
 				} 
 
@@ -215,35 +230,57 @@ public class SABitAlgorithm implements Algorithm{
 					maxScorePruning.put((BitSet) toPrune.clone(), currentScore.clone());
 				}
 
-//System.out.println(Math.exp(-(currentScore[0] - prevScore[0]) / temperature));
-				
-				if (Random.nextFloat() < Math.exp((currentScore[0] - prevScore[0]) / temperature)) {
-					acceptCounter++;
+				//System.out.println(Math.exp(-(currentScore[0] - prevScore[0]) / temperature));
+
+				if (Random.nextDouble() < Math.exp((currentScore[0] - prevScore[0]) / temperature)) {
 					prevPruning = (BitSet) toPrune.clone(); 
 					prevScore = currentScore.clone();
+
 				} //try different pruning otherwise
-				System.out.println(prevScore[0]);
+				//System.out.println(prevScore[0]);
+				outputCounter++;
+				if (outputCounter % 40 == 0) {
+					try {
+						out.write(prevScore[0]+"\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 
-
-			if (maxScore[0] > tolerance && temperature < minTemperature) {
+			//maxScore[0] > tolerance && vvvv
+			if (temperature < minTemperature) {
+				System.out.println("temp " + temperature);
+				System.out.println("iter " + iterationCounter);
 				runCounter++;
 				taxa = new LinkedHashMap<BitSet, float[]>(maxScorePruning);
 				repeat = false;
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				//extra experimental and progress-tracking stuff
 				System.out.println(maxScore[0] + " " + maxScore[1]);
 
 			} else {
-//				System.out.println("temperature " + temperature);
-//				System.out.println("number of accepts " + acceptCounter);
-				acceptCounter = 0;
-				temperature = temperature / 2;
+				//System.out.println("temperature " + temperature);
+				temperature = temperature * coolingRate;
 			}
+			//temperature -= temperatureDecrement;
+			//				temperature /= 1.1;
+			//				System.out.println(temperature);
 		}
-	}
 
-	int acceptCounter = 0;
+
+		//			runCounter++;
+		//			taxa = new LinkedHashMap<BitSet, float[]>(maxScorePruning);
+		//			repeat = false;
+		//
+		//			System.out.println(maxScore[0] + " " + maxScore[1]);
+	}
 
 	public List<ArrayList<Taxon>> getPrunedTaxa() {
 		List<ArrayList<Taxon>> output = new ArrayList<ArrayList<Taxon>>();

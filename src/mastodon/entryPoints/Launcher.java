@@ -18,6 +18,7 @@ import mastodon.core.*;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 
@@ -256,6 +257,11 @@ public class Launcher {
 	}
 	
 	public int getSAIterationMax() {
-		return (int) (iterations * Math.log(initTemp/minTemp) / Math.log(2));
+		//return (int) (iterations * Math.log(initTemp/minTemp) / Math.log(2));
+		return iterations;
+	}
+	
+	public RootedTree getMapTree() {
+		return bts.reconstructTree(bts.getBitTrees().get(bts.getMapTreeIndex()), null);
 	}
 }

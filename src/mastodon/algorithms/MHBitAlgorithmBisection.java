@@ -133,7 +133,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 				int numberToSet = 0;
 				int numberToClear = 0;
 
-				while(numberToSet == 0 || numberToSet > prunedSpeciesCount) {
+				while(numberToSet < 1 || numberToSet > prunedSpeciesCount) {
 					numberToSet = pd.sample() + 1;
 				}
 
