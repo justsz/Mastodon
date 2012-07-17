@@ -33,9 +33,9 @@ public class MainInteractive {
 		Scanner scanner = new Scanner(System.in);
 		TreeReader reader = new TreeReader();
 		BitTreeSystem bts = new BitTreeSystem();
-		MHBitAlgorithm algorithm = new MHBitAlgorithm();
+		MHLinearAlgorithm algorithm = new MHLinearAlgorithm();
 		boolean inputOk = false;	//used in input-validation loops
-		float minScore = 0;
+		double minScore = 0;
 		int maxPrune = 0;
 		int maxIterations = 0;
 
@@ -81,7 +81,7 @@ public class MainInteractive {
 			while (!inputOk) {
 				try {
 					String input = scanner.nextLine();
-					minScore = Float.parseFloat(input);
+					minScore = Double.parseDouble(input);
 
 					if(minScore < 0.0 || minScore > 1.0) {
 						System.out.println("Invalid range. Try again.");
@@ -134,7 +134,7 @@ public class MainInteractive {
 			algorithm.setLimits(minScore, maxPrune, maxIterations);
 			algorithm.run();
 
-			Map<ArrayList<Taxon>, float[]> result = algorithm.getTaxa();
+			Map<ArrayList<Taxon>, double[]> result = algorithm.getTaxa();
 
 			BufferedWriter out = new BufferedWriter(new FileWriter("run" + runCounter + ".txt"));
 			out.write("Pruned taxa\t[MAP score for this pruning, number of matching subtrees]\n----\n");

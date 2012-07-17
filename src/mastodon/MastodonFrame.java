@@ -108,11 +108,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	TreeViewerListener scoreListner = new TreeViewerListener() {
 		public void treeChanged() {
 			//TreeViewer treeViewer = figTreePanel.getTreeViewer();
-			float[] scores;
+			double[] scores;
 			try {	//likely a temporary solution
 				scores = runResults.get(selectedRun).getPruningScores().get(figTreePanel.getTreeViewer().getCurrentTreeIndex());
 			} catch (IndexOutOfBoundsException e) {
-				scores = new float[2];
+				scores = new double[2];
 				scores[0] = 0;
 				scores[1] = 0;
 			}

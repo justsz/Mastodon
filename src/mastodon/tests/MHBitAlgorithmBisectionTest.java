@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import mastodon.algorithms.MHBitAlgorithm;
+import mastodon.algorithms.MHLinearAlgorithm;
 import mastodon.algorithms.MHBitAlgorithmBisection;
 import mastodon.core.*;
 
@@ -55,7 +55,7 @@ public class MHBitAlgorithmBisectionTest {
 		start = System.currentTimeMillis();
 
 		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.233f, 2000);
+		mh.setLimits(0.5f, 3300);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
@@ -69,20 +69,20 @@ public class MHBitAlgorithmBisectionTest {
 		
 		
 		
-		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
-		NexusWriter writer = new NexusWriter("Highlighted.trees");
-		writer.writeTrees(prunedTrees);
-		
-		
-		
-		
-		System.out.print("Final Pruned taxa: ");
-		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
-			for (Taxon taxon : taxaList) {
-				System.out.print(taxon.getName() + ", ");
-			}
-			System.out.println();
-		}
+//		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
+//		NexusWriter writer = new NexusWriter("Highlighted.trees");
+//		writer.writeTrees(prunedTrees);
+//		
+//		
+//		
+//		
+//		System.out.print("Final Pruned taxa: ");
+//		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
+//			for (Taxon taxon : taxaList) {
+//				System.out.print(taxon.getName() + ", ");
+//			}
+//			System.out.println();
+//		}
 		
 		
 

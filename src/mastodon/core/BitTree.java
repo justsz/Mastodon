@@ -14,14 +14,14 @@ import java.util.Set;
  */
 public class BitTree {
 	private List<BitSet> treeClades;
-	private float weight;
+	private double weight;
 
 	/**
 	 * Standard constructor, specify clades and weight of tree. Weight should be set to -1 if the tree is unweighted.
 	 * @param tc - list of all clades in tree with respect to some list of all taxa which decodes the BitSets
 	 * @param weight - probability weight of tree
 	 */
-	BitTree(List<BitSet> tc, float weight) {
+	BitTree(List<BitSet> tc, double weight) {
 		treeClades = tc;
 		this.weight = weight;
 	}
@@ -38,7 +38,7 @@ public class BitTree {
 	 * Returns weight of the tree.
 	 * @return weight of the tree
 	 */
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 

@@ -5,9 +5,12 @@ package mastodon.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import mastodon.algorithms.MHBitAlgorithm;
+import mastodon.algorithms.MHBisectionAlgorithm;
+import mastodon.algorithms.MHLinearAlgorithm;
 import mastodon.core.*;
 
 
@@ -47,14 +50,19 @@ public class MHBitAlgorithmTest {
 		System.out.println(bts.getClades().size());
 		trees = null;	//signals to the GC that this can be disposed of
 		System.out.println("tree adding time: " + (System.currentTimeMillis() - start));
-		
-		List<BitTree> bitTrees = bts.getBitTrees();
 
-		MHBitAlgorithm mh = new MHBitAlgorithm();
+//		MHLinearAlgorithm mh = new MHLinearAlgorithm();
+		MHBisectionAlgorithm mh = new MHBisectionAlgorithm();
 		start = System.currentTimeMillis();
+		
+		Map<String, Object> limits = new HashMap<String, Object>();
+		limits.put("minMapScore", 0.6);
+		limits.put("minPruning", 1);
+		limits.put("maxPruning", 83);
+		limits.put("totalIterations", 10000);
 
-		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.9f, 43, 20000);
+		mh.setBTS(bts);
+		mh.setLimits(limits);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
@@ -66,15 +74,15 @@ public class MHBitAlgorithmTest {
 //			writer.writeTrees(tree);
 //		}
 		
-		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
-		NexusWriter writer = new NexusWriter("Highlighted.trees");
-		writer.writeTrees(prunedTrees);
+//		List<SimpleRootedTree> prunedTrees = mh.getHighlightedPrunedMapTrees();
+//		NexusWriter writer = new NexusWriter("Highlighted.trees");
+//		writer.writeTrees(prunedTrees);
 		
 		
 		
 		
 		System.out.print("Final Pruned taxa: ");
-		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
+		for(List<Taxon> taxaList : mh.getRunResult().getPrunedTaxa()) {
 			for (Taxon taxon : taxaList) {
 				System.out.print(taxon.getName() + ", ");
 			}

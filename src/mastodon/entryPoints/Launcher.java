@@ -33,7 +33,7 @@ public class Launcher {
 	private String fileName;
 	
 	
-	private float minScore;
+	private double minScore;
 	private int maxPruned;
 	private int iterations;
 	private int numberToPrune;
@@ -45,10 +45,10 @@ public class Launcher {
 	private BitTreeSystem bts;
 	private MHBitAlgorithmBisection bisection = new MHBitAlgorithmBisection();
 	private SABitAlgorithm sa = new SABitAlgorithm();
-	private MHBitAlgorithm mh = new MHBitAlgorithm();
+	private MHLinearAlgorithm mh = new MHLinearAlgorithm();
 	private int treeCounter;
 
-	//	public Launcher(JFrame frame, String filename, float minScore, int maxPruned, int iterations) {
+	//	public Launcher(JFrame frame, String filename, double minScore, int maxPruned, int iterations) {
 	//		setFrame(frame);
 	//		setFileName(filename);
 	//		setMinScore(minScore);
@@ -65,7 +65,7 @@ public class Launcher {
 		setMaxPruned(maxPruned);
 		setIterations(iterations);
 		reader = new TreeReader();
-		mh = new MHBitAlgorithm();
+		mh = new MHLinearAlgorithm();
 	}
 
 	public Launcher(JFrame frame) {
@@ -105,14 +105,14 @@ public class Launcher {
 
 	public void launchMH() {
 		mh.setTrees(bts, bts.getBitTrees());
-		mh.setLimits((float) minScore, (int) maxPruned, (int) iterations);
+		mh.setLimits((double) minScore, (int) maxPruned, (int) iterations);
 		mh.setIterationCounter(0);
 		mh.run();
 	}
 	
 	public void launchBisection() {
 		bisection.setTrees(bts, bts.getBitTrees());
-		bisection.setLimits((float) minScore, iterations);
+		bisection.setLimits((double) minScore, iterations);
 		bisection.setIterationCounter(0);
 		bisection.run();
 	}
@@ -174,7 +174,7 @@ public class Launcher {
 	/**
 	 * @return the minScore
 	 */
-	public float getMinScore() {
+	public double getMinScore() {
 		return minScore;
 	}
 
@@ -182,7 +182,7 @@ public class Launcher {
 	 * @param minScore the minScore to set
 	 */
 	public void setMinScore(String minScore) {
-		this.minScore = Float.parseFloat(minScore);
+		this.minScore = Double.parseDouble(minScore);
 	}
 
 	/**

@@ -55,9 +55,9 @@ public class MainCLI {
 
 		TreeReader reader = new TreeReader();
 		BitTreeSystem bts = new BitTreeSystem();
-		MHBitAlgorithm algorithm = new MHBitAlgorithm();
+		MHLinearAlgorithm algorithm = new MHLinearAlgorithm();
 		//boolean inputOk = false;	//used in input-validation loops
-		float minScore = 0;
+		double minScore = 0;
 		int maxPrune = 0;
 		int maxIterations = 0;
 
@@ -91,7 +91,7 @@ public class MainCLI {
 
 
 		try {
-			minScore = Float.parseFloat(cmd.getOptionValue("s"));
+			minScore = Double.parseDouble(cmd.getOptionValue("s"));
 
 			if(minScore < 0.0 || minScore > 1.0) {
 				System.out.println("Invalid MAP score range.");
@@ -135,21 +135,23 @@ public class MainCLI {
 		algorithm.setLimits(minScore, maxPrune, maxIterations);
 		algorithm.run();
 
-		Map<ArrayList<Taxon>, float[]> result = algorithm.getTaxa();
+		
+		List<ArrayList<Taxon>> prunedTaxa = algorithm.getRunResult().getPrunedTaxa();
+		List<double[]> scores = algorithm.getRunResult().getPruningScores();
 
 		BufferedWriter out = new BufferedWriter(new FileWriter("run" + runCounter + ".txt"));
 		out.write("Pruned taxa\t[MAP score for this pruning, number of matching subtrees]\n----\n");
 
-		for(ArrayList<Taxon> taxaList : result.keySet()) {
-			for (Taxon taxon : taxaList) {
+		for(int i = 0; i < prunedTaxa.size(); i++) {
+			for (Taxon taxon : prunedTaxa.get(i)) {
 				out.write(taxon.getName() + ", ");
 			}
-			out.write("[" + result.get(taxaList)[0] + ", " + (int) result.get(taxaList)[1] + "]\n");
+			out.write("[" + scores.get(i)[0] + ", " + (int) scores.get(i)[1] + "]\n");
 		}
 
 		out.close();
 
-		List<SimpleRootedTree> prunedTrees = algorithm.getHighlightedPrunedMapTrees();
+		List<SimpleRootedTree> prunedTrees = algorithm.getRunResult().getPrunedMapTrees();
 		NexusWriter writer = new NexusWriter("prunedTrees" + runCounter + ".trees");
 		writer.writeTrees(prunedTrees);
 

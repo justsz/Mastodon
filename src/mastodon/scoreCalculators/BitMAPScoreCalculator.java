@@ -24,10 +24,10 @@ public class BitMAPScoreCalculator {
 	 * @param trees - all trees to compare against
 	 * @return {map score, numbers of trees matched}
 	 */
-	public float[] getMAPScore(BitTree MAPTree, List<BitTree> trees) {
+	public double[] getMAPScore(BitTree MAPTree, List<BitTree> trees) {
 		//double start = System.currentTimeMillis();
-		float[] result = new float[2];
-		float sum = 0;
+		double[] result = new double[2];
+		double sum = 0;
 		int count = 0;
 		boolean weighted = true;
 		forTest.clear();
@@ -38,7 +38,7 @@ public class BitMAPScoreCalculator {
 			if(matches[i]) {
 				forTest.set(i);
 				count++;
-				float weight = trees.get(i).getWeight();
+				double weight = trees.get(i).getWeight();
 				if(weight == -1) {
 					sum++;
 					weighted = false;	//annotation errors that cause trees to not be exclusively weighted or unweighted should have been dealt with while adding trees

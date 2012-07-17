@@ -5,10 +5,14 @@ package mastodon.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import mastodon.algorithms.MHBitAlgorithm;
+import mastodon.algorithms.MHLinearAlgorithm;
+import mastodon.algorithms.SABisectionAlgorithm;
 import mastodon.algorithms.SABitAlgorithm;
+import mastodon.algorithms.SALinearAlgorithm;
 import mastodon.core.*;
 
 
@@ -49,13 +53,27 @@ public class SABitAlgorithmTest {
 		trees = null;	//signals to the GC that this can be disposed of
 		System.out.println("tree adding time: " + (System.currentTimeMillis() - start));
 		
-		List<BitTree> bitTrees = bts.getBitTrees();
+		
 
 		SABitAlgorithm mh = new SABitAlgorithm();
+		//SALinearAlgorithm sa = new SALinearAlgorithm();
+		SABisectionAlgorithm sa = new SABisectionAlgorithm();
 		start = System.currentTimeMillis();
+		
+		Map<String, Object> limits = new HashMap<String, Object>();
+		limits.put("minMapScore", 0.6);
+		limits.put("minPruning", 1);
+		limits.put("maxPruning", 83);
+		limits.put("totalIterations", 10000);
+		limits.put("initTemp", 1000.0);
+		limits.put("finalTemp", 0.0001);
+		
+//		sa.setBTS(bts);
+//		sa.setLimits(limits);
+//		sa.run();
 
-		mh.setTrees(bts, bitTrees);
-		mh.setLimits(0.5f, 43, 10000, 100000, 0.000001);
+		mh.setTrees(bts, bts.getBitTrees());
+		mh.setLimits(0.5f, 43, 10000, 100000, 0.00001);
 		mh.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
@@ -74,13 +92,13 @@ public class SABitAlgorithmTest {
 		
 		
 		
-		System.out.print("Final Pruned taxa: ");
-		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
-			for (Taxon taxon : taxaList) {
-				System.out.print(taxon.getName() + ", ");
-			}
-			System.out.println();
-		}
+//		System.out.print("Final Pruned taxa: ");
+//		for(List<Taxon> taxaList : mh.getPrunedTaxa()) {
+//			for (Taxon taxon : taxaList) {
+//				System.out.print(taxon.getName() + ", ");
+//			}
+//			System.out.println();
+//		}
 		
 		
 

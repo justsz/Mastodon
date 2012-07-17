@@ -81,14 +81,14 @@ public class BitTreeSystem {
 
 		for(RootedTree tree : trees) {
 			addClades(tree, tree.getRootNode());
-			float weight = -1;	//signifies unweighted tree
+			double weight = -1;	//signifies unweighted tree
 			if(tree.getAttribute("weight") != null) {	//checking this might be better to put in a pre-processing stage
 				if(!weighted) {
 					System.out.println("Weight annotation error. Not all trees are weighted. Exiting.");
 					System.exit(2);
 				}
 				weighted = true;
-				weight = (Float) tree.getAttribute("weight");
+				weight = ((Float) tree.getAttribute("weight")).doubleValue();
 			} else {
 				if(weighted && treeCount != 0) {
 					System.out.println("Weight annotation error at: " + tree.getAttributeMap() + " Exiting.");
@@ -185,9 +185,9 @@ public class BitTreeSystem {
 	public int getMapTreeIndex() {	//this could all be done at creation time
 		int index = 0;
 		if(weighted) {
-			float maxWeight = 0.0f;
+			double maxWeight = 0;
 			for(int i = 0; i < treeCount; i++) {
-				float weight = bitTrees.get(i).getWeight();
+				double weight = bitTrees.get(i).getWeight();
 				if(weight > maxWeight) {
 					maxWeight = weight;
 					index = i;
@@ -392,9 +392,9 @@ public class BitTreeSystem {
 		}
 	}
 
-	public float[] pruneFast(BitSet pruner, BitTree mapTree) {
+	public double[] pruneFast(BitSet pruner, BitTree mapTree) {
 		weighted = false;
-		float[] result = new float[2];
+		double[] result = new double[2];
 		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
 		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());
 
@@ -455,7 +455,7 @@ public class BitTreeSystem {
 				if(weighted) {
 					result[0] = bitTrees.get(runningIntersection.nextSetBit(0)).getWeight();
 				} else {
-					result[0] = 1.0f/bitTrees.size();
+					result[0] = 1.0/bitTrees.size();
 				}
 				result[1] = 1;
 				forTest = runningIntersection;
@@ -504,7 +504,7 @@ public class BitTreeSystem {
 				result[0] += bitTrees.get(i).getWeight();
 			}
 		} else {
-			result[0] = (float) subTreeCount/bitTrees.size();
+			result[0] = (double) subTreeCount/bitTrees.size();
 		}		
 
 		result[1] = subTreeCount;

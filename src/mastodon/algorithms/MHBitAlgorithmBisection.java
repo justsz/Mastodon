@@ -28,12 +28,12 @@ import jebl.math.Random;
  * A BitTree implementation of a Metropolis-Hastings (MH) algorithm for pruning trees.
  * @author justs
  */
-public class MHBitAlgorithmBisection implements Algorithm{
+public class MHBitAlgorithmBisection{
 
-	private Map<BitSet, float[]> taxa;
+	private Map<BitSet, double[]> taxa;
 	private BitTreeSystem bts;
 	List<BitTree> bitTrees;
-	float tolerance;
+	double tolerance;
 	int stepIterations;
 	int mapTreeIndex;
 	int runCounter = 0;
@@ -44,7 +44,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 		this.bitTrees = bitTrees;			
 	}
 
-	public void setLimits(float tolerance, int stepIterations) {
+	public void setLimits(double tolerance, int stepIterations) {
 		this.tolerance = tolerance;
 		this.stepIterations = stepIterations;
 	}
@@ -70,11 +70,11 @@ public class MHBitAlgorithmBisection implements Algorithm{
 		boolean repeat = true;
 
 		//initializing variables
-		float[] maxScore = {0, 0};
-		Map<BitSet, float[]> maxScorePruning = new HashMap<BitSet, float[]>();
+		double[] maxScore = {0, 0};
+		Map<BitSet, double[]> maxScorePruning = new HashMap<BitSet, double[]>();
 		BitSet toPrune = new BitSet();
 		BitSet prevPruning = new BitSet();
-		float[] prevScore = {0, 0};
+		double[] prevScore = {0, 0};
 
 		while(repeat) {
 			double start = System.currentTimeMillis();
@@ -85,7 +85,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 			if (!lastAdjustment) {
 				maxScore[0] = 0;
 				maxScore[1] = 0;
-				maxScorePruning = new HashMap<BitSet, float[]>();
+				maxScorePruning = new HashMap<BitSet, double[]>();
 				toPrune = new BitSet();
 
 				for(int i = 0; i < prunedSpeciesCount; i++) {
@@ -99,7 +99,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 
 
 				//		Map<BitSet, BitSet> filters = bts.prune(toPrune);
-				//		float[] prevScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
+				//		double[] prevScore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);
 				//		bts.unPrune(filters);
 
 				prevScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
@@ -176,10 +176,10 @@ public class MHBitAlgorithmBisection implements Algorithm{
 
 
 				//				filters = bts.prune(toPrune);
-				//				float[] currentscore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
+				//				double[] currentscore = calc.getMAPScore(bitTrees.get(mapTreeIndex), bitTrees);		
 				//				bts.unPrune(filters);
 
-				float[] currentScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
+				double[] currentScore = bts.pruneFast(toPrune, bitTrees.get(mapTreeIndex));
 				
 
 				if (currentScore[0] > maxScore[0]) {	//set new optimum
@@ -191,7 +191,7 @@ public class MHBitAlgorithmBisection implements Algorithm{
 				}
 
 
-				if (currentScore[0]/prevScore[0] > Random.nextFloat()) {
+				if (currentScore[0]/prevScore[0] > Random.nextDouble()) {
 					prevPruning = (BitSet) toPrune.clone(); 
 					prevScore = currentScore.clone();
 				} //try different pruning otherwise
@@ -216,68 +216,15 @@ public class MHBitAlgorithmBisection implements Algorithm{
 			}
 		}
 	}
-
-	public List<ArrayList<Taxon>> getPrunedTaxa() {
-		List<ArrayList<Taxon>> output = new ArrayList<ArrayList<Taxon>>();
-		for(BitSet bits : taxa.keySet()) {
-			output.add((ArrayList<Taxon>) bts.getTaxa(bits));
-		}
-		return output;
-	}
-
-
-	public List<SimpleRootedTree> getOutputTrees() {
-		//might need to change the interface for this one
-		Map<BitSet, BitSet> filters = bts.prune(taxa.keySet().iterator().next());
-		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
-		for(BitTree bitTree : bitTrees) {
-			SimpleRootedTree tr = bts.reconstructTree(bitTree, null);
-			trs.add(tr);
-		}
-		bts.unPrune(filters);
-		return trs;
-	}
-
-	public Map<ArrayList<Taxon>, float[]> getTaxa() {
-		Map<ArrayList<Taxon>, float[]> output = new HashMap<ArrayList<Taxon>, float[]>();
-
-		Object[] keys = taxa.keySet().toArray();
-		for(int i = 0; i < keys.length; i ++) {
-			output.put((ArrayList<Taxon>) bts.getTaxa((BitSet) keys[i]), taxa.get(keys[i]));
-		}
-
-		return output;
-	}
-
-	public List<SimpleRootedTree> getPrunedMapTrees() {
-		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
-		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
-		trs.add(bts.reconstructTree(mapTree, null));
-		for(BitSet bs : taxa.keySet()) {
-			mapTree = bitTrees.get(mapTreeIndex).clone();
-			mapTree.pruneTree(bs);
-			trs.add(bts.reconstructTree(mapTree, null));
-		}				
-		return trs;
-	}
-
-	public List<SimpleRootedTree> getHighlightedPrunedMapTrees() {
-		List<SimpleRootedTree> trs = new ArrayList<SimpleRootedTree>();
-		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
-		for(BitSet bs : taxa.keySet()) {
-			trs.add(bts.reconstructTree(mapTree, bs));
-		}
-		return trs;
-	}
 	
 	public RunResult getRunResult() {
 		List<ArrayList<Taxon>> prunedTaxa = new ArrayList<ArrayList<Taxon>>();
-		List<float[]> pruningScores = new ArrayList<float[]>();
+		List<double[]> pruningScores = new ArrayList<double[]>();
 		List<SimpleRootedTree> prunedMapTrees = new ArrayList<SimpleRootedTree>();
 		
 		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
 		
-		for(Entry<BitSet, float[]> entry : taxa.entrySet()) {
+		for(Entry<BitSet, double[]> entry : taxa.entrySet()) {
 			prunedTaxa.add((ArrayList<Taxon>) bts.getTaxa(entry.getKey()));
 			pruningScores.add(entry.getValue());
 			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey()));

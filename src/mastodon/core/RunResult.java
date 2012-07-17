@@ -15,11 +15,11 @@ import jebl.evolution.trees.SimpleRootedTree;
  */
 public class RunResult {
 	private List<ArrayList<Taxon>> prunedTaxa;
-	private List<float[]> pruningScores;
+	private List<double[]> pruningScores;
 	private List<SimpleRootedTree> prunedMapTrees;
 	private String name;
 
-	public RunResult(List<ArrayList<Taxon>> pt, List<float[]> ps, List<SimpleRootedTree> pmt, String name) {
+	public RunResult(List<ArrayList<Taxon>> pt, List<double[]> ps, List<SimpleRootedTree> pmt, String name) {
 		prunedTaxa = pt;
 		pruningScores = ps;
 		prunedMapTrees = pmt;
@@ -34,11 +34,11 @@ public class RunResult {
 		this.prunedTaxa = prunedTaxa;
 	}
 
-	public List<float[]> getPruningScores() {
+	public List<double[]> getPruningScores() {
 		return pruningScores;
 	}
 
-	public void setPruningScores(List<float[]> pruningScores) {
+	public void setPruningScores(List<double[]> pruningScores) {
 		this.pruningScores = pruningScores;
 	}
 
