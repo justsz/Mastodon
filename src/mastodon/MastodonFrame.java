@@ -470,30 +470,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 
 		if (algorithmDialog.showDialog() == JOptionPane.OK_OPTION) {
-
-//			boolean inputIsValid = false;
 			final int selection = algorithmDialog.getSelection();
-
-//			switch(selection) {
-//			case 11:	//const SA
-//				inputIsValid = GUIInputVerifier.verifyBisectionAlgorithmInput(algorithmDialog.getBisectionInput());
-//				break;
-//			case 12:	//const MH
-//				break;
-//			case 21:	//linear SA
-//				inputIsValid = GUIInputVerifier.verifySAAlgorithmInput(algorithmDialog.getSAInput(), launcher.getTaxaCount());
-//				break;
-//			case 22:	//linear MH
-//				break;
-//			case 31:	//bisection SA
-//				inputIsValid = GUIInputVerifier.verifyMHAlgorithmInput(algorithmDialog.getMHInput(), launcher.getTaxaCount());
-//				break;
-//			case 32:	//bisection MH
-//				
-//			}
-			
 			Map<String, Object> input = GUIInputVerifier.verifyInput(algorithmDialog.getInput(), selection, launcher.getTaxaCount());
-
 
 			if(input != null) {
 
@@ -501,10 +479,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				progressBar.setValue(0);
 				progressBar.setMaximum((Integer) input.get("totalIterations"));
 				progressBar.setStringPainted(false);
-				
-				
+
+
 				Algorithm algorithm;
-				
+
 				if(selection % 10 == 3) { //bisection
 					if ((int) (selection / 10) == 1) {	//SA
 						algorithm = new SABisectionAlgorithm();
@@ -518,32 +496,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 						algorithm = new MHLinearAlgorithm();
 					}
 				}
-				
+
 				launcher.setupAlgorithm(algorithm, input);
 				new AlgorithmWorker().execute();
 
-//				switch(selection) {
-//				case 1:	//bisection
-//					launcher.setupBisection(algorithmDialog.getBisectionInput());
-//					
-//					new BisectionWorker().execute();
-//					break;
-//				case 2:	//simulated annealing
-//					launcher.setupSA(algorithmDialog.getSAInput());
-//					
-//					new SAWorker().execute();
-//					break;
-//				case 3:	//metropolis hastings
-//					launcher.setupMH(algorithmDialog.getMHInput());
-//					
-//					new MHWorker().execute();
-//				}
 				timer = new javax.swing.Timer(1000, new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						//try {
-							progressBar.setValue(launcher.getCurrentIterations(selection));
-						//} catch (Exception ignore) {
-						//}
+						progressBar.setValue(launcher.getCurrentIterations(selection));
 					}
 				});
 
@@ -552,7 +511,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}//the input verifier will display the input validation error if required
 		}
 	}
-	
+
 	class AlgorithmWorker extends SwingWorker<Void, Void> {
 		protected Void doInBackground() throws Exception {
 			launcher.runAlgorithm();
@@ -574,74 +533,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 
 	}
-	
-	class SAWorker extends SwingWorker<Void, Void> {
-		protected Void doInBackground() throws Exception {
-			launcher.launchSA();
-			return null;
-		}
-
-		protected void done() {
-			timer.stop();
-			runResults.add(launcher.getSAResults());
-			selectedRun = runResults.size() - 1;			
-			runTableModel.fireTableDataChanged();
-
-			//highlight current run in runTable and update display
-			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-
-			//switch from progress bar to score panel
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-			getAlgorithmAction().setEnabled(true);
-		}
-
-	}
-	
-	class MHWorker extends SwingWorker<Void, Void> {
-		protected Void doInBackground() throws Exception {
-			launcher.launchMH();
-			return null;
-		}
-
-		protected void done() {
-			timer.stop();
-			runResults.add(launcher.getMHResults());
-			selectedRun = runResults.size() - 1;			
-			runTableModel.fireTableDataChanged();
-
-			//highlight current run in runTable and update display
-			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-
-			//switch from progress bar to score panel
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-			getAlgorithmAction().setEnabled(true);
-		}
-
-	}
-	
-	class BisectionWorker extends SwingWorker<Void, Void> {
-		protected Void doInBackground() throws Exception {
-			launcher.launchBisection();
-			return null;
-		}
-
-		protected void done() {
-			timer.stop();
-			runResults.add(launcher.getBisectionResults());
-			selectedRun = runResults.size() - 1;			
-			runTableModel.fireTableDataChanged();
-
-			//highlight current run in runTable and update display
-			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-
-			//switch from progress bar to score panel
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-			getAlgorithmAction().setEnabled(true);
-		}
-
-	}
-
-
 
 	private File openDefaultDirectory = null;
 
@@ -686,20 +577,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 						JOptionPane.ERROR_MESSAGE);
 				((DocumentFrame) launcher.getFrame()).doCloseWindow();
 			} else {
-				//			runResults.add(launcher.getResults());
-				//			selectedRun = runResults.size() - 1;			
-				//			runTableModel.fireTableDataChanged();
-				//
-				//			//highlight current run in runTable and update display
-				//			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-				//
-				//			//switch from progress bar to score panel
 				((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(launcher.getMapTree());
 				getAlgorithmAction().setEnabled(true);
 				progressBar.setString("");
 				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-				
-				//			getPruningOptionAction().setEnabled(true);
 			}
 		}
 

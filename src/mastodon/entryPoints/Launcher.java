@@ -32,44 +32,20 @@ public class Launcher {
 
 	private String fileName;
 	
-	
-	private double minScore;
-	private int maxPruned;
-	private int iterations;
-	private int numberToPrune;
-	private double initTemp;
-	private double minTemp;
-	
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
 
 	private TreeReader reader;
-	private BitTreeSystem bts;
-	private MHBitAlgorithmBisection bisection = new MHBitAlgorithmBisection();
-	private SABitAlgorithm sa = new SABitAlgorithm();
-	private MHLinearAlgorithm mh = new MHLinearAlgorithm();
-	
+	private BitTreeSystem bts;	
 	private Algorithm algorithm;
 	
 	private int treeCounter;
-
-	//	public Launcher(JFrame frame, String filename, double minScore, int maxPruned, int iterations) {
-	//		setFrame(frame);
-	//		setFileName(filename);
-	//		setMinScore(minScore);
-	//		setMaxPruned(maxPruned);
-	//		setIterations(iterations);
-	//		reader = new TreeReader();
-	//		mh = new MHBitAlgorithm();
-	//	}
-
-	public Launcher(JFrame frame, String filename, String minScore, String maxPruned, String iterations) {
-		setFrame(frame);
-		setFileName(filename);
-		setMinScore(minScore);
-		setMaxPruned(maxPruned);
-		setIterations(iterations);
-		reader = new TreeReader();
-		mh = new MHLinearAlgorithm();
-	}
 
 	public Launcher(JFrame frame) {
 		setFrame(frame);
@@ -121,40 +97,6 @@ public class Launcher {
 		return algorithm.getRunResult();
 	}
 
-	public void launchMH() {
-//		mh.setTrees(bts, bts.getBitTrees());
-//		mh.setLimits((double) minScore, (int) maxPruned, (int) iterations);
-		mh.setIterationCounter(0);
-		mh.run();
-	}
-	
-	public void launchBisection() {
-		bisection.setTrees(bts, bts.getBitTrees());
-		bisection.setLimits((double) minScore, iterations);
-		bisection.setIterationCounter(0);
-		bisection.run();
-	}
-	
-	public void launchSA() {
-		sa.setTrees(bts, bts.getBitTrees());
-		sa.setLimits(minScore, numberToPrune, iterations, initTemp, minTemp);
-		sa.setIterationCounter(0);
-		sa.run();
-	}
-
-
-	public RunResult getSAResults() {
-		return sa.getRunResult();
-	}
-
-	public RunResult getMHResults() {
-		return mh.getRunResult();
-	}
-	
-	public RunResult getBisectionResults() {
-		return bisection.getRunResult();
-	}
-
 	public int getTreeCounter() {
 		return treeCounter;
 	}
@@ -175,96 +117,12 @@ public class Launcher {
 		this.frame = frame;
 	}
 
-	/**
-	 * @return the fileName
-	 */
-	public String getFileName() {
-		return fileName;
-	}
-
-	/**
-	 * @param fileName the fileName to set
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	/**
-	 * @return the minScore
-	 */
-	public double getMinScore() {
-		return minScore;
-	}
-
-	/**
-	 * @param minScore the minScore to set
-	 */
-	public void setMinScore(String minScore) {
-		this.minScore = Double.parseDouble(minScore);
-	}
-
-	/**
-	 * @return the maxPruned
-	 */
-	public int getMaxPruned() {
-		return maxPruned;
-	}
-
-	/**
-	 * @param maxPruned the maxPruned to set
-	 */
-	public void setMaxPruned(String maxPruned) {
-		this.maxPruned = Integer.parseInt(maxPruned);
-	}
-
-	/**
-	 * @return the iterations
-	 */
-	public int getIterations() {
-		return iterations;
-	}
-
-	/**
-	 * @param iterations the iterations to set
-	 */
-	public void setIterations(String iterations) {
-		this.iterations = Integer.parseInt(iterations);
-	}
-
 	public int getCurrentIterations(int selection) {
-//		switch (selection) {
-//		case 1:
-//			return bisection.getIterationCounter();
-//		case 2:
-//			return sa.getIterationCounter();
-//		case 3:
-//			return mh.getIterationCounter();
-//		}
-//		return -1;
 		return algorithm.getIterationCounter();
 	}
 
 	public int getTaxaCount() {
 		return bts.getTaxaCount();
-	}
-
-	public void setupMH(String[] input) {
-		setMinScore(input[0]);
-		setMaxPruned(input[1]);
-		setIterations(input[2]);
-	}
-	
-	public void setupBisection(String[] input) {
-		setMinScore(input[0]);
-		setIterations(input[1]);
-	}
-	
-	public void setupSA(String[] input) {
-		setMinScore(input[0]);
-		numberToPrune = Integer.parseInt(input[1]);
-		initTemp = Double.parseDouble(input[2]);
-		minTemp = Double.parseDouble(input[3]);
-		setIterations(input[4]);
 	}
 	
 	public RootedTree getMapTree() {

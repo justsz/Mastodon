@@ -164,14 +164,6 @@ public class AlgorithmDialog {
 		algorithmChoiceCardPanel.add(SAOptions, "SA");
 		algorithmChoiceCardPanel.add(new JPanel(), "MH");	//blank panel, no additional input needed		
 		
-		
-//		JPanel buttonsAndFields = new JPanel(new BorderLayout(0, 0));
-//		buttonsAndFields.add(searchMethodButtonsPanel, BorderLayout.NORTH);
-//		buttonsAndFields.add(searchMethodCardPanel, BorderLayout.CENTER);
-//		buttonsAndFields.add(algorithmChoiceButtonsPanel, BorderLayout.CENTER);
-//		buttonsAndFields.add(algorithmChoiceCardPanel, BorderLayout.CENTER);
-//		buttonsAndFields.add(overallOptions, BorderLayout.SOUTH);
-		
 		JPanel buttonsAndFields = new JPanel();
 		buttonsAndFields.setLayout(new BoxLayout(buttonsAndFields, BoxLayout.Y_AXIS));
 		buttonsAndFields.add(searchMethodButtonsPanel);
