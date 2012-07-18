@@ -21,18 +21,12 @@ import mastodon.core.*;
  */
 public class SALinearAlgorithm extends Algorithm{
 
-	private Map<BitSet, double[]> taxa;
-
-	double minMapScore;
 	private double[] stepIterations;
-	int totalIterations;
 
 	private double initTemp;
 	private double currTemp;
 	private double finalTemp;
 	private double coolingRate;
-
-	Map<Integer, Integer> pruningFreq;
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
@@ -216,7 +210,7 @@ public class SALinearAlgorithm extends Algorithm{
 
 	protected void afterActions() {
 		runCounter++;
-		taxa = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
+		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		stepIterations = null;
 		System.out.println(maxScore[0] + " " + maxScore[1]);
 		System.out.println(pruningFreq);

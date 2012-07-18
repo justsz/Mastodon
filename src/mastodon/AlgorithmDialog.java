@@ -11,6 +11,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import jam.panels.OptionsPanel;
 
@@ -27,30 +31,46 @@ import mastodon.inputVerifiers.*;
  */
 public class AlgorithmDialog {
 	JFrame frame;
-	String fileName;
 	JLabel selectedData;
-	JPanel cardPanel;
+	JPanel searchMethodCardPanel;
+	JPanel algorithmChoiceCardPanel;
 
-	int selection = 1;
+	int searchMethodSelection = 10;
+	int algorithmSelection = 1;
 	
-	private AbstractAction bisectionAction = new AbstractAction("Bisection") {
+	private AbstractAction constAction = new AbstractAction("Constant") {
 		public void actionPerformed(ActionEvent ae) {
-			selection = 1;
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "bisection");
+			searchMethodSelection = 10;
+			((CardLayout)searchMethodCardPanel.getLayout()).show(searchMethodCardPanel, "const");
 		}
 	};
 	
+	private AbstractAction linearAction = new AbstractAction("Linear") {
+		public void actionPerformed(ActionEvent ae) {
+			searchMethodSelection = 20;
+			((CardLayout)searchMethodCardPanel.getLayout()).show(searchMethodCardPanel, "linAndBis");
+		}
+	};
+	
+	private AbstractAction bisectionAction = new AbstractAction("Bisection") {
+		public void actionPerformed(ActionEvent ae) {
+			searchMethodSelection = 30;
+			((CardLayout)searchMethodCardPanel.getLayout()).show(searchMethodCardPanel, "linAndBis");
+		}
+	};
+	
+	
 	private AbstractAction SAAction = new AbstractAction("Simulated Annealing") {
 		public void actionPerformed(ActionEvent ae) {
-			selection = 2;
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "SA");
+			algorithmSelection = 1;
+			((CardLayout)algorithmChoiceCardPanel.getLayout()).show(algorithmChoiceCardPanel, "SA");
 		}
 	};
 	
 	private AbstractAction MHAction = new AbstractAction("Metropolis Hastings") {
 		public void actionPerformed(ActionEvent ae) {
-			selection = 3;
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "MH");
+			algorithmSelection = 2;
+			((CardLayout)algorithmChoiceCardPanel.getLayout()).show(algorithmChoiceCardPanel, "MH");
 		}
 	};
 	
@@ -60,21 +80,20 @@ public class AlgorithmDialog {
 	private final JOptionPane optionPane;
 
 	
-	
-	JTextField minBisectionScore = new JTextField("0.0");	
-	JTextField bisectionIterations = new JTextField("1");
-	
-	JTextField minSAScore = new JTextField("0.0");
 	JTextField numberToPrune = new JTextField("1");
+	JTextField minNumberToPrune = new JTextField("1");
+	JTextField maxNumberToPrune = new JTextField("1");
+	
+	JTextField minMapScore = new JTextField("0.0");	
+	JTextField totalIterations = new JTextField("1");
+	
 	JTextField initialTemp = new JTextField("1");
-	JTextField minTemp = new JTextField("1");
-	JTextField SAIterations = new JTextField("1");
+	JTextField finalTemp = new JTextField("1");	
 	
-	JTextField minMHScore = new JTextField("0.0");
-	JTextField maxPruning = new JTextField("1");
-	JTextField MHIterations = new JTextField("1");
-	
+	JRadioButton constButton = new JRadioButton(constAction);
+	JRadioButton linearButton = new JRadioButton(linearAction);
 	JRadioButton bisectionButton = new JRadioButton(bisectionAction);
+	
 	JRadioButton MHButton = new JRadioButton(MHAction);
 	JRadioButton SAButton = new JRadioButton(SAAction);
 	
@@ -85,66 +104,81 @@ public class AlgorithmDialog {
 	public AlgorithmDialog(JFrame frame) {
 		this.frame = frame;
 		
-		cardPanel = new JPanel(new CardLayout());
+		searchMethodCardPanel = new JPanel(new CardLayout());
+		algorithmChoiceCardPanel = new JPanel(new CardLayout());
 		
 		
-		OptionsPanel bisectionOptions = new OptionsPanel(12, 12);
+		OptionsPanel constOptions = new OptionsPanel(12, 12);
+		OptionsPanel linearAndBisectionOptions = new OptionsPanel(12, 12);
+		
 		OptionsPanel SAOptions = new OptionsPanel(12, 12);
-		OptionsPanel MHOptions = new OptionsPanel(12, 12);
 		
-		minBisectionScore.setColumns(10);
-		bisectionIterations.setColumns(10);
+		OptionsPanel overallOptions = new OptionsPanel(12, 12);
+
+		numberToPrune.setColumns(5);
+		minNumberToPrune.setColumns(5);
+		maxNumberToPrune.setColumns(5);
 		
-		minSAScore.setColumns(10);
-		numberToPrune.setColumns(10);
+		minMapScore.setColumns(10);
+		totalIterations.setColumns(10);		
+		
 		initialTemp.setColumns(10);
-		minTemp.setColumns(10);
-		SAIterations.setColumns(10);
-		
-		
-		minMHScore.setColumns(10);
-		maxPruning.setColumns(10);
-		MHIterations.setColumns(10);
+		finalTemp.setColumns(10);
 		
 //		JPanel bisectionPanel = new JPanel();
 //		bisectionPanel.add(minScore);
 //		bisectionPanel.add(bisectionIterations);
 		
-		JPanel buttonsPanel = new JPanel();
-		ButtonGroup group = new ButtonGroup();
-		bisectionButton.setSelected(true);
-		group.add(bisectionButton);
-		group.add(MHButton);
-		group.add(SAButton);
-		buttonsPanel.add(bisectionButton);
-		buttonsPanel.add(SAButton);
-		buttonsPanel.add(MHButton);
+		JPanel searchMethodButtonsPanel = new JPanel();
+		ButtonGroup searchGroup = new ButtonGroup();
+		constButton.setSelected(true);
+		searchGroup.add(constButton);
+		searchGroup.add(linearButton);
+		searchGroup.add(bisectionButton);
+		searchMethodButtonsPanel.add(constButton);
+		searchMethodButtonsPanel.add(linearButton);
+		searchMethodButtonsPanel.add(bisectionButton);
 		
+		JPanel algorithmChoiceButtonsPanel = new JPanel();
+		ButtonGroup algGroup = new ButtonGroup();
+		SAButton.setSelected(true);
+		algGroup.add(SAButton);
+		algGroup.add(MHButton);
+		algorithmChoiceButtonsPanel.add(SAButton);
+		algorithmChoiceButtonsPanel.add(MHButton);
 		
+		constOptions.addComponentWithLabel("Number of taxa to prune[1+]", numberToPrune);
 		
-		
-		
-		bisectionOptions.addComponentWithLabel("Minimum MAP score[fraction]", minBisectionScore);
-		bisectionOptions.addComponentWithLabel("Number of iterations to spend in each step[1+]", bisectionIterations);
+		linearAndBisectionOptions.addComponentWithLabel("Min number of taxa to prune[1+]", minNumberToPrune);
+		linearAndBisectionOptions.addComponentWithLabel("Max number of taxa to prune[1+]", maxNumberToPrune);
 
-		SAOptions.addComponentWithLabel("Minimum MAP score[fraction]", minSAScore);
-		SAOptions.addComponentWithLabel("Number of taxa to prune[1+]", numberToPrune);
 		SAOptions.addComponentWithLabel("Initial temperature[0+]", initialTemp);
-		SAOptions.addComponentWithLabel("Minimum temperature[0+]", minTemp);
-		SAOptions.addComponentWithLabel("Maximum number of iterations[1+]", SAIterations);
+		SAOptions.addComponentWithLabel("Final temperature[0+]", finalTemp);
 		
-		MHOptions.addComponentWithLabel("Minimum MAP score[fraction]", minMHScore);
-		MHOptions.addComponentWithLabel("Maximum number of taxa to prune[1+]", maxPruning);
-		MHOptions.addComponentWithLabel("Maximum number of iterations[1+]", MHIterations);		
-		
+		overallOptions.addComponentWithLabel("Total iterations[1+]", totalIterations);
+		overallOptions.addComponentWithLabel("Desired MAP score[0.0-1.0]", minMapScore);
 
-		cardPanel.add(bisectionOptions, "bisection");
-		cardPanel.add(SAOptions, "SA");
-		cardPanel.add(MHOptions, "MH");
+		searchMethodCardPanel.add(constOptions, "const");
+		searchMethodCardPanel.add(linearAndBisectionOptions, "linAndBis");
 		
-		JPanel buttonsAndFields = new JPanel(new BorderLayout(0, 0));
-		buttonsAndFields.add(buttonsPanel, BorderLayout.NORTH);
-		buttonsAndFields.add(cardPanel, BorderLayout.SOUTH);
+		algorithmChoiceCardPanel.add(SAOptions, "SA");
+		algorithmChoiceCardPanel.add(new JPanel(), "MH");	//blank panel, no additional input needed		
+		
+		
+//		JPanel buttonsAndFields = new JPanel(new BorderLayout(0, 0));
+//		buttonsAndFields.add(searchMethodButtonsPanel, BorderLayout.NORTH);
+//		buttonsAndFields.add(searchMethodCardPanel, BorderLayout.CENTER);
+//		buttonsAndFields.add(algorithmChoiceButtonsPanel, BorderLayout.CENTER);
+//		buttonsAndFields.add(algorithmChoiceCardPanel, BorderLayout.CENTER);
+//		buttonsAndFields.add(overallOptions, BorderLayout.SOUTH);
+		
+		JPanel buttonsAndFields = new JPanel();
+		buttonsAndFields.setLayout(new BoxLayout(buttonsAndFields, BoxLayout.Y_AXIS));
+		buttonsAndFields.add(searchMethodButtonsPanel);
+		buttonsAndFields.add(searchMethodCardPanel);
+		buttonsAndFields.add(algorithmChoiceButtonsPanel);
+		buttonsAndFields.add(algorithmChoiceCardPanel);
+		buttonsAndFields.add(overallOptions);
 
 		optionPane = new JOptionPane(buttonsAndFields,
 				JOptionPane.PLAIN_MESSAGE,
@@ -153,10 +187,6 @@ public class AlgorithmDialog {
 				null,
 				null);
 		optionPane.setBorder(new EmptyBorder(12, 12, 12, 12));
-		
-		
-
-		
 		
 		dialog = optionPane.createDialog(frame, "Select pruning algorithm");
 		dialog.pack();
@@ -177,53 +207,21 @@ public class AlgorithmDialog {
 		return result;
 	}
 	
-//	public void setVisible(boolean b) {
-//		dialog.setVisible(b);
-//	}
-	
-	public String getFile() {
-		return fileName;
-	}
-	
-	public String getMinScore() {
-		return minMHScore.getText();
-	}
-	
-	public String getMaxPrunedTaxa() {
-		return maxPruning.getText();
-	}
-	
-	public String getIterations() {
-		return MHIterations.getText();
-		
-	}
-	
 	public int getSelection() {
-		return selection;
+		return searchMethodSelection + algorithmSelection;
 	}
 	
-	public String[] getBisectionInput() {
-		String[] input = new String[2];
-		input[0] = minBisectionScore.getText();
-		input[1] = bisectionIterations.getText();
-		return input;
-	}
-	
-	public String[] getSAInput() {
-		String[] input = new String[5];
-		input[0] = minSAScore.getText();
-		input[1] = numberToPrune.getText();
-		input[2] = initialTemp.getText();
-		input[3] = minTemp.getText();
-		input[4] = SAIterations.getText();		
-		return input;
-	}
-	
-	public String[] getMHInput() {
-		String[] input = new String[3];
-		input[0] = minMHScore.getText();
-		input[1] = maxPruning.getText();
-		input[2] = MHIterations.getText();
+	public Map<String, String> getInput() {
+		Map<String, String> input = new HashMap<String, String>();
+		
+		input.put("minMapScore", minMapScore.getText());
+		input.put("totalIterations", totalIterations.getText());
+		input.put("minPruning", minNumberToPrune.getText());
+		input.put("maxPruning", maxNumberToPrune.getText());
+		input.put("constPruning", numberToPrune.getText());
+		input.put("initTemp", initialTemp.getText());
+		input.put("finalTemp", finalTemp.getText());
+		
 		return input;
 	}
 	

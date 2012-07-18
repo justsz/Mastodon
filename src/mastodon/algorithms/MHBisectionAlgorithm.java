@@ -31,14 +31,11 @@ import jebl.math.Random;
  */
 public class MHBisectionAlgorithm extends Algorithm{
 
-	double minMapScore;
+	
 	private int stepIterations;
-	int totalIterations;
 
 	int kLeft;
 	int kRight;
-
-	Map<Integer, Integer> pruningFreq;
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;

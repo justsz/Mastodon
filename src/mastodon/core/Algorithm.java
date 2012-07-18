@@ -17,10 +17,13 @@ import jebl.evolution.trees.Tree;
  *
  */
 public abstract class Algorithm {
-	private RunResult runResult;
 	protected Map<BitSet, double[]> finalPruning;
 	protected String stub;
 
+	protected double minMapScore;
+	protected int totalIterations;
+	protected Map<Integer, Integer> pruningFreq;
+	
 	protected int minPrunedSpeciesCount;
 	protected int currPrunedSpeciesCount;
 	protected int maxPrunedSpeciesCount;
@@ -61,7 +64,6 @@ public abstract class Algorithm {
 
 			iterationCounter++;
 		}
-		System.out.println(iterationCounter);
 		afterActions();		
 	}
 

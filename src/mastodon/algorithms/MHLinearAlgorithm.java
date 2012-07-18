@@ -31,13 +31,7 @@ import jebl.math.Random;
  */
 public class MHLinearAlgorithm extends Algorithm{
 
-	
-
-	double minMapScore;
 	private double[] stepIterations;
-	int totalIterations;
-
-	Map<Integer, Integer> pruningFreq;
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
@@ -390,17 +384,4 @@ public class MHLinearAlgorithm extends Algorithm{
 
 
 	}
-
-
-
-
-
-	public int getIterationCounter() {
-		return iterationCounter;
-	}
-
-	public void setIterationCounter(int i) {
-		iterationCounter = i;
-	}
-
 }

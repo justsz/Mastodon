@@ -10,6 +10,8 @@ import mastodon.app.gui.MapperPanel;
 import mastodon.app.gui.FileDrop;
 import mastodon.app.gui.ChartRuntimeException;
 import mastodon.app.gui.TableEditorStopper;
+import mastodon.core.Algorithm;
+import mastodon.algorithms.*;
 import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
@@ -35,6 +37,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import jebl.evolution.io.ImportException;
@@ -441,99 +444,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	PruningDialog pruningDialog;
 	Launcher launcher;
 	javax.swing.Timer timer;
-	public final void doPruning() throws IOException, ImportException {
-		//((MultiDocApplication) Application.getApplication()).getUpperDocumentFrame().requestClose();
-		if (pruningDialog == null) {
-			pruningDialog = new PruningDialog(this);
-		}
-
-		if (pruningDialog.showDialog() == JOptionPane.OK_OPTION) {
-			if(pruningDialog.getFile() != null) {
-				String file = pruningDialog.getFile();
-				String minScore = pruningDialog.getMinScore();
-				String maxPruning = pruningDialog.getMaxPrunedTaxa();
-				String iterations = pruningDialog.getIterations();
-
-				//				if(GUIInputVerifier.verifyMHAlgorithmInput(minScore, maxPruning, iterations)) {
-				if(launcher == null) {
-					launcher = new Launcher(this, file, minScore, maxPruning, iterations);
-				} else {
-					launcher.setFrame(this);
-					launcher.setFileName(file);
-					launcher.setMinScore(minScore);
-					launcher.setMaxPruned(maxPruning);
-					launcher.setIterations(iterations);
-				}
-
-				((CardLayout)cardPanel.getLayout()).show(cardPanel, "progress");
-				progressBar.setMaximum(launcher.getIterations());
-				progressBar.setValue(0);					
-				progressBar.setString("");
-				progressBar.setStringPainted(true);
-				timer = new javax.swing.Timer(1000, new ActionListener() {
-					public void actionPerformed(ActionEvent evt) {
-//						if (launcher.getCurrentIterations() > 0) {
-//							progressBar.setStringPainted(false);
-//							progressBar.setValue(launcher.getCurrentIterations());
-//						} else {
-//							progressBar.setString(launcher.getTreeCounter() + " trees loaded");
-//						}
-					}
-				});
-
-				getPruningOptionAction().setEnabled(false);
-				new PruningWorker().execute();
-				timer.start();
-				//				}//the input verifier will display the input validation error if required
-
-			} else {
-				JOptionPane.showMessageDialog(this,
-						"Please select file.", "Error Massage",
-						JOptionPane.ERROR_MESSAGE);
-			}
-
-		}
-	}
-
-	class PruningWorker extends SwingWorker<Void, Void> {
-		protected Void doInBackground() throws Exception {
-			launcher.launchMH();
-			return null;
-		}
-
-		protected void done() {
-			timer.stop();
-			runResults.add(launcher.getMHResults());
-			selectedRun = runResults.size() - 1;			
-			runTableModel.fireTableDataChanged();
-
-			//highlight current run in runTable and update display
-			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-
-			//switch from progress bar to score panel
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
-			getPruningOptionAction().setEnabled(true);
-		}
-
-	}
-
-
-
-	public Action getPruningOptionAction() {
-		return pruningOptionAction;
-	}
-
-	protected AbstractAction pruningOptionAction = new AbstractAction("Prune...") {
-		public void actionPerformed(ActionEvent ae) {
-			try {
-				doPruning();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ImportException e) {
-				e.printStackTrace();
-			}
-		}
-	};
 
 	public Action getAlgorithmAction() {
 		return algorithmAction;
@@ -561,44 +471,73 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		if (algorithmDialog.showDialog() == JOptionPane.OK_OPTION) {
 
-			boolean inputIsValid = false;
+//			boolean inputIsValid = false;
 			final int selection = algorithmDialog.getSelection();
 
-			switch(selection) {
-			case 1:	//bisection
-				inputIsValid = GUIInputVerifier.verifyBisectionAlgorithmInput(algorithmDialog.getBisectionInput());
-				break;
-			case 2:	//simulated annealing
-				inputIsValid = GUIInputVerifier.verifySAAlgorithmInput(algorithmDialog.getSAInput(), launcher.getTaxaCount());
-				break;
-			case 3:	//metropolis hastings
-				inputIsValid = GUIInputVerifier.verifyMHAlgorithmInput(algorithmDialog.getMHInput(), launcher.getTaxaCount());
-			}
+//			switch(selection) {
+//			case 11:	//const SA
+//				inputIsValid = GUIInputVerifier.verifyBisectionAlgorithmInput(algorithmDialog.getBisectionInput());
+//				break;
+//			case 12:	//const MH
+//				break;
+//			case 21:	//linear SA
+//				inputIsValid = GUIInputVerifier.verifySAAlgorithmInput(algorithmDialog.getSAInput(), launcher.getTaxaCount());
+//				break;
+//			case 22:	//linear MH
+//				break;
+//			case 31:	//bisection SA
+//				inputIsValid = GUIInputVerifier.verifyMHAlgorithmInput(algorithmDialog.getMHInput(), launcher.getTaxaCount());
+//				break;
+//			case 32:	//bisection MH
+//				
+//			}
+			
+			Map<String, Object> input = GUIInputVerifier.verifyInput(algorithmDialog.getInput(), selection, launcher.getTaxaCount());
 
 
-			if(inputIsValid) {
+			if(input != null) {
 
 				((CardLayout)cardPanel.getLayout()).show(cardPanel, "progress");
 				progressBar.setValue(0);
+				progressBar.setMaximum((Integer) input.get("totalIterations"));
 				progressBar.setStringPainted(false);
 				
-
-				switch(selection) {
-				case 1:	//bisection
-					launcher.setupBisection(algorithmDialog.getBisectionInput());
-					progressBar.setMaximum(launcher.getBisectionIterationMax());
-					new BisectionWorker().execute();
-					break;
-				case 2:	//simulated annealing
-					launcher.setupSA(algorithmDialog.getSAInput());
-					progressBar.setMaximum(launcher.getSAIterationMax());
-					new SAWorker().execute();
-					break;
-				case 3:	//metropolis hastings
-					launcher.setupMH(algorithmDialog.getMHInput());
-					progressBar.setMaximum(launcher.getMHIterationMax());
-					new MHWorker().execute();
+				
+				Algorithm algorithm;
+				
+				if(selection % 10 == 3) { //bisection
+					if ((int) (selection / 10) == 1) {	//SA
+						algorithm = new SABisectionAlgorithm();
+					} else { //MH
+						algorithm = new MHBisectionAlgorithm();
+					}
+				} else { //constant or linear
+					if ((int) (selection / 10) == 1) {	//SA
+						algorithm = new SALinearAlgorithm();
+					} else { //MH
+						algorithm = new MHLinearAlgorithm();
+					}
 				}
+				
+				launcher.setupAlgorithm(algorithm, input);
+				new AlgorithmWorker().execute();
+
+//				switch(selection) {
+//				case 1:	//bisection
+//					launcher.setupBisection(algorithmDialog.getBisectionInput());
+//					
+//					new BisectionWorker().execute();
+//					break;
+//				case 2:	//simulated annealing
+//					launcher.setupSA(algorithmDialog.getSAInput());
+//					
+//					new SAWorker().execute();
+//					break;
+//				case 3:	//metropolis hastings
+//					launcher.setupMH(algorithmDialog.getMHInput());
+//					
+//					new MHWorker().execute();
+//				}
 				timer = new javax.swing.Timer(1000, new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						//try {
@@ -612,6 +551,28 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				getAlgorithmAction().setEnabled(false);
 			}//the input verifier will display the input validation error if required
 		}
+	}
+	
+	class AlgorithmWorker extends SwingWorker<Void, Void> {
+		protected Void doInBackground() throws Exception {
+			launcher.runAlgorithm();
+			return null;
+		}
+
+		protected void done() {
+			timer.stop();
+			runResults.add(launcher.getResults());
+			selectedRun = runResults.size() - 1;			
+			runTableModel.fireTableDataChanged();
+
+			//highlight current run in runTable and update display
+			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+
+			//switch from progress bar to score panel
+			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+			getAlgorithmAction().setEnabled(true);
+		}
+
 	}
 	
 	class SAWorker extends SwingWorker<Void, Void> {

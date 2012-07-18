@@ -12,7 +12,5 @@ public interface MastodonFileMenuHandler {
 	Action getExportDataAction();
 
 	Action getExportPDFAction();
-	
-	Action getPruningOptionAction();
 
 }

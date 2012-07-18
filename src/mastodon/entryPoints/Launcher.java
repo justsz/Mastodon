@@ -46,6 +46,9 @@ public class Launcher {
 	private MHBitAlgorithmBisection bisection = new MHBitAlgorithmBisection();
 	private SABitAlgorithm sa = new SABitAlgorithm();
 	private MHLinearAlgorithm mh = new MHLinearAlgorithm();
+	
+	private Algorithm algorithm;
+	
 	private int treeCounter;
 
 	//	public Launcher(JFrame frame, String filename, double minScore, int maxPruned, int iterations) {
@@ -102,10 +105,25 @@ public class Launcher {
 
 		return success;
 	}
+	
+	public void setupAlgorithm(Algorithm alg, Map<String, Object> limits) {
+		algorithm = alg;
+		alg.setBTS(bts);
+		alg.setLimits(limits);
+		alg.setIterationCounter(0);
+	}
+	
+	public void runAlgorithm() {
+		algorithm.run();
+	}
+	
+	public RunResult getResults() {
+		return algorithm.getRunResult();
+	}
 
 	public void launchMH() {
-		mh.setTrees(bts, bts.getBitTrees());
-		mh.setLimits((double) minScore, (int) maxPruned, (int) iterations);
+//		mh.setTrees(bts, bts.getBitTrees());
+//		mh.setLimits((double) minScore, (int) maxPruned, (int) iterations);
 		mh.setIterationCounter(0);
 		mh.run();
 	}
@@ -214,15 +232,16 @@ public class Launcher {
 	}
 
 	public int getCurrentIterations(int selection) {
-		switch (selection) {
-		case 1:
-			return bisection.getIterationCounter();
-		case 2:
-			return sa.getIterationCounter();
-		case 3:
-			return mh.getIterationCounter();
-		}
-		return -1;
+//		switch (selection) {
+//		case 1:
+//			return bisection.getIterationCounter();
+//		case 2:
+//			return sa.getIterationCounter();
+//		case 3:
+//			return mh.getIterationCounter();
+//		}
+//		return -1;
+		return algorithm.getIterationCounter();
 	}
 
 	public int getTaxaCount() {
@@ -234,18 +253,10 @@ public class Launcher {
 		setMaxPruned(input[1]);
 		setIterations(input[2]);
 	}
-			
-	public int getMHIterationMax() {
-		return iterations;
-	}
 	
 	public void setupBisection(String[] input) {
 		setMinScore(input[0]);
 		setIterations(input[1]);
-	}
-	
-	public int getBisectionIterationMax() {
-		return (int) (iterations * Math.log(getTaxaCount()) / Math.log(2));
 	}
 	
 	public void setupSA(String[] input) {
@@ -254,11 +265,6 @@ public class Launcher {
 		initTemp = Double.parseDouble(input[2]);
 		minTemp = Double.parseDouble(input[3]);
 		setIterations(input[4]);
-	}
-	
-	public int getSAIterationMax() {
-		//return (int) (iterations * Math.log(initTemp/minTemp) / Math.log(2));
-		return iterations;
 	}
 	
 	public RootedTree getMapTree() {

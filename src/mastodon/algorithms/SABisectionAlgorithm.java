@@ -21,11 +21,7 @@ import mastodon.core.*;
  */
 public class SABisectionAlgorithm extends Algorithm{
 
-	private Map<BitSet, double[]> taxa;
-
-	double minMapScore;
 	private int stepIterations;
-	int totalIterations;
 
 	int kLeft;
 	int kRight;
@@ -34,8 +30,6 @@ public class SABisectionAlgorithm extends Algorithm{
 	private double currTemp;
 	private double finalTemp;
 	private double coolingRate;
-
-	Map<Integer, Integer> pruningFreq;
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
@@ -205,7 +199,7 @@ public class SABisectionAlgorithm extends Algorithm{
 
 	protected void afterActions() {
 		runCounter++;
-		taxa = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
+		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		stepIterations = 0;
 		System.out.println("Pruned number " + currPrunedSpeciesCount);
 		System.out.println(maxScore[0] + " " + maxScore[1]);

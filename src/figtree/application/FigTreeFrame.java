@@ -1326,44 +1326,6 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 
 	PruningDialog pruningDialog;
 	Launcher launcher;
-	public final void doPruning() throws IOException, ImportException {
-		if (pruningDialog == null) {
-			pruningDialog = new PruningDialog(this);
-		}
-
-		if (pruningDialog.showDialog() == JOptionPane.OK_OPTION) {
-			if(pruningDialog.getFile() != null) {
-
-				pruningDialog.setVisible(false);
-
-				if(launcher == null) {
-					launcher = new Launcher(this, 
-							pruningDialog.getFile(), 
-							pruningDialog.getMinScore(), 
-							pruningDialog.getMaxPrunedTaxa(), 
-							pruningDialog.getIterations());
-				} else {
-					launcher.setFrame(this);
-					launcher.setFileName(pruningDialog.getFile());
-					launcher.setMinScore(pruningDialog.getMinScore());
-					launcher.setMaxPruned(pruningDialog.getMaxPrunedTaxa());
-					launcher.setIterations(pruningDialog.getIterations());
-				}
-
-				launcher.launchMH();
-
-				for(Tree tree : launcher.getResults().getPrunedMapTrees()) {
-					treeViewer.addTree(tree);
-				}
-				treeViewer.fireTreeChanged();
-			} else {
-				JOptionPane.showMessageDialog(this,
-						"Please select file.", "Error Massage",
-						JOptionPane.ERROR_MESSAGE);
-			}
-
-		}
-	}
 
 	//<<<<<<<<<<<<<<<
 
@@ -1475,27 +1437,6 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 		return findAction;
 	}
 
-	//>>>>>>>
-
-	public Action getPruningOptionAction() {
-		return pruningOptionAction;
-	}
-
-	protected AbstractAction pruningOptionAction = new AbstractAction("Prune...") {
-		public void actionPerformed(ActionEvent ae) {
-			try {
-				doPruning();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ImportException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	};
-
-	//<<<<<<<<<
 
 	private AbstractAction importAction = new AbstractAction("Import Annotations...") {
 		public void actionPerformed(ActionEvent ae) {
