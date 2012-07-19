@@ -188,7 +188,7 @@ public class FigTreePanel extends JPanel {
 
                     Decorator decorator = new ContinuousColorDecorator(
                             new ContinousScale(attribute, nodes, 0.0, 1.0),
-                            new Color(0, 0, 0), Color.RED, false);
+                            new Color(0, 0, 0), Color.WHITE, false);
 
                     treeViewer.setBranchColouringDecorator(null, null);
                     treeViewer.setBranchDecorator(decorator);

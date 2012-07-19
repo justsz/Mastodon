@@ -198,7 +198,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 		stepIterations = 0;
 		System.out.println("Pruned number " + currPrunedSpeciesCount);
 		System.out.println(maxScore[0] + " " + maxScore[1]);
-		System.out.println(pruningFreq);
+		System.out.println(pruningFreq);		
 	}
 
 }

@@ -48,7 +48,7 @@ import jebl.evolution.io.ImportException;
  * @version $Id$
  */
 public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHandler {
-	private final String[] columnToolTips = {"", "", ""};
+	private final String[] columnToolTips = {"", "", "", "", ""};
 
 	private FigTreePanel figTreePanel = null;
 
@@ -137,6 +137,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		runTableModel = new RunTableModel();
 		runTable = new JTable(runTableModel);
+		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
 		runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
 		runTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
@@ -184,6 +185,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				};
 			}
 		};
+		
+		resultTable.setAutoCreateRowSorter(true);
 		resultTable.getColumnModel().getColumn(0).setPreferredWidth(10);
 		resultTable.getColumnModel().getColumn(1).setPreferredWidth(5);
 		//resultTable.getColumnModel().getColumn(1).setPreferredWidth(150);
@@ -191,7 +194,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		resultTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
 		resultTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
 		resultTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
-		resultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		resultTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 		resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
@@ -353,10 +356,16 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 	public void resultTableSelectionChanged() {
-		int selRow = resultTable.getSelectedRow();
-		List<String> taxonNames = new ArrayList<String>();
-		taxonNames.add((String) resultTableModel.getValueAt(selRow, 2));
-		figTreePanel.getTreeViewer().selectTaxa(taxonNames);		
+		int[] selRows = resultTable.getSelectedRows();
+		if (selRows.length > 0) {
+			List<String> taxonNames = new ArrayList<String>();
+			for(int i = 0; i < selRows.length; i++) {
+				taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
+			}
+			figTreePanel.getTreeViewer().selectTaxa(taxonNames);
+		} else {
+			figTreePanel.getTreeViewer().clearSelectedTaxa();
+		}
 	}
 
 	public final void doExportData() {
@@ -491,14 +500,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 				Algorithm algorithm;
 
-				if(selection % 10 == 3) { //bisection
-					if ((int) (selection / 10) == 1) {	//SA
+				if((int) (selection / 10) == 3) { //bisection
+					if ((int) (selection % 10) == 1) {	//SA
 						algorithm = new SABisectionAlgorithm();
 					} else { //MH
 						algorithm = new MHBisectionAlgorithm();
 					}
 				} else { //constant or linear
-					if ((int) (selection / 10) == 1) {	//SA
+					if ((int) (selection % 10) == 1) {	//SA
 						algorithm = new SALinearAlgorithm();
 					} else { //MH
 						algorithm = new MHLinearAlgorithm();
@@ -614,7 +623,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 	class RunTableModel extends AbstractTableModel {
-		final String[] columnNames = {"Run", "Score"};
+		final String[] columnNames = {"Run","Pruned k", "Min k", "Max k", "Score"};
 
 		public int getColumnCount() {
 			return columnNames.length;
@@ -646,6 +655,12 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				case 0:
 					return runResult.getName();
 				case 1:
+					return runResult.getPrunedTaxa().get(figTreePanel.getTreeViewer().getCurrentTreeIndex()).size();
+				case 2:
+					return runResult.getMinPruning();
+				case 3:
+					return runResult.getMaxPruning();
+				case 4:
 					//justification for .get(0) : 
 					//all runs will have at least 1 tree; all scores in the maxima list are equal, though the number of matching trees could be different
 					return runResult.getPruningScores().get(0)[0];

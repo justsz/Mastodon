@@ -89,7 +89,7 @@ public abstract class Algorithm {
 		}
 		
 		String name = stub + " run " + runCounter;
-		return new RunResult(bts, prunedTaxa, pruningScores, prunedMapTrees, pruningFrequencies, name);
+		return new RunResult(bts, prunedTaxa, pruningScores, prunedMapTrees, pruningFrequencies, name, minPrunedSpeciesCount, maxPrunedSpeciesCount);
 	}
 
 	public int getIterationCounter() {

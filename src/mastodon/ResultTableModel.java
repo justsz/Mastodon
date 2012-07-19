@@ -57,7 +57,7 @@ import jebl.evolution.taxa.Taxon;
 				return "";
 			}
 			if (col == 2) return taxon.getName();
-			if (col == 3) return Double.valueOf(twoDForm.format(100 * runResult.getPruningFreq().get(taxon))) + "%";
+			if (col == 3) return Double.valueOf(twoDForm.format(runResult.getPruningFreq().get(taxon)));
 			
 
 			return "";

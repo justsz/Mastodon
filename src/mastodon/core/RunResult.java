@@ -15,6 +15,8 @@ import jebl.evolution.trees.SimpleRootedTree;
  *
  */
 public class RunResult {
+	private int minPruning;
+	private int maxPruning;
 	private BitTreeSystem bts;
 	private List<ArrayList<Taxon>> prunedTaxa;
 	private List<double[]> pruningScores;
@@ -22,13 +24,15 @@ public class RunResult {
 	private Map<Taxon, Double> pruningFreq;
 	private String name;
 
-	public RunResult(BitTreeSystem bts, List<ArrayList<Taxon>> pt, List<double[]> ps, List<SimpleRootedTree> pmt, Map<Taxon, Double> pf, String name) {
+	public RunResult(BitTreeSystem bts, List<ArrayList<Taxon>> pt, List<double[]> ps, List<SimpleRootedTree> pmt, Map<Taxon, Double> pf, String name, int minK, int maxK) {
 		this.bts = bts;
 		prunedTaxa = pt;
 		pruningScores = ps;
 		prunedMapTrees = pmt;
 		pruningFreq = pf;
 		this.name = name;
+		minPruning = minK;
+		maxPruning = maxK;
 	}
 
 	public List<ArrayList<Taxon>> getPrunedTaxa() {
@@ -77,5 +81,13 @@ public class RunResult {
 
 	public void setBts(BitTreeSystem bts) {
 		this.bts = bts;
+	}
+
+	public int getMinPruning() {
+		return minPruning;
+	}
+
+	public int getMaxPruning() {
+		return maxPruning;
 	}
 }
