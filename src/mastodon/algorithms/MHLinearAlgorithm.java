@@ -203,6 +203,7 @@ public class MHLinearAlgorithm extends Algorithm{
 			for (int a = currPruning.nextSetBit(0); a >= 0; a = currPruning.nextSetBit(a+1)) {
 				pruningFreq.put(a, pruningFreq.get(a) + 1);
 			}
+			totalPruningFreq++;
 
 		} //try different pruning otherwise
 	}

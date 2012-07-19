@@ -184,11 +184,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				};
 			}
 		};
-		resultTable.getColumnModel().getColumn(0).setPreferredWidth(20);
-		resultTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+		resultTable.getColumnModel().getColumn(0).setPreferredWidth(10);
+		resultTable.getColumnModel().getColumn(1).setPreferredWidth(5);
+		//resultTable.getColumnModel().getColumn(1).setPreferredWidth(150);
 		resultTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
 		resultTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
-		resultTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		resultTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+		resultTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
+		resultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
@@ -319,7 +322,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 		//
 
+		//what is this?
 		setAnalysesEnabled(true);
+		
 		getRemoveRunAction().setEnabled(true);
 		selectedRun = selRow;
 		updateDataDisplay();
@@ -343,12 +348,15 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
 
-		figTreePanel.setColourBy("pruned");
+		//figTreePanel.setColourBy("pruned");
 	}
 
 
 	public void resultTableSelectionChanged() {
-
+		int selRow = resultTable.getSelectedRow();
+		List<String> taxonNames = new ArrayList<String>();
+		taxonNames.add((String) resultTableModel.getValueAt(selRow, 2));
+		figTreePanel.getTreeViewer().selectTaxa(taxonNames);		
 	}
 
 	public final void doExportData() {
@@ -530,6 +538,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
+			
+			if (runResults.size() == 1) {
+				//set default coloring option
+				figTreePanel.setColourBy("pruned");
+			}
 		}
 
 	}

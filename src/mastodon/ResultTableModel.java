@@ -1,5 +1,7 @@
 package mastodon;
 
+import java.text.DecimalFormat;
+
 import javax.swing.table.AbstractTableModel;
 
 import mastodon.core.RunResult;
@@ -21,7 +23,7 @@ import jebl.evolution.taxa.Taxon;
 		}
 		
 		
-		final String[] columnNames = {"#", "Taxon name"};
+		final String[] columnNames = {"#", "pruned", "Taxon name", "Pruning frequency"};
 
 		public int getColumnCount() {
 			return columnNames.length;
@@ -31,8 +33,10 @@ import jebl.evolution.taxa.Taxon;
 			if(runResult == null) {
 				return 0;
 			}
-			int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
-			return runResult.getPrunedTaxa().get(currentTree).size();
+//			int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
+//			return runResult.getPrunedTaxa().get(currentTree).size();
+			
+			return runResult.getBts().getAllTaxa().size();
 		}
 
 		public String getColumnName(int col) {
@@ -41,10 +45,20 @@ import jebl.evolution.taxa.Taxon;
 
 		public Object getValueAt(int row, int col) {
 			int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
-			Taxon taxon = runResult.getPrunedTaxa().get(currentTree).get(row);
+			//Taxon taxon = runResult.getPrunedTaxa().get(currentTree).get(row);
+			Taxon taxon = (Taxon) runResult.getBts().getAllTaxa().toArray()[row];
+			DecimalFormat twoDForm = new DecimalFormat("#.##");
 
 			if (col == 0) return row + 1;
-			if (col == 1) return taxon.getName();			
+			if (col == 1) {
+				if (runResult.getPrunedTaxa().get(currentTree).contains(taxon)) {
+					return "Ã";
+				} 
+				return "";
+			}
+			if (col == 2) return taxon.getName();
+			if (col == 3) return Double.valueOf(twoDForm.format(100 * runResult.getPruningFreq().get(taxon))) + "%";
+			
 
 			return "";
 		}

@@ -6,6 +6,7 @@ package mastodon;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FileDialog;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -105,15 +106,14 @@ public class AlgorithmDialog {
 		this.frame = frame;
 		
 		searchMethodCardPanel = new JPanel(new CardLayout());
-		algorithmChoiceCardPanel = new JPanel(new CardLayout());
+		algorithmChoiceCardPanel = new JPanel(new CardLayout());		
 		
+		OptionsPanel constOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
+		OptionsPanel linearAndBisectionOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		
-		OptionsPanel constOptions = new OptionsPanel(12, 12);
-		OptionsPanel linearAndBisectionOptions = new OptionsPanel(12, 12);
+		OptionsPanel SAOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		
-		OptionsPanel SAOptions = new OptionsPanel(12, 12);
-		
-		OptionsPanel overallOptions = new OptionsPanel(12, 12);
+		OptionsPanel overallOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 
 		numberToPrune.setColumns(5);
 		minNumberToPrune.setColumns(5);
@@ -148,12 +148,12 @@ public class AlgorithmDialog {
 		algorithmChoiceButtonsPanel.add(MHButton);
 		
 		constOptions.addComponentWithLabel("Number of taxa to prune[1+]", numberToPrune);
-		
+
 		linearAndBisectionOptions.addComponentWithLabel("Min number of taxa to prune[1+]", minNumberToPrune);
 		linearAndBisectionOptions.addComponentWithLabel("Max number of taxa to prune[1+]", maxNumberToPrune);
 
-		SAOptions.addComponentWithLabel("Initial temperature[0+]", initialTemp);
-		SAOptions.addComponentWithLabel("Final temperature[0+]", finalTemp);
+		SAOptions.addComponentWithLabel("Initial temperature[>0]", initialTemp);
+		SAOptions.addComponentWithLabel("Final temperature[>0]", finalTemp);
 		
 		overallOptions.addComponentWithLabel("Total iterations[1+]", totalIterations);
 		overallOptions.addComponentWithLabel("Desired MAP score[0.0-1.0]", minMapScore);
@@ -166,10 +166,14 @@ public class AlgorithmDialog {
 		
 		JPanel buttonsAndFields = new JPanel();
 		buttonsAndFields.setLayout(new BoxLayout(buttonsAndFields, BoxLayout.Y_AXIS));
+		//buttonsAndFields.add(new JLabel("Search method to use"));
 		buttonsAndFields.add(searchMethodButtonsPanel);
 		buttonsAndFields.add(searchMethodCardPanel);
+		buttonsAndFields.add(new JSeparator(SwingConstants.HORIZONTAL));
+		//buttonsAndFields.add(new JLabel("Algorithm to use"));
 		buttonsAndFields.add(algorithmChoiceButtonsPanel);
 		buttonsAndFields.add(algorithmChoiceCardPanel);
+		buttonsAndFields.add(new JSeparator(SwingConstants.HORIZONTAL));
 		buttonsAndFields.add(overallOptions);
 
 		optionPane = new JOptionPane(buttonsAndFields,

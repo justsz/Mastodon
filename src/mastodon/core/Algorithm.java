@@ -2,6 +2,7 @@ package mastodon.core;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ public abstract class Algorithm {
 	protected double minMapScore;
 	protected int totalIterations;
 	protected Map<Integer, Integer> pruningFreq;
+	protected int totalPruningFreq;
 	
 	protected int minPrunedSpeciesCount;
 	protected int currPrunedSpeciesCount;
@@ -56,6 +58,7 @@ public abstract class Algorithm {
 	public void run() {
 		//add a check to see if everything has been set correctly
 		initialize();
+		totalPruningFreq = 0;
 
 		while (!finished()) {
 			choosePruningCount();
@@ -71,17 +74,22 @@ public abstract class Algorithm {
 		List<ArrayList<Taxon>> prunedTaxa = new ArrayList<ArrayList<Taxon>>();
 		List<double[]> pruningScores = new ArrayList<double[]>();
 		List<SimpleRootedTree> prunedMapTrees = new ArrayList<SimpleRootedTree>();
+		Map<Taxon, Double> pruningFrequencies = new HashMap<Taxon, Double>();
 
 		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+		
+		for(Entry<Integer, Integer> entry : pruningFreq.entrySet()) {
+			pruningFrequencies.put(bts.getTaxon(entry.getKey()), (double) entry.getValue() / totalPruningFreq);
+		}
 
 		for(Entry<BitSet, double[]> entry : finalPruning.entrySet()) {
 			prunedTaxa.add((ArrayList<Taxon>) bts.getTaxa(entry.getKey()));
 			pruningScores.add(entry.getValue());
-			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey()));
+			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey(), pruningFrequencies));
 		}
-
+		
 		String name = stub + " run " + runCounter;
-		return new RunResult(prunedTaxa, pruningScores, prunedMapTrees, name);
+		return new RunResult(bts, prunedTaxa, pruningScores, prunedMapTrees, pruningFrequencies, name);
 	}
 
 	public int getIterationCounter() {

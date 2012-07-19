@@ -238,12 +238,11 @@ public class BitTreeSystem {
 	}
 
 	/**
-	 * Returns taxon at index from all taxa. 
-	 * @param taxa - list of all unique taxa in set of trees
+	 * Returns taxon at index from all taxa.
 	 * @param index index of sought taxa
 	 * @return taxon at index in set of all unique taxa
 	 */
-	private Taxon getTaxon(Set<Taxon> taxa, int index) {
+	public Taxon getTaxon(int index) {
 		Object[] taxaA = taxa.toArray();
 		return (Taxon) taxaA[index];
 	}
@@ -251,7 +250,7 @@ public class BitTreeSystem {
 	public List<Taxon> getTaxa(BitSet bits) {
 		List<Taxon> taxaList = new ArrayList<Taxon>();
 		for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i+1)) {
-			taxaList.add(getTaxon(taxa, i));
+			taxaList.add(getTaxon(i));
 		}
 		return taxaList;
 	}
@@ -304,7 +303,7 @@ public class BitTreeSystem {
 	 * @param highlights - leaves that should be colored
 	 * @return reconstructed tree object
 	 */
-	public SimpleRootedTree reconstructTree(BitTree bitTree, BitSet highlights) {
+	public SimpleRootedTree reconstructTree(BitTree bitTree, BitSet highlights, Map<Taxon, Double> pruningFreq) {
 		//Pay attention to order and size of all the various Lists.
 
 		//sort bitSets in ascending cardinality(number of bits set)
@@ -330,13 +329,17 @@ public class BitTreeSystem {
 		//first create all tips
 		for (int i = allTaxa.nextSetBit(0); i >= 0; i = allTaxa.nextSetBit(i+1)) {
 			externalNodes[i] = tree.createExternalNode((Taxon) taxaA[i]);
+			if (pruningFreq != null) {
+				externalNodes[i].setAttribute("pruningFreq", pruningFreq.get((Taxon) taxaA[i]));
+			}
 		}
 
 		int numberOfInternalNodes = bitSets.size();	//assumption which I'm pretty sure is always true
 		Node[] internalNodes = new Node[numberOfInternalNodes];
 
 
-		//iterate through list of clades. First add ones of size 2. Then for bigger ones, search the list of already created clades backwards to find sub-clades and add as nodes
+		//iterate through list of clades. First add ones of size 2. 
+		//Then for bigger ones, search the list of already created clades backwards to find sub-clades and add as nodes
 		for(int i = 0; i < numberOfInternalNodes; i++) {
 			List<Node> nodes = new ArrayList<Node>();
 			BitSet copy = (BitSet) bitSets.get(i).clone();
@@ -354,7 +357,7 @@ public class BitTreeSystem {
 
 		if (highlights != null) {
 			for(Node node : getNodes(externalNodes, highlights)) {
-				node.setAttribute("pruned", 1.0);
+				node.setAttribute("pruned", true);
 			}
 		}
 

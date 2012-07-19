@@ -47,9 +47,9 @@ public class GUIInputVerifier {
 			initTemp = 0;
 			finalTemp = 0;
 		} else {
-			initTemp = checkDouble("Initial temperature", input.get("initTemp"), 0, Double.MAX_VALUE);
+			initTemp = checkDouble("Initial temperature", input.get("initTemp"), Double.MIN_VALUE, Double.MAX_VALUE);
 			if (initTemp != - 1) {
-				finalTemp = checkDouble("Final temperature", input.get("finalTemp"), 0, initTemp);
+				finalTemp = checkDouble("Final temperature", input.get("finalTemp"), Double.MIN_VALUE, initTemp);
 			} else {
 				finalTemp = -1;
 			}

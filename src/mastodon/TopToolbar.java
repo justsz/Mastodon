@@ -3,6 +3,7 @@
  */
 package mastodon;
 
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
@@ -12,13 +13,7 @@ import jam.toolbar.ToolbarAction;
 import jam.toolbar.ToolbarButton;
 import jam.util.IconUtils;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.*;
 
 import figtree.treeviewer.TreeViewerListener;
 
@@ -35,6 +30,24 @@ public class TopToolbar{
 
 	Icon nextIcon = IconUtils.getIcon(this.getClass(), "images/next.png");
 	Icon prevIcon = IconUtils.getIcon(this.getClass(), "images/prev.png");
+	
+	private AbstractAction noColorAction = new AbstractAction("No color") {
+		public void actionPerformed(ActionEvent ae) {
+			((FigTreePanel) treeViewer.getParent()).setColourBy(null);
+		}
+	};
+	
+	private AbstractAction prunedAction = new AbstractAction("Pruned") {
+		public void actionPerformed(ActionEvent ae) {
+			((FigTreePanel) treeViewer.getParent()).setColourBy("pruned");
+		}
+	};
+	
+	private AbstractAction pruningFreqAction = new AbstractAction("Pruning frequencies") {
+		public void actionPerformed(ActionEvent ae) {
+			((FigTreePanel) treeViewer.getParent()).setColourBy("pruningFreq");
+		}
+	};
 
 	final ToolbarAction nextTreeToolbarAction =
 			new ToolbarAction(null, "Next Tree...", nextIcon) {
@@ -114,6 +127,20 @@ public class TopToolbar{
 		box.add(prevTreeToolButton);
 		box.add(nextTreeToolButton);
 		toolBar.addComponent(new GenericToolbarItem("Prev/Next", "Navigate through the trees", box));
+		
+		JRadioButton noColor = new JRadioButton(noColorAction);
+		JRadioButton pruned = new JRadioButton(prunedAction);
+		pruned.setSelected(true);
+		JRadioButton frequencies = new JRadioButton(pruningFreqAction);
+		ButtonGroup coloringGroup = new ButtonGroup();
+		
+		coloringGroup.add(noColor);
+		coloringGroup.add(pruned);
+		coloringGroup.add(frequencies);
+		
+		toolBar.addComponent(noColor);
+		toolBar.addComponent(pruned);
+		toolBar.addComponent(frequencies);
 
 
 		treeViewer.addTreeViewerListener(l);

@@ -178,15 +178,17 @@ public class FigTreePanel extends JPanel {
                     treeViewer.setBranchColouringDecorator(attribute.substring(0, attribute.length() - 2), decorator);
                     treeViewer.setBranchDecorator(null);
                 } else if (DiscreteColorDecorator.isDiscrete(attribute, nodes)) {
-                    Decorator decorator = new DiscreteColorDecorator(attribute, nodes);
+                	Color[] red = new Color[1];
+                	red[0] = Color.RED;
+                    Decorator decorator = new DiscreteColorDecorator(attribute, nodes, red, false);
 
                     treeViewer.setBranchColouringDecorator(null, null);
                     treeViewer.setBranchDecorator(decorator);
                 } else {
 
                     Decorator decorator = new ContinuousColorDecorator(
-                            new ContinousScale(attribute, nodes),
-                            new Color(192, 16, 0), new Color(0, 0, 0), new Color(245, 0, 61), false);
+                            new ContinousScale(attribute, nodes, 0.0, 1.0),
+                            new Color(0, 0, 0), Color.RED, false);
 
                     treeViewer.setBranchColouringDecorator(null, null);
                     treeViewer.setBranchDecorator(decorator);

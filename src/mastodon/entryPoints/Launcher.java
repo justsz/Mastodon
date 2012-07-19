@@ -126,6 +126,6 @@ public class Launcher {
 	}
 	
 	public RootedTree getMapTree() {
-		return bts.reconstructTree(bts.getBitTrees().get(bts.getMapTreeIndex()), null);
+		return bts.reconstructTree(bts.getBitTrees().get(bts.getMapTreeIndex()), null, null);
 	}
 }
