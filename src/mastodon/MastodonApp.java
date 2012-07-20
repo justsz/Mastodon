@@ -102,8 +102,8 @@ public class MastodonApp extends MultiDocApplication {
                     "<a href=\"http://code.google.com/p/beast-mcmc/\">http://code.google.com/p/beast-mcmc/</a></p>" +
                     "</center></html>";
 
-            String websiteURLString = "http://beast.bio.ed.ac.uk/";
-            String helpURLString = "http://beast.bio.ed.ac.uk/Mapper";
+            String websiteURLString = "http://informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets";
+            String helpURLString = "https://github.com/justsz/Mastodon/downloads";
 
             MastodonApp app = new MastodonApp(nameString, aboutString, icon, websiteURLString, helpURLString);
             app.setDocumentFrameFactory(new DocumentFrameFactory() {

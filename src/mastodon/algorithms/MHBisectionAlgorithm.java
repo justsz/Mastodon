@@ -74,7 +74,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 	}
 
 	protected boolean finished() {
-		return currPrunedSpeciesCount > maxPrunedSpeciesCount || iterationCounter >= totalIterations;
+		return iterationCounter >= totalIterations;
 	}
 
 	protected void choosePruningCount() {

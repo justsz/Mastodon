@@ -29,9 +29,9 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
         Application application = Application.getApplication();
         JMenuItem item;
 
-        item = new JMenuItem(application.getNewAction());
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuBarFactory.MENU_MASK));
-        menu.add(item);
+//        item = new JMenuItem(application.getNewAction());
+//        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuBarFactory.MENU_MASK));
+//        menu.add(item);
         
 		item = new JMenuItem(application.getOpenAction());
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MenuBarFactory.MENU_MASK));
@@ -42,51 +42,51 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
         // are simply missing. In contrast, on Mac, the menu is for the application so items should
         // be enabled/disabled as frames come to the front.
         if (frame instanceof MastodonFileMenuHandler) {
-            Action action = frame.getImportAction();
-            if (action != null) {
-                item = new JMenuItem(action);
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
-                menu.add(item);
-            } else {
-                item = new JMenuItem("Import Trace File...");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
-                item.setEnabled(false);
-                menu.add(item);
-            }
+//            Action action = frame.getImportAction();
+//            if (action != null) {
+//                item = new JMenuItem(action);
+//                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
+//                menu.add(item);
+//            } else {
+//                item = new JMenuItem("Import Trace File...");
+//                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
+//                item.setEnabled(false);
+//                menu.add(item);
+//            }
 
             menu.addSeparator();
 
-            item = new JMenuItem(((MastodonFileMenuHandler)frame).getExportDataAction());
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
-            menu.add(item);
-
-            item = new JMenuItem(((MastodonFileMenuHandler)frame).getExportPDFAction());
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK + KeyEvent.ALT_MASK));
-            menu.add(item);
+//            item = new JMenuItem(((MastodonFileMenuHandler)frame).getExportDataAction());
+//            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
+//            menu.add(item);
+//
+//            item = new JMenuItem(((MastodonFileMenuHandler)frame).getExportPDFAction());
+//            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK + KeyEvent.ALT_MASK));
+//            menu.add(item);
         } else {
             // If the frame is not a TracerFileMenuHandler then create a dummy set of disabled menu options.
             // At present the only situation where this may happen is in Mac OS X when no windows
             // are open and the menubar is created by the hidden frame.
 
-            item = new JMenuItem("Import Trace File...");
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
-            item.setEnabled(false);
-            menu.add(item);
+//            item = new JMenuItem("Import Trace File...");
+//            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
+//            item.setEnabled(false);
+//            menu.add(item);
 
             menu.addSeparator();
 
-            item = new JMenuItem("Export Data...");
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
-            item.setEnabled(false);
-            menu.add(item);
-
-            item = new JMenuItem("Export PDF...");
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK + KeyEvent.ALT_MASK));
-            item.setEnabled(false);
-            menu.add(item);
+//            item = new JMenuItem("Export Data...");
+//            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
+//            item.setEnabled(false);
+//            menu.add(item);
+//
+//            item = new JMenuItem("Export PDF...");
+//            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK + KeyEvent.ALT_MASK));
+//            item.setEnabled(false);
+//            menu.add(item);
         }
 
-        menu.addSeparator();
+//        menu.addSeparator();
 
         item = new JMenuItem(frame.getCloseWindowAction());
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, MenuBarFactory.MENU_MASK));

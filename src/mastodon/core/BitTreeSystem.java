@@ -397,7 +397,7 @@ public class BitTreeSystem {
 	}
 
 	public double[] pruneFast(BitSet pruner, BitTree mapTree) {
-		weighted = false;
+		//weighted = false;
 		double[] result = new double[2];
 		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
 		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());

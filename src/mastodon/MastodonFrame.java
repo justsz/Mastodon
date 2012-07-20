@@ -153,10 +153,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	};
 		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
-		runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
+		//runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
 		runTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
-		runTable.getColumnModel().getColumn(1).setPreferredWidth(50);
+		//runTable.getColumnModel().getColumn(1).setPreferredWidth(50);
 		runTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
+		runTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+		runTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
+		runTable.getColumnModel().getColumn(4).setCellRenderer(renderer);
 		runTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		runTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -318,7 +321,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		runResults.remove(selRow);
 		int prevRow = selRow - 1;
 		if (prevRow < 0) {
-			getRemoveRunAction().setEnabled(false);
+			//getRemoveRunAction().setEnabled(false);
 			prevRow = 0;
 		}
 		selectedRun = prevRow;
@@ -335,7 +338,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		//needed?
 		if (selRow < 0) {
 			getRemoveRunAction().setEnabled(false);
-			setAnalysesEnabled(false);
+			//setAnalysesEnabled(false);
 			return;
 		}
 		//
@@ -343,7 +346,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		//what is this?
 		setAnalysesEnabled(true);
 		
-		getRemoveRunAction().setEnabled(true);
+		if(runResults.size() > 0) {
+			getRemoveRunAction().setEnabled(true);
+		} else {
+			getRemoveRunAction().setEnabled(false);
+		}
 		selectedRun = selRow;
 		updateDataDisplay();
 
