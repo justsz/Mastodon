@@ -46,7 +46,11 @@ public class MHLinearAlgorithm extends Algorithm{
 	}
 
 	protected void initialize() {
-		stub = "MH";
+		if (minPrunedSpeciesCount == maxPrunedSpeciesCount) {
+			stub = "MH Cons.";
+		} else {
+			stub = "MH Lin.";
+		}
 		
 		pruningFreq = new HashMap<Integer, Integer>();
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
@@ -209,11 +213,9 @@ public class MHLinearAlgorithm extends Algorithm{
 	}
 
 	protected void afterActions() {
-		runCounter++;
 		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		stepIterations = null;
-		System.out.println(maxScore[0] + " " + maxScore[1]);
-		System.out.println(pruningFreq);
+		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
 	}
 
 

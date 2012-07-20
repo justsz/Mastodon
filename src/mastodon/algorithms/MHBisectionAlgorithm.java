@@ -50,7 +50,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 	}
 
 	protected void initialize() {
-		stub = "MH";
+		stub = "MH Bi.";
 		
 		pruningFreq = new HashMap<Integer, Integer>();
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
@@ -193,12 +193,10 @@ public class MHBisectionAlgorithm extends Algorithm{
 	}
 
 	protected void afterActions() {
-		runCounter++;
 		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		stepIterations = 0;
 		System.out.println("Pruned number " + currPrunedSpeciesCount);
-		System.out.println(maxScore[0] + " " + maxScore[1]);
-		System.out.println(pruningFreq);		
+		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);		
 	}
 
 }

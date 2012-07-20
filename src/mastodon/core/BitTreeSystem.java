@@ -352,6 +352,7 @@ public class BitTreeSystem {
 			}
 			nodes.addAll(getNodes(externalNodes, copy));
 			internalNodes[i] = tree.createInternalNode(nodes);
+			internalNodes[i].setAttribute("cladeProb", (double) clades.get(bitSets.get(i)).getFrequency()/treeCount);
 		}
 		tree.setAttribute("W", bitTree.getWeight());	//should the attribute be named W or weight?
 

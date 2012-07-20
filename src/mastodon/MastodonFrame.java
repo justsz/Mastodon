@@ -48,7 +48,9 @@ import jebl.evolution.io.ImportException;
  * @version $Id$
  */
 public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHandler {
-	private final String[] columnToolTips = {"", "", "", "", ""};
+	private final String[] resultTableColumnToolTips = {"", "Checkmark indicates inclusion in the pruning set that produced the highest MAP score"
+			, "", "Number of times the taxon is included in a pruning set that is accepted by the search algorithm as the next step, divided by total accepted steps"};
+	private final String[] runTableColumnToolTips = {"Algorithm run", "Number of taxa pruned in the pruning set that produced the highest MAP score", "Pruned taxa lower limit", "Pruned taxa upper limit", "MAP score"};
 
 	private FigTreePanel figTreePanel = null;
 
@@ -136,7 +138,19 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		figTreePanel.getTreeViewer().addTreeViewerListener(scoreListner);
 
 		runTableModel = new RunTableModel();
-		runTable = new JTable(runTableModel);
+		runTable = new JTable(runTableModel) { 
+		//Implement table header tool tips.
+		protected JTableHeader createDefaultTableHeader() {
+			return new JTableHeader(columnModel) {
+				public String getToolTipText(MouseEvent e) {
+					java.awt.Point p = e.getPoint();
+					int index = columnModel.getColumnIndexAtX(p.x);
+					int realIndex = columnModel.getColumn(index).getModelIndex();
+					return runTableColumnToolTips[realIndex];
+				}
+			};
+		}
+	};
 		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
 		runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
@@ -180,7 +194,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 						java.awt.Point p = e.getPoint();
 						int index = columnModel.getColumnIndexAtX(p.x);
 						int realIndex = columnModel.getColumn(index).getModelIndex();
-						return columnToolTips[realIndex];
+						return resultTableColumnToolTips[realIndex];
 					}
 				};
 			}
@@ -294,6 +308,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 	private void removeRun() {
+		//figTreePanel.getTreeViewer().
 		int selRow = runTable.getSelectedRow();
 
 		if (selRow < 0) {
@@ -645,7 +660,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			if (runResults.size() == 0) {
 				switch (col) {
 				case 0:
-					return "No runs available";
+					return "No pruning done yet";
 				case 1:
 					return "";
 				}

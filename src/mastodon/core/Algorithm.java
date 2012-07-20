@@ -32,7 +32,6 @@ public abstract class Algorithm {
 
 	protected int mapTreeIndex;
 	protected int iterationCounter = 0;
-	protected int runCounter = 0;
 
 	protected BitTreeSystem bts;
 	protected List<BitTree> bitTrees;
@@ -79,7 +78,13 @@ public abstract class Algorithm {
 		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
 		
 		for(Entry<Integer, Integer> entry : pruningFreq.entrySet()) {
-			pruningFrequencies.put(bts.getTaxon(entry.getKey()), (double) entry.getValue() / totalPruningFreq);
+			double freq = 0.0;
+			if (totalPruningFreq == 0) {
+				System.out.println("division by zero? no thanks!");
+			} else {
+				freq = (double) entry.getValue() / totalPruningFreq;
+			}
+			pruningFrequencies.put(bts.getTaxon(entry.getKey()), freq);
 		}
 
 		for(Entry<BitSet, double[]> entry : finalPruning.entrySet()) {
@@ -88,7 +93,7 @@ public abstract class Algorithm {
 			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey(), pruningFrequencies));
 		}
 		
-		String name = stub + " run " + runCounter;
+		String name = stub;
 		return new RunResult(bts, prunedTaxa, pruningScores, prunedMapTrees, pruningFrequencies, name, minPrunedSpeciesCount, maxPrunedSpeciesCount);
 	}
 

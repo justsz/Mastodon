@@ -27,6 +27,7 @@ public class SimpleLabelPainter extends LabelPainter<Node> {
 	public static final String TAXON_NAMES = "Taxon names";
 	public static final String NODE_AGES = "Node ages";
 	public static final String BRANCH_LENGTHS = "Branch lengths";
+	public static final String NODE_PROB = "Clade probabilities";
 
     public enum PainterIntent {
 		NODE,
@@ -58,6 +59,7 @@ public class SimpleLabelPainter extends LabelPainter<Node> {
 				break;
 			}
 			case NODE: {
+				attributeNames.add(NODE_PROB);
 				attributeNames.add(NODE_AGES);
 				attributeNames.add(BRANCH_LENGTHS);
 				break;
@@ -155,6 +157,8 @@ public class SimpleLabelPainter extends LabelPainter<Node> {
 				return getNumberFormat().format(rtree.getHeight(node));
 			} else if (displayAttribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
 				return getNumberFormat().format(rtree.getLength(node));
+			} else if (displayAttribute.equalsIgnoreCase(NODE_PROB)) {
+				return ((Double) node.getAttribute("cladeProb")).toString();
 			}
 		}
 
