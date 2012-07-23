@@ -36,6 +36,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -254,7 +255,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		leftPanel.add(cardPanel, BorderLayout.SOUTH);
 		leftPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
 
-		topToolbar = new TopToolbar((SimpleTreeViewer) figTreePanel.getTreeViewer(), resultTable);
+		topToolbar = new TopToolbar((SimpleTreeViewer) figTreePanel.getTreeViewer(), resultTable, this);
 		JPanel rightPanel = new JPanel(new BorderLayout(0,0));
 		rightPanel.add(topToolbar.getToolbar(), BorderLayout.NORTH);
 		rightPanel.add(figTreePanel, BorderLayout.CENTER);
@@ -576,6 +577,27 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}
 		}
 
+	}
+	
+	public void pruneTaxa() {
+		RunResult runResult = runResults.get(selectedRun);
+		int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
+		BitSet pruning = runResult.getPrunedTaxaBits().get(currentTree);
+		
+		int[] selRows = resultTable.getSelectedRows();
+		if (selRows.length > 0) {
+			//List<String> taxonNames = new ArrayList<String>();
+			for(int i = 0; i < selRows.length; i++) {
+				//taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
+				pruning.set(resultTable.convertRowIndexToModel(selRows[i]));
+			}
+			runResult.updateRun(currentTree);
+//			resultTableModel.fireTableDataChanged();
+//			runTableModel.fireTableDataChanged();
+			updateDataDisplay();
+		} else {
+			//do nothing
+		}
 	}
 
 	private File openDefaultDirectory = null;

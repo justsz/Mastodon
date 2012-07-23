@@ -30,7 +30,7 @@ public abstract class Algorithm {
 	protected int currPrunedSpeciesCount;
 	protected int maxPrunedSpeciesCount;
 
-	protected int mapTreeIndex;
+//	protected int mapTreeIndex;
 	protected int iterationCounter = 0;
 
 	protected BitTreeSystem bts;
@@ -67,15 +67,17 @@ public abstract class Algorithm {
 			iterationCounter++;
 		}
 		afterActions();		
+		System.out.println(totalPruningFreq);
 	}
 
 	public RunResult getRunResult() {
 		List<ArrayList<Taxon>> prunedTaxa = new ArrayList<ArrayList<Taxon>>();
+		List<BitSet> prunedTaxaBits = new ArrayList<BitSet>();
 		List<double[]> pruningScores = new ArrayList<double[]>();
 		List<SimpleRootedTree> prunedMapTrees = new ArrayList<SimpleRootedTree>();
 		Map<Taxon, Double> pruningFrequencies = new HashMap<Taxon, Double>();
 
-		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
+//		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
 		
 		for(Entry<Integer, Integer> entry : pruningFreq.entrySet()) {
 			double freq = 0.0;
@@ -89,12 +91,13 @@ public abstract class Algorithm {
 
 		for(Entry<BitSet, double[]> entry : finalPruning.entrySet()) {
 			prunedTaxa.add((ArrayList<Taxon>) bts.getTaxa(entry.getKey()));
+			prunedTaxaBits.add(entry.getKey());
 			pruningScores.add(entry.getValue());
-			prunedMapTrees.add(bts.reconstructTree(mapTree, entry.getKey(), pruningFrequencies));
+			prunedMapTrees.add(bts.reconstructMapTree(entry.getKey(), pruningFrequencies));
 		}
 		
 		String name = stub;
-		return new RunResult(bts, prunedTaxa, pruningScores, prunedMapTrees, pruningFrequencies, name, minPrunedSpeciesCount, maxPrunedSpeciesCount);
+		return new RunResult(bts, prunedTaxa, prunedTaxaBits, pruningScores, prunedMapTrees, pruningFrequencies, name, minPrunedSpeciesCount, maxPrunedSpeciesCount);
 	}
 
 	public int getIterationCounter() {

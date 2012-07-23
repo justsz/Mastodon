@@ -58,8 +58,8 @@ public class SALinearAlgorithm extends Algorithm{
 			pruningFreq.put(i, 0);
 		}
 
-		mapTreeIndex = bts.getMapTreeIndex();
-		System.out.println("Map tree: " + (mapTreeIndex+1));
+//		mapTreeIndex = bts.getMapTreeIndex();
+//		System.out.println("Map tree: " + (mapTreeIndex+1));
 
 		currTemp = initTemp;
 
@@ -76,7 +76,7 @@ public class SALinearAlgorithm extends Algorithm{
 		}
 		prevPruning = (BitSet) currPruning.clone();	
 
-		prevScore = bts.pruneFast(currPruning, bitTrees.get(mapTreeIndex));
+		prevScore = bts.pruneFast(currPruning);
 		maxScore = prevScore.clone();
 		maxScorePruning.put(prevPruning, maxScore);	
 
@@ -189,7 +189,7 @@ public class SALinearAlgorithm extends Algorithm{
 		currPruning.or(bitsToSet);
 		currPruning.xor(bitsToClear);
 
-		currScore = bts.pruneFast(currPruning, bitTrees.get(mapTreeIndex));
+		currScore = bts.pruneFast(currPruning);
 	}
 
 	protected void setNewBest() {

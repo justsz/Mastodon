@@ -57,8 +57,8 @@ public class MHLinearAlgorithm extends Algorithm{
 			pruningFreq.put(i, 0);
 		}
 
-		mapTreeIndex = bts.getMapTreeIndex();
-		System.out.println("Map tree: " + (mapTreeIndex+1));
+//		mapTreeIndex = bts.getMapTreeIndex();
+//		System.out.println("Map tree: " + (mapTreeIndex+1));
 
 		currPrunedSpeciesCount = minPrunedSpeciesCount;
 		maxScorePruning = new HashMap<BitSet, double[]>();
@@ -73,7 +73,7 @@ public class MHLinearAlgorithm extends Algorithm{
 		}
 		prevPruning = (BitSet) currPruning.clone();	
 
-		prevScore = bts.pruneFast(currPruning, bitTrees.get(mapTreeIndex));
+		prevScore = bts.pruneFast(currPruning);
 		maxScore = prevScore.clone();
 		maxScorePruning.put(prevPruning, maxScore);	
 		
@@ -186,7 +186,7 @@ public class MHLinearAlgorithm extends Algorithm{
 		currPruning.or(bitsToSet);
 		currPruning.xor(bitsToClear);
 
-		currScore = bts.pruneFast(currPruning, bitTrees.get(mapTreeIndex));
+		currScore = bts.pruneFast(currPruning);
 
 	}
 
@@ -200,7 +200,7 @@ public class MHLinearAlgorithm extends Algorithm{
 		}
 
 
-		if (currScore[0]/prevScore[0] > Random.nextDouble()) {
+		if (Math.pow(currScore[0]/prevScore[0], 3) > Random.nextDouble()) {
 			prevPruning = (BitSet) currPruning.clone(); 
 			prevScore = currScore.clone();
 

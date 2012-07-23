@@ -27,9 +27,11 @@ public class TopToolbar{
 	Toolbar toolBar;
 	SimpleTreeViewer treeViewer;
 	JTable resultTable;
+	MastodonFrame frame;
 
 	Icon nextIcon = IconUtils.getIcon(this.getClass(), "images/next.png");
 	Icon prevIcon = IconUtils.getIcon(this.getClass(), "images/prev.png");
+	Icon pruneIcon = IconUtils.getIcon(this.getClass(), "images/scissors.png");
 	
 	private AbstractAction noColorAction = new AbstractAction("No color") {
 		public void actionPerformed(ActionEvent ae) {
@@ -64,6 +66,14 @@ public class TopToolbar{
 			((ResultTableModel)resultTable.getModel()).fireTableDataChanged();
 		}
 	};
+	
+	final ToolbarAction pruneToolbarAction =
+			new ToolbarAction(null, "Prune...", pruneIcon) {
+		public void actionPerformed(ActionEvent e){
+			frame.pruneTaxa();
+			l.treeChanged();
+		}
+	};
 
 	//    private AbstractAction nextTreeAction =
 	//            new AbstractAction("Next Tree") {
@@ -95,9 +105,10 @@ public class TopToolbar{
 		}
 	};
 
-	public TopToolbar(SimpleTreeViewer treeViewer, JTable resultTable) {
+	public TopToolbar(SimpleTreeViewer treeViewer, JTable resultTable, MastodonFrame frame) {
 		this.treeViewer = treeViewer;
 		this.resultTable = resultTable;
+		this.frame = frame;
 		toolBar = new Toolbar();
 		toolBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
 		toolBar.setRollover(true);
@@ -141,6 +152,9 @@ public class TopToolbar{
 		toolBar.addComponent(noColor);
 		toolBar.addComponent(pruned);
 		toolBar.addComponent(frequencies);
+		
+		JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
+		toolBar.addComponent(pruneButton);				
 
 
 		treeViewer.addTreeViewerListener(l);

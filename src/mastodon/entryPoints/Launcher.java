@@ -8,6 +8,7 @@ import jam.framework.Application;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class Launcher {
 
 
 	private TreeReader reader;
-	private BitTreeSystem bts;	
+	private BitTreeSystem bts;
 	private Algorithm algorithm;
 	
 	private int treeCounter;
@@ -78,6 +79,10 @@ public class Launcher {
 		boolean success = treeCounter != 0;
 		trees = null;
 		reader = null;
+		
+		if(success) {
+			bts.findMapTree();
+		}
 
 		return success;
 	}
@@ -126,6 +131,6 @@ public class Launcher {
 	}
 	
 	public RootedTree getMapTree() {
-		return bts.reconstructTree(bts.getBitTrees().get(bts.getMapTreeIndex()), null, null);
+		return bts.reconstructMapTree(null, null);
 	}
 }

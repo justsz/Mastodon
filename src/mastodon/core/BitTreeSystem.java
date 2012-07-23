@@ -36,6 +36,7 @@ public class BitTreeSystem {
 	private boolean weighted;
 	private int treeNumber;
 	private boolean firstTree;
+	private BitTree mapTree;
 
 
 	/**
@@ -182,7 +183,7 @@ public class BitTreeSystem {
 	 * If the trees are weighted, returns the max weight tree. Otherwise returns the index of the tree that has the maximum probability clades. 
 	 * @return index of the MAP tree
 	 */
-	public int getMapTreeIndex() {	//this could all be done at creation time
+	public void findMapTree() {	//this could all be done at creation time
 		int index = 0;
 		if(weighted) {
 			double maxWeight = 0;
@@ -218,7 +219,9 @@ public class BitTreeSystem {
 				}
 			}
 		}
-		return index;
+		
+		System.out.println("Map tree: " + (index+1));
+		mapTree = bitTrees.get(index);		
 	}
 
 	/**
@@ -364,6 +367,10 @@ public class BitTreeSystem {
 
 		return tree;
 	}
+	
+	public SimpleRootedTree reconstructMapTree(BitSet highlights, Map<Taxon, Double> pruningFreq) {
+		return reconstructTree(mapTree, highlights, pruningFreq);
+	}
 
 
 	/**
@@ -396,7 +403,7 @@ public class BitTreeSystem {
 		}
 	}
 
-	public double[] pruneFast(BitSet pruner, BitTree mapTree) {
+	public double[] pruneFast(BitSet pruner) {
 		//weighted = false;
 		double[] result = new double[2];
 		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();

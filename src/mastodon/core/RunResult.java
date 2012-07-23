@@ -4,6 +4,7 @@
 package mastodon.core;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +20,16 @@ public class RunResult {
 	private int maxPruning;
 	private BitTreeSystem bts;
 	private List<ArrayList<Taxon>> prunedTaxa;
+	private List<BitSet> prunedTaxaBits;
 	private List<double[]> pruningScores;
 	private List<SimpleRootedTree> prunedMapTrees;
 	private Map<Taxon, Double> pruningFreq;
 	private String name;
 
-	public RunResult(BitTreeSystem bts, List<ArrayList<Taxon>> pt, List<double[]> ps, List<SimpleRootedTree> pmt, Map<Taxon, Double> pf, String name, int minK, int maxK) {
+	public RunResult(BitTreeSystem bts, List<ArrayList<Taxon>> pt, List<BitSet> ptb, List<double[]> ps, List<SimpleRootedTree> pmt, Map<Taxon, Double> pf, String name, int minK, int maxK) {
 		this.bts = bts;
 		prunedTaxa = pt;
+		prunedTaxaBits = ptb;
 		pruningScores = ps;
 		prunedMapTrees = pmt;
 		pruningFreq = pf;
@@ -89,5 +92,20 @@ public class RunResult {
 
 	public int getMaxPruning() {
 		return maxPruning;
+	}
+
+	public void setPrunedTaxaBits(List<BitSet> prunedTaxaBits) {
+		this.prunedTaxaBits = prunedTaxaBits;
+	}
+
+	public List<BitSet> getPrunedTaxaBits() {
+		return prunedTaxaBits;
+	}
+	
+	public void updateRun(int selectedTree) {
+		prunedTaxa.set(selectedTree, (ArrayList<Taxon>) bts.getTaxa(prunedTaxaBits.get(selectedTree)));
+		pruningScores.set(selectedTree, bts.pruneFast(prunedTaxaBits.get(selectedTree)));
+		prunedMapTrees.set(selectedTree, bts.reconstructMapTree(prunedTaxaBits.get(selectedTree), pruningFreq));	
+		System.out.println(prunedTaxaBits.get(selectedTree));
 	}
 }
