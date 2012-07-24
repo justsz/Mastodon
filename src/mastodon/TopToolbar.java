@@ -6,6 +6,7 @@ package mastodon;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import jam.toolbar.GenericToolbarItem;
 import jam.toolbar.Toolbar;
@@ -68,7 +69,8 @@ public class TopToolbar{
 	};
 	
 	final ToolbarAction pruneToolbarAction =
-			new ToolbarAction(null, "Prune...", pruneIcon) {
+			new ToolbarAction("Prune", "Prune/UnPrune selected taxa", pruneIcon) {
+		
 		public void actionPerformed(ActionEvent e){
 			frame.pruneTaxa();
 			l.treeChanged();
@@ -114,7 +116,7 @@ public class TopToolbar{
 		toolBar.setRollover(true);
 		toolBar.setFloatable(false);
 
-
+		pruneToolbarAction.putValue(AbstractAction.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
 
 
 		JButton prevTreeToolButton = new ToolbarButton(prevTreeToolbarAction, true);
@@ -143,17 +145,25 @@ public class TopToolbar{
 		JRadioButton pruned = new JRadioButton(prunedAction);
 		pruned.setSelected(true);
 		JRadioButton frequencies = new JRadioButton(pruningFreqAction);
-		ButtonGroup coloringGroup = new ButtonGroup();
 		
+		ButtonGroup coloringGroup = new ButtonGroup();		
 		coloringGroup.add(noColor);
 		coloringGroup.add(pruned);
 		coloringGroup.add(frequencies);
+		
+//		Box colorBox = Box.createHorizontalBox();
+//		colorBox.add(noColor);
+//		colorBox.add(pruned);
+//		colorBox.add(frequencies);
+//		
+//		toolBar.addComponent(new GenericToolbarItem("No color/MAP pruning/Pruning frequency", "Choose how to color the tree", colorBox));
 		
 		toolBar.addComponent(noColor);
 		toolBar.addComponent(pruned);
 		toolBar.addComponent(frequencies);
 		
 		JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
+		pruneButton.registerKeyboardAction(pruneToolbarAction, KeyStroke.getKeyStroke("p"), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		toolBar.addComponent(pruneButton);				
 
 

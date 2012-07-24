@@ -15,6 +15,8 @@ import mastodon.algorithms.*;
 import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
 import mastodon.inputVerifiers.GUIInputVerifier;
+import figtree.treeviewer.TreePaneSelector.SelectionMode;
+import figtree.treeviewer.TreeSelectionListener;
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.Application;
 import jam.framework.DocumentFrame;
@@ -37,11 +39,16 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 
 /**
  * @author Just Zarins
@@ -111,7 +118,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		runResults = new ArrayList<RunResult>();
 	}
 
-	TreeViewerListener scoreListner = new TreeViewerListener() {
+	TreeViewerListener scoreListener = new TreeViewerListener() {
 		public void treeChanged() {
 			//TreeViewer treeViewer = figTreePanel.getTreeViewer();
 			double[] scores;
@@ -126,9 +133,48 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 
 		public void treeSettingsChanged() {
-			// nothing to do
 		}
+
+
 	};
+
+	TreeSelectionListener selectionListener = new TreeSelectionListener() {
+
+		@Override
+		public void selectionChanged() {
+			Set<Node> nodes = figTreePanel.getTreeViewer().getSelectedTips();
+			RootedTree tree = launcher.getMapTree();
+
+			if(nodes.size() < 1) {
+				resultTable.clearSelection();
+			} else {
+				boolean firstInterval = true;
+				for(Node node : nodes) {
+					String taxonName = tree.getTaxon(node).getName();
+					int k = resultTable.convertRowIndexToModel(searchTable(taxonName));
+
+					if(firstInterval) {
+						resultTable.getSelectionModel().setSelectionInterval(k, k);
+						firstInterval = false;
+					} else {
+						resultTable.getSelectionModel().addSelectionInterval(k, k);
+					}				
+				}
+			}
+		}
+
+	};
+
+	public int searchTable(String taxonName) {
+		for(int i = 0; i < resultTableModel.getRowCount(); i++) {
+			if (resultTableModel.getValueAt(i, 2) == taxonName) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+
 
 	public void initializeComponents() {
 
@@ -136,22 +182,24 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		figTreePanel = new FigTreePanel(FigTreePanel.Style.DEFAULT);
 		figTreePanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 6, 12, 12)));
-		figTreePanel.getTreeViewer().addTreeViewerListener(scoreListner);
+		figTreePanel.getTreeViewer().addTreeViewerListener(scoreListener);
+		figTreePanel.getTreeViewer().setSelectionMode(SelectionMode.TAXA);
+		figTreePanel.getTreeViewer().addTreeSelectionListener(selectionListener);
 
 		runTableModel = new RunTableModel();
 		runTable = new JTable(runTableModel) { 
-		//Implement table header tool tips.
-		protected JTableHeader createDefaultTableHeader() {
-			return new JTableHeader(columnModel) {
-				public String getToolTipText(MouseEvent e) {
-					java.awt.Point p = e.getPoint();
-					int index = columnModel.getColumnIndexAtX(p.x);
-					int realIndex = columnModel.getColumn(index).getModelIndex();
-					return runTableColumnToolTips[realIndex];
-				}
-			};
-		}
-	};
+			//Implement table header tool tips.
+			protected JTableHeader createDefaultTableHeader() {
+				return new JTableHeader(columnModel) {
+					public String getToolTipText(MouseEvent e) {
+						java.awt.Point p = e.getPoint();
+						int index = columnModel.getColumnIndexAtX(p.x);
+						int realIndex = columnModel.getColumn(index).getModelIndex();
+						return runTableColumnToolTips[realIndex];
+					}
+				};
+			}
+		};
 		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
 		//runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
@@ -203,7 +251,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				};
 			}
 		};
-		
+
 		resultTable.setAutoCreateRowSorter(true);
 		resultTable.getColumnModel().getColumn(0).setPreferredWidth(10);
 		resultTable.getColumnModel().getColumn(1).setPreferredWidth(5);
@@ -214,11 +262,15 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		resultTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
 		resultTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-		resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				resultTableSelectionChanged();
-			}
-		});
+
+		//removed for now because having both a table listener and a tree selection listener causes a stack overflow
+//				resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//					public void valueChanged(ListSelectionEvent evt) {
+//						resultTableSelectionChanged();
+//					}
+//				});
+
+
 
 		TableEditorStopper.ensureEditingStopWhenTableLosesFocus(resultTable);
 
@@ -346,7 +398,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		//what is this?
 		setAnalysesEnabled(true);
-		
+
 		if(runResults.size() > 0) {
 			getRemoveRunAction().setEnabled(true);
 		} else {
@@ -379,6 +431,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 	public void resultTableSelectionChanged() {
+
 		int[] selRows = resultTable.getSelectedRows();
 		if (selRows.length > 0) {
 			List<String> taxonNames = new ArrayList<String>();
@@ -570,7 +623,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
-			
+
 			if (runResults.size() == 1) {
 				//set default coloring option
 				figTreePanel.setColourBy("pruned");
@@ -578,22 +631,23 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 
 	}
-	
+
 	public void pruneTaxa() {
 		RunResult runResult = runResults.get(selectedRun);
 		int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
 		BitSet pruning = runResult.getPrunedTaxaBits().get(currentTree);
-		
+
 		int[] selRows = resultTable.getSelectedRows();
 		if (selRows.length > 0) {
 			//List<String> taxonNames = new ArrayList<String>();
 			for(int i = 0; i < selRows.length; i++) {
 				//taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
-				pruning.set(resultTable.convertRowIndexToModel(selRows[i]));
+				pruning.flip(resultTable.convertRowIndexToModel(selRows[i]));
 			}
 			runResult.updateRun(currentTree);
-//			resultTableModel.fireTableDataChanged();
-//			runTableModel.fireTableDataChanged();
+			//			resultTableModel.fireTableDataChanged();
+			//			runTableModel.fireTableDataChanged();
+			runTableModel.fireTableDataChanged();
 			updateDataDisplay();
 		} else {
 			//do nothing

@@ -361,7 +361,7 @@ public class BitTreeSystem {
 
 		if (highlights != null) {
 			for(Node node : getNodes(externalNodes, highlights)) {
-				node.setAttribute("pruned", true);
+				node.setAttribute("pruned", true);				
 			}
 		}
 
