@@ -167,7 +167,7 @@ public class TreeReader {
 	}
 	
 	/**
-	 * Reads in only the tree at the specified position in the file.
+	 * Reads in only the tree at the specified position in the file. !Might not be working correctly!
 	 * @param index - position of desired tree in file
 	 * @return the tree at index
 	 * @throws IOException
@@ -178,10 +178,12 @@ public class TreeReader {
 		SimpleRootedTree tree = (SimpleRootedTree) imp.importNextTree();
 		while (index > 0) {
 			//this can give null pointer exception if you give index too large. 
-			tree = (SimpleRootedTree) imp.importNextTree();
+			//tree = (SimpleRootedTree) imp.importNextTree();
+			imp.hasTree();
 			index--;
 		}
-		return tree;
+		//tree = (SimpleRootedTree) imp.importNextTree();
+		return (SimpleRootedTree) imp.importNextTree();
 	}
 
 

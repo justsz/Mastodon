@@ -89,7 +89,7 @@ public class MHLinearAlgorithm extends Algorithm{
 	}
 
 	protected boolean finished() {
-		return maxScore[0] > minMapScore || currPrunedSpeciesCount > maxPrunedSpeciesCount || iterationCounter >= totalIterations;
+		return maxScore[0] >= minMapScore || currPrunedSpeciesCount > maxPrunedSpeciesCount || iterationCounter >= totalIterations;
 	}
 
 	protected void choosePruningCount() {

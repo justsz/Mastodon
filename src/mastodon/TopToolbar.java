@@ -33,24 +33,41 @@ public class TopToolbar{
 	Icon nextIcon = IconUtils.getIcon(this.getClass(), "images/next.png");
 	Icon prevIcon = IconUtils.getIcon(this.getClass(), "images/prev.png");
 	Icon pruneIcon = IconUtils.getIcon(this.getClass(), "images/scissors.png");
+	Icon noColorIcon = IconUtils.getIcon(this.getClass(), "images/black.gif");
+	Icon prunedIcon = IconUtils.getIcon(this.getClass(), "images/red.gif");
+	Icon freqIcon = IconUtils.getIcon(this.getClass(), "images/gradient.gif");
 	
-	private AbstractAction noColorAction = new AbstractAction("No color") {
-		public void actionPerformed(ActionEvent ae) {
+	
+	final ToolbarAction noColorAction =
+			new ToolbarAction(null, "No color", noColorIcon) {
+		public void actionPerformed(ActionEvent e){
 			((FigTreePanel) treeViewer.getParent()).setColourBy(null);
+			noColor.setSelected(true);
+			pruned.setSelected(false);
+			frequencies.setSelected(false);
 		}
 	};
 	
-	private AbstractAction prunedAction = new AbstractAction("Pruned") {
-		public void actionPerformed(ActionEvent ae) {
+	final ToolbarAction prunedAction =
+			new ToolbarAction(null, "Color pruned branches", prunedIcon) {
+		public void actionPerformed(ActionEvent e){
 			((FigTreePanel) treeViewer.getParent()).setColourBy("pruned");
+			noColor.setSelected(false);
+			pruned.setSelected(true);
+			frequencies.setSelected(false);
 		}
 	};
 	
-	private AbstractAction pruningFreqAction = new AbstractAction("Pruning frequencies") {
-		public void actionPerformed(ActionEvent ae) {
+	final ToolbarAction pruningFreqAction =
+			new ToolbarAction(null, "Color by pruning frequencies", freqIcon) {
+		public void actionPerformed(ActionEvent e){
 			((FigTreePanel) treeViewer.getParent()).setColourBy("pruningFreq");
+			noColor.setSelected(false);
+			pruned.setSelected(false);
+			frequencies.setSelected(true);
 		}
 	};
+	
 
 	final ToolbarAction nextTreeToolbarAction =
 			new ToolbarAction(null, "Next Tree...", nextIcon) {
@@ -106,6 +123,15 @@ public class TopToolbar{
 			// nothing to do
 		}
 	};
+	
+	//JRadioButton noColor = new JRadioButton(noColorAction);
+	//JRadioButton pruned = new JRadioButton(prunedAction);
+	//JRadioButton frequencies = new JRadioButton(pruningFreqAction);
+	JButton noColor = new ToolbarButton(noColorAction, true);
+	JButton pruned = new ToolbarButton(prunedAction, true);
+	JButton frequencies = new ToolbarButton(pruningFreqAction, true);	
+	
+	JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
 
 	public TopToolbar(SimpleTreeViewer treeViewer, JTable resultTable, MastodonFrame frame) {
 		this.treeViewer = treeViewer;
@@ -140,29 +166,31 @@ public class TopToolbar{
 		box.add(prevTreeToolButton);
 		box.add(nextTreeToolButton);
 		toolBar.addComponent(new GenericToolbarItem("Prev/Next", "Navigate through the trees", box));
+				
+		//noColor.setSelected(true);
 		
-		JRadioButton noColor = new JRadioButton(noColorAction);
-		JRadioButton pruned = new JRadioButton(prunedAction);
-		pruned.setSelected(true);
-		JRadioButton frequencies = new JRadioButton(pruningFreqAction);
+		noColor.setEnabled(false);
+		pruned.setEnabled(false);		
+		frequencies.setEnabled(false);
+				
+//		ButtonGroup coloringGroup = new ButtonGroup();		
+//		coloringGroup.add(noColor);
+//		coloringGroup.add(pruned);
+//		coloringGroup.add(frequencies);
 		
-		ButtonGroup coloringGroup = new ButtonGroup();		
-		coloringGroup.add(noColor);
-		coloringGroup.add(pruned);
-		coloringGroup.add(frequencies);
+		Box colorBox = Box.createHorizontalBox();
+		colorBox.add(noColor);
+		colorBox.add(pruned);
+		colorBox.add(frequencies);
 		
-//		Box colorBox = Box.createHorizontalBox();
-//		colorBox.add(noColor);
-//		colorBox.add(pruned);
-//		colorBox.add(frequencies);
-//		
-//		toolBar.addComponent(new GenericToolbarItem("No color/MAP pruning/Pruning frequency", "Choose how to color the tree", colorBox));
+		toolBar.addComponent(new GenericToolbarItem("Coloring", "Choose how to color the tree", colorBox));
 		
-		toolBar.addComponent(noColor);
-		toolBar.addComponent(pruned);
-		toolBar.addComponent(frequencies);
+//		toolBar.addComponent(noColor);
+//		toolBar.addComponent(pruned);
+//		toolBar.addComponent(frequencies);
 		
-		JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
+		
+		pruneButton.setEnabled(false);
 		pruneButton.registerKeyboardAction(pruneToolbarAction, KeyStroke.getKeyStroke("p"), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		toolBar.addComponent(pruneButton);				
 
@@ -179,5 +207,15 @@ public class TopToolbar{
 
 	public void fireTreesChanged() {
 		l.treeChanged();
+	}
+	
+	public void enableColorButtons(boolean enable) {
+		noColor.setEnabled(enable);
+		pruned.setEnabled(enable);
+		frequencies.setEnabled(enable);
+	}
+	
+	public void enablePruneButton(boolean enable) {
+		pruneButton.setEnabled(enable);
 	}
 }

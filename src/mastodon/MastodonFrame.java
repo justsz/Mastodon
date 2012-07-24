@@ -400,8 +400,12 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		setAnalysesEnabled(true);
 
 		if(runResults.size() > 0) {
+			topToolbar.enablePruneButton(true);
+			topToolbar.enableColorButtons(true);
 			getRemoveRunAction().setEnabled(true);
 		} else {
+			topToolbar.enablePruneButton(false);
+			topToolbar.enableColorButtons(false);
 			getRemoveRunAction().setEnabled(false);
 		}
 		selectedRun = selRow;
@@ -623,11 +627,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
-
-			if (runResults.size() == 1) {
-				//set default coloring option
-				figTreePanel.setColourBy("pruned");
-			}
 		}
 
 	}
@@ -666,6 +665,26 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	}
 
 	protected boolean readFromFile(File file) throws IOException {
+//		JPanel burninPanel = new JPanel();
+//		burninPanel.add(new JLabel("Discard the first"));
+//		JTextField burnin = new JTextField();
+//		burnin.setColumns(5);
+//		burninPanel.add(burnin);
+//		burninPanel.add(new JLabel("trees as burn-in."));
+		
+//		JOptionPane.showInputDialog(this,
+//				"Discard first x trees as burnin", "Burn-in",
+//				JOptionPane.OK_CANCEL_OPTION);
+		String input = JOptionPane.showInputDialog("Discard first x trees as burn-in:", "0");
+		int burnin = 0;
+		try {
+			burnin = (int) Double.parseDouble(input);
+			if (burnin < 0) {
+				burnin = 0;
+			}
+		} catch (Exception ignore) {
+		}
+		
 		if (launcher == null) {
 			launcher = new Launcher(this);
 		}
@@ -678,28 +697,41 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				progressBar.setString(launcher.getTreeCounter() + " trees loaded");
 			}
 		});
-		new ReadFileWorker().execute();
+		new ReadFileWorker(burnin).execute();
 		timer.start();
 		return true;
 	}
 
 	class ReadFileWorker extends SwingWorker<Void, Void> {
+		int burnin;
+		
+		ReadFileWorker(int b) {
+			burnin = b;
+		}
+		
 		protected Void doInBackground() throws Exception {
-			launcher.processFile();
+			launcher.processFile(burnin);
 			return null;
 		}
 
 		protected void done() {
 			timer.stop();
 			if(launcher.getTreeCounter() < 1) {
-				JOptionPane.showMessageDialog(launcher.getFrame(), "File " + launcher.getFileName() + " contains no trees.",
+				JOptionPane.showMessageDialog(launcher.getFrame(), "File " + launcher.getFileName() + " contains no trees or all were discarded in Burn-in.",
 						"Error",
 						JOptionPane.ERROR_MESSAGE);
 				((DocumentFrame) launcher.getFrame()).doCloseWindow();
 			} else {
-				((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(launcher.getMapTree());
+				//((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(launcher.getMapTree());
 				getAlgorithmAction().setEnabled(true);
 				progressBar.setString("");
+				runResults.add(launcher.getResults());
+				selectedRun = runResults.size() - 1;			
+				runTableModel.fireTableDataChanged();
+
+				//highlight current run in runTable and update display
+				runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+				
 				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			}
 		}
@@ -753,7 +785,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				case 0:
 					return runResult.getName();
 				case 1:
-					return runResult.getPrunedTaxa().get(figTreePanel.getTreeViewer().getCurrentTreeIndex()).size();
+					if (runResult.getPrunedTaxa().size() > 0) {
+						return runResult.getPrunedTaxa().get(figTreePanel.getTreeViewer().getCurrentTreeIndex()).size();
+					} else {
+						return 0;
+					}
 				case 2:
 					return runResult.getMinPruning();
 				case 3:

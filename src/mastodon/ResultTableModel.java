@@ -51,9 +51,11 @@ import jebl.evolution.taxa.Taxon;
 
 			if (col == 0) return row + 1;
 			if (col == 1) {
-				if (runResult.getPrunedTaxa().get(currentTree).contains(taxon)) {
+				if (runResult.getPrunedTaxa().size() > 0) {
+					if (runResult.getPrunedTaxa().get(currentTree).contains(taxon)) {
 					return "Ã";
-				} 
+					} 
+				}
 				return "";
 			}
 			if (col == 2) return taxon.getName();

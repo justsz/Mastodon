@@ -93,7 +93,7 @@ public class SALinearAlgorithm extends Algorithm{
 	}
 
 	protected boolean finished() {
-		return maxScore[0] > minMapScore || currPrunedSpeciesCount > maxPrunedSpeciesCount || iterationCounter >= totalIterations;
+		return maxScore[0] >= minMapScore || currPrunedSpeciesCount > maxPrunedSpeciesCount || iterationCounter >= totalIterations;
 		// || currTemp < finalTemp 
 	}
 

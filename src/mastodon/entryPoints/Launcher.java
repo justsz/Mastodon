@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,28 +53,36 @@ public class Launcher {
 		setFrame(frame);
 	}
 
-	public boolean processFile() throws IOException, ImportException{
+	public boolean processFile(int burnin) throws IOException, ImportException{
 		if(reader == null) {
 			reader = new TreeReader();
 		}
-
-
 		bts = new BitTreeSystem();
 
 		reader.setFile(fileName);
 
 		treeCounter = 0;
+		int readTreeCount = 0;
 
 		List<SimpleRootedTree> trees;		
 		do {
 			trees = reader.read100Trees();
+			readTreeCount = trees.size();
 			if (trees.size() < 1) {
 				//mostly to check for empty file
 				break;
 			}
-			bts.addTrees(trees);
-			treeCounter += trees.size();
-		} while (trees.size() == 100);
+
+			while(burnin > 0 && trees.size() > 0) {
+				trees.remove(0);
+				burnin--;
+			}
+			
+			if (trees.size() > 0) {
+				bts.addTrees(trees);
+				treeCounter += trees.size();
+			}
+		} while (readTreeCount == 100);
 
 		//mark for garbage collection
 		boolean success = treeCounter != 0;
@@ -82,6 +91,8 @@ public class Launcher {
 		
 		if(success) {
 			bts.findMapTree();
+			String message = "Read successful.\nFound:\n" + bts.getBitTrees().size() + " trees,\n" + bts.getTaxaCount() + " taxa,\n" + bts.getClades().size() + " unique clades.";
+			JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 		return success;
@@ -99,7 +110,25 @@ public class Launcher {
 	}
 	
 	public RunResult getResults() {
-		return algorithm.getRunResult();
+		if (algorithm != null) {
+			return algorithm.getRunResult();
+		} else {
+			List<ArrayList<Taxon>> a = new ArrayList<ArrayList<Taxon>>();
+			a.add(new ArrayList<Taxon>());
+			List<BitSet> b = new ArrayList<BitSet>();
+			b.add(new BitSet());
+			List<double[]> c = new ArrayList<double[]>();
+			c.add(new double[] {0,0});
+			List<SimpleRootedTree> d = new ArrayList<SimpleRootedTree>();
+			d.add(bts.reconstructMapTree(null, null));
+			Map<Taxon, Double> e = new HashMap<Taxon, Double>();
+			for (Taxon taxon : bts.getAllTaxa()) {
+				e.put(taxon, 0.0);
+			}
+			
+			RunResult emptyResult = new RunResult(bts, a, b, c, d, e, "Manual", 0, 0);
+			return emptyResult;
+		}
 	}
 
 	public int getTreeCounter() {
