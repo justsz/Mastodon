@@ -611,6 +611,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	class AlgorithmWorker extends SwingWorker<Void, Void> {
 		protected Void doInBackground() throws Exception {
+			topToolbar.enablePruneButton(false);
 			launcher.runAlgorithm();
 			return null;
 		}
@@ -627,6 +628,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
+			topToolbar.enablePruneButton(true);
 		}
 
 	}

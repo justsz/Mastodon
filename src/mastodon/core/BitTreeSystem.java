@@ -363,6 +363,23 @@ public class BitTreeSystem {
 			for(Node node : getNodes(externalNodes, highlights)) {
 				node.setAttribute("pruned", true);				
 			}
+			
+			for(Node node : getNodes(externalNodes, highlights)) {
+				Node parent = tree.getParent(node);
+				boolean colorParent = true;
+				while(parent != null && colorParent) {
+					for(Node child : tree.getChildren(parent)) {
+						if (child.getAttribute("pruned") == null) {
+							colorParent = false;
+							break;
+						}
+					}
+					if(colorParent) {
+						parent.setAttribute("pruned", true);	
+						parent = tree.getParent(parent);	
+					}
+				}
+			}
 		}
 
 		return tree;
