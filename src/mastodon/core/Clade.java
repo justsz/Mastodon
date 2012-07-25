@@ -16,13 +16,18 @@ import java.util.Set;
  */
 public class Clade {
 	private BitSet clade;
-	private int count;
+	//private int count;
 	private BitSet cladeToTrees;
 	
 	public Clade(BitSet bits) {
 		clade = bits;
-		count = 1;
+//		count = 1;
 		cladeToTrees = new BitSet();
+	}
+	
+	public Clade(BitSet bits, BitSet cladeToTrees) {
+		clade = bits;
+		this.cladeToTrees = cladeToTrees;
 	}
 	
 	public void addTrees(Collection<Integer> trees) {
@@ -39,20 +44,20 @@ public class Clade {
 		return cladeToTrees;
 	}
 	
-	public void incrementCount() {
-		count++;
-	}
+//	public void incrementCount() {
+//		count++;
+//	}
 	
-	public void setCount(int count) {
-		this.count = count;
-	}
+//	public void setCount(int count) {
+//		this.count = count;
+//	}
 	
 	public BitSet getCladeBits() {
 		return clade;
 	}
 	
 	public int getFrequency() {
-		return count;
+		return cladeToTrees.cardinality();
 	}
 	
 }

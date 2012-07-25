@@ -162,4 +162,17 @@ public class Launcher {
 	public RootedTree getMapTree() {
 		return bts.reconstructMapTree(null, null);
 	}
+	
+	public void setCopiedAndPrunedBTS(Launcher oldLauncher, BitSet pruning) {
+		BitTreeSystem oldBts = oldLauncher.getBTS();
+		oldBts.pruneFast(pruning);
+		Map<BitSet, BitSet> prunedClades = oldBts.getPrunedClades();
+		this.bts = oldBts.createSubSystem(prunedClades);
+		//bts.findMapTree();
+		oldBts.unPrune();
+	}
+	
+	public BitTreeSystem getBTS() {
+		return bts;
+	}
 }

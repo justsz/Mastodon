@@ -105,6 +105,7 @@ public class RunResult {
 	public void updateRun(int selectedTree) {
 		prunedTaxa.set(selectedTree, (ArrayList<Taxon>) bts.getTaxa(prunedTaxaBits.get(selectedTree)));
 		pruningScores.set(selectedTree, bts.pruneFast(prunedTaxaBits.get(selectedTree)));
+		bts.unPrune();
 		prunedMapTrees.set(selectedTree, bts.reconstructMapTree(prunedTaxaBits.get(selectedTree), pruningFreq));	
 		System.out.println(prunedTaxaBits.get(selectedTree));
 	}

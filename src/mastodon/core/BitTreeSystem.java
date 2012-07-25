@@ -57,6 +57,30 @@ public class BitTreeSystem {
 		//			taxa.addAll(tree.getTaxa());
 		//		}
 	}
+	
+	public BitTreeSystem createSubSystem(Map<BitSet, BitSet> subClades) {
+		BitTreeSystem subSystem = new BitTreeSystem();
+		subSystem.weighted = this.weighted;
+		subSystem.treeCount = this.treeCount;
+		subSystem.taxa.addAll(this.taxa);
+		for(Map.Entry<BitSet, BitSet> entry : subClades.entrySet()) {
+			BitSet bits = (BitSet) entry.getKey().clone();
+			subSystem.clades.put(bits, new Clade(bits, (BitSet) entry.getValue().clone()));
+		}
+		for(BitTree bt : bitTrees) {
+			List<BitSet> btCopy = new ArrayList<BitSet>();
+			for(BitSet bs : bt.getBits()) {
+				if (bs.cardinality() > 1) {
+					btCopy.add(subSystem.clades.get(bs).getCladeBits());
+				}
+			}
+			subSystem.bitTrees.add(new BitTree(btCopy, bt.getWeight()));			
+		}		
+		
+		//will the map tree still be the same? That's what I want to display anyway...
+		subSystem.mapTree = subSystem.getBitTrees().get(this.index); 
+		return subSystem;
+	}
 
 	/**
 	 * Converts the input RootedTrees to BitTrees.
@@ -171,7 +195,7 @@ public class BitTreeSystem {
 			newClade.addTree(treeNumber);
 			//System.out.println(bits);
 		} else {
-			clade.incrementCount();
+			//clade.incrementCount();
 			clade.addTree(treeNumber);
 		}
 
@@ -179,12 +203,13 @@ public class BitTreeSystem {
 		bitTree.add(clades.get(bits).getCladeBits());
 	}
 
+	int index;
 	/**
 	 * If the trees are weighted, returns the max weight tree. Otherwise returns the index of the tree that has the maximum probability clades. 
 	 * @return index of the MAP tree
 	 */
 	public void findMapTree() {	//this could all be done at creation time
-		int index = 0;
+		index = 0;
 		if(weighted) {
 			double maxWeight = 0;
 			for(int i = 0; i < treeCount; i++) {
@@ -389,13 +414,15 @@ public class BitTreeSystem {
 		return reconstructTree(mapTree, highlights, pruningFreq);
 	}
 
+	//filters created in last pruning
+	private Map<BitSet, BitSet> filters;
 
 	/**
 	 * Prune the taxa flagged in the input BitSet in set of all trees 
 	 * @param pruner - taxa to prune
 	 * @return List of filters used in pruning. Pass to unPrune to undo pruning.
 	 */
-	public Map<BitSet, BitSet> prune(BitSet pruner){
+	public void prune(BitSet pruner){
 		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
 
 		for (Map.Entry<BitSet, Clade> entry : clades.entrySet()) {
@@ -407,17 +434,31 @@ public class BitTreeSystem {
 				cladeBits.xor(filter);
 			}
 		}
-		return filters;
+		this.filters = filters;
 	}
 
 	/**
 	 * UnPrune trees to previous state.
 	 * @param filters - list of filters used in original pruning of trees
 	 */
-	public void unPrune(Map<BitSet, BitSet> filters) {
+	public void unPrune() {
 		for(Map.Entry<BitSet, BitSet> filter : filters.entrySet()) {
+//			BitSet forTest = new BitSet();
+//			forTest.set(0);
+//			forTest.set(4);
+//			forTest.set(5);
+//			System.out.println("[045] " + forTest.hashCode());
+//			System.out.println(filter.getKey().hashCode());
+//			System.out.println(((BitSet) filter.getKey().clone()).hashCode());
+//			System.out.println(clades.containsKey(filter.getKey()));
 			clades.get(filter.getKey()).getCladeBits().xor(filter.getValue());
 		}
+	}
+
+	private Map<BitSet, BitSet> prunedClades;
+	
+	public Map<BitSet, BitSet> getPrunedClades() {
+		return prunedClades;
 	}
 
 	public double[] pruneFast(BitSet pruner) {
@@ -427,7 +468,7 @@ public class BitTreeSystem {
 		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());
 
 		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
-		Map<BitSet, BitSet> prunedClades = new HashMap<BitSet, BitSet>(clades.size());
+		prunedClades = new HashMap<BitSet, BitSet>(clades.size());
 		//		List<BitSet> possibleLimiters = new ArrayList<BitSet>(); 
 
 		//Clade3 cl = new Clade3(new BitSet());	//just a placeholder
@@ -479,7 +520,7 @@ public class BitTreeSystem {
 				}
 			}
 			if (runningIntersection.cardinality() == 1) {	//a limiting clade has reduced it to only the map tree
-				unPrune(filters);
+				this.filters = filters;
 				if(weighted) {
 					result[0] = bitTrees.get(runningIntersection.nextSetBit(0)).getWeight();
 				} else {
@@ -538,7 +579,7 @@ public class BitTreeSystem {
 		result[1] = subTreeCount;
 
 
-		unPrune(filters);
+		this.filters = filters;
 		forTest = runningIntersection;
 		return result;
 	}

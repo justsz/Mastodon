@@ -654,6 +654,27 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//do nothing
 		}
 	}
+	
+	//"commit" is a bit misleading as the old data won't be lost
+	public void commitPruning() {
+		MastodonFrame fr = (MastodonFrame) Application.getApplication().doNew();
+		Launcher newLauncher = new Launcher(fr);
+		newLauncher.setCopiedAndPrunedBTS(launcher, runResults.get(selectedRun).getPrunedTaxaBits().get(figTreePanel.getTreeViewer().getCurrentTreeIndex()));
+		fr.launcher = newLauncher;
+		
+		fr.getAlgorithmAction().setEnabled(true);
+		fr.progressBar.setString("");
+		fr.runResults.add(fr.launcher.getResults());
+		fr.selectedRun = fr.runResults.size() - 1;			
+		fr.runTableModel.fireTableDataChanged();
+
+		//highlight current run in runTable and update display
+		fr.runTable.getSelectionModel().setSelectionInterval(fr.selectedRun, fr.selectedRun);
+		
+		((CardLayout)fr.cardPanel.getLayout()).show(fr.cardPanel, "score");
+		//setup RunResult
+		
+	}
 
 	private File openDefaultDirectory = null;
 

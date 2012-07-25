@@ -74,6 +74,7 @@ public class MHLinearAlgorithm extends Algorithm{
 		prevPruning = (BitSet) currPruning.clone();	
 
 		prevScore = bts.pruneFast(currPruning);
+		bts.unPrune();
 		maxScore = prevScore.clone();
 		maxScorePruning.put(prevPruning, maxScore);	
 		
@@ -187,6 +188,7 @@ public class MHLinearAlgorithm extends Algorithm{
 		currPruning.xor(bitsToClear);
 
 		currScore = bts.pruneFast(currPruning);
+		bts.unPrune();
 
 	}
 

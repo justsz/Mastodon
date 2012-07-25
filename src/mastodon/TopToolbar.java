@@ -93,6 +93,15 @@ public class TopToolbar{
 			l.treeChanged();
 		}
 	};
+	
+	final ToolbarAction commitPruningAction =
+			new ToolbarAction("Commit", "Remove red branches and open as new file", null) {
+		public void actionPerformed(ActionEvent e){
+			frame.commitPruning();
+		}
+	};
+	
+	
 
 	//    private AbstractAction nextTreeAction =
 	//            new AbstractAction("Next Tree") {
@@ -130,6 +139,7 @@ public class TopToolbar{
 	JButton noColor = new ToolbarButton(noColorAction, true);
 	JButton pruned = new ToolbarButton(prunedAction, true);
 	JButton frequencies = new ToolbarButton(pruningFreqAction, true);	
+	JButton commit = new ToolbarButton(commitPruningAction, true);
 	
 	JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
 
@@ -192,7 +202,10 @@ public class TopToolbar{
 		
 		pruneButton.setEnabled(false);
 		pruneButton.registerKeyboardAction(pruneToolbarAction, KeyStroke.getKeyStroke("p"), JComponent.WHEN_IN_FOCUSED_WINDOW);
-		toolBar.addComponent(pruneButton);				
+		toolBar.addComponent(pruneButton);	
+		toolBar.addComponent(commit);
+		
+		
 
 
 		treeViewer.addTreeViewerListener(l);

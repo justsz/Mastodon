@@ -104,7 +104,8 @@ public class MHBisectionAlgorithm extends Algorithm{
 			}
 			prevPruning = (BitSet) currPruning.clone();
 			prevScore = bts.pruneFast(currPruning);
-
+			bts.unPrune();
+			
 			maxScorePruning.put(prevPruning, prevScore);
 
 			double mean = 1.0;	//needed when pruning 1 taxon (can't have a mean of 0 in PoissonDistribution())
@@ -167,6 +168,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 		currPruning.xor(bitsToClear);
 
 		currScore = bts.pruneFast(currPruning);
+		bts.unPrune();
 
 	}
 

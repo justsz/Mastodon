@@ -108,6 +108,7 @@ public class SABisectionAlgorithm extends Algorithm{
 			}
 			prevPruning = (BitSet) currPruning.clone();
 			prevScore = bts.pruneFast(currPruning);
+			bts.unPrune();
 
 			maxScorePruning.put(prevPruning, prevScore);
 
@@ -174,6 +175,7 @@ public class SABisectionAlgorithm extends Algorithm{
 		currPruning.xor(bitsToClear);
 
 		currScore = bts.pruneFast(currPruning);
+		bts.unPrune();
 	}
 
 	protected void setNewBest() {

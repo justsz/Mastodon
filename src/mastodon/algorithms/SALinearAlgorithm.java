@@ -77,6 +77,7 @@ public class SALinearAlgorithm extends Algorithm{
 		prevPruning = (BitSet) currPruning.clone();	
 
 		prevScore = bts.pruneFast(currPruning);
+		bts.unPrune();
 		maxScore = prevScore.clone();
 		maxScorePruning.put(prevPruning, maxScore);	
 
@@ -190,6 +191,7 @@ public class SALinearAlgorithm extends Algorithm{
 		currPruning.xor(bitsToClear);
 
 		currScore = bts.pruneFast(currPruning);
+		bts.unPrune();
 	}
 
 	protected void setNewBest() {
