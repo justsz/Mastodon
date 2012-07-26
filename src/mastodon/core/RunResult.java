@@ -107,6 +107,6 @@ public class RunResult {
 		pruningScores.set(selectedTree, bts.pruneFast(prunedTaxaBits.get(selectedTree)));
 		bts.unPrune();
 		prunedMapTrees.set(selectedTree, bts.reconstructMapTree(prunedTaxaBits.get(selectedTree), pruningFreq));	
-		System.out.println(prunedTaxaBits.get(selectedTree));
+		//System.out.println(prunedTaxaBits.get(selectedTree));
 	}
 }

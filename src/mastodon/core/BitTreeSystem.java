@@ -63,17 +63,20 @@ public class BitTreeSystem {
 		subSystem.weighted = this.weighted;
 		subSystem.treeCount = this.treeCount;
 		subSystem.taxa.addAll(this.taxa);
+		
 		for(Map.Entry<BitSet, BitSet> entry : subClades.entrySet()) {
 			BitSet bits = (BitSet) entry.getKey().clone();
 			subSystem.clades.put(bits, new Clade((BitSet) bits.clone(), (BitSet) entry.getValue().clone()));
 		}
 		for(BitTree bt : bitTrees) {
 			List<BitSet> btCopy = new ArrayList<BitSet>();
+			Set<BitSet> btCopySet = new HashSet<BitSet>();
 			for(BitSet bs : bt.getBits()) {
 				if (bs.cardinality() > 1) {
-					btCopy.add(subSystem.clades.get(bs).getCladeBits());
+					btCopySet.add(subSystem.clades.get(bs).getCladeBits());
 				}
 			}
+			btCopy.addAll(btCopySet);
 			subSystem.bitTrees.add(new BitTree(btCopy, bt.getWeight()));			
 		}		
 		
@@ -342,13 +345,14 @@ public class BitTreeSystem {
 		};
 		List<BitSet> bitSets = bitTree.getBits();
 		Collections.sort(bitSets, c);
-
+		
 		Object[] taxaA = taxa.toArray();	//could be stored as an instance variable since it's so useful
 		SimpleRootedTree tree = new SimpleRootedTree();
 		//BitSet of all taxa in this tree, not necessarily in all trees
 		BitSet allTaxa = bitSets.get(bitSets.size()-1);
 		//int numberOfTaxaInTree = allTaxa.cardinality();
 		Node[] externalNodes = new Node[taxaA.length];
+		
 
 
 		// !!! Problems arise in writer if there is a tree with a different set of taxa in it.

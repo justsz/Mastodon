@@ -636,6 +636,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		RunResult runResult = runResults.get(selectedRun);
 		int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
 		BitSet pruning = runResult.getPrunedTaxaBits().get(currentTree);
+		System.out.println(pruning);
 
 		int[] selRows = resultTable.getSelectedRows();
 		if (selRows.length > 0) {
