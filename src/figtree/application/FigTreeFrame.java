@@ -879,7 +879,7 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 
 		FileWriter writer = new FileWriter(file);
 		FigTreeNexusExporter exporter = new FigTreeNexusExporter(writer, true);
-		exporter.exportTrees(treeViewer.getTrees());
+//		exporter.exportTrees(treeViewer.getTrees());
 		exporter.writeFigTreeBlock(settings);
 
 		writer.close();
@@ -1237,7 +1237,7 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 			break;
 		case NEXUS:
 			FigTreeNexusExporter nexusExporter = new FigTreeNexusExporter(writer, writeAnnotations);
-			nexusExporter.exportTrees(trees);
+//			nexusExporter.exportTrees(trees);
 			if (settings != null) {
 				nexusExporter.writeFigTreeBlock(settings);
 			}

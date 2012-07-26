@@ -130,7 +130,8 @@ public class TreeReader {
 
 		while (imp.hasTree()) {
 			tree = imp.importNextTree();
-			trees.add(new MutableRootedTree((RootedTree) tree));
+			System.out.println("Reading mutable rooted trees only works with JEBL 2, modified by Andrew to convert a simple rooted tree to a mutable one");
+//			trees.add(new MutableRootedTree((RootedTree) tree));
 		}
 
 		if (trees.size() == 0) {

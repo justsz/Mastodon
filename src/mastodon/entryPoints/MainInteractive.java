@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -129,12 +130,13 @@ public class MainInteractive {
 				}
 			}
 
-
-			algorithm.setTrees(bts, bts.getBitTrees());
-			algorithm.setLimits(minScore, maxPrune, maxIterations);
+			System.out.println("I haven't been updated after refactoring.");
+//			algorithm.setTrees(bts, bts.getBitTrees());
+//			algorithm.setLimits(minScore, maxPrune, maxIterations);
 			algorithm.run();
 
-			Map<ArrayList<Taxon>, double[]> result = algorithm.getTaxa();
+			Map<ArrayList<Taxon>, double[]> result = new HashMap<ArrayList<Taxon>, double[]>(); 
+//					algorithm.getTaxa();
 
 			BufferedWriter out = new BufferedWriter(new FileWriter("run" + runCounter + ".txt"));
 			out.write("Pruned taxa\t[MAP score for this pruning, number of matching subtrees]\n----\n");
@@ -148,9 +150,9 @@ public class MainInteractive {
 
 			out.close();
 			
-			List<SimpleRootedTree> prunedTrees = algorithm.getHighlightedPrunedMapTrees();
+			//List<SimpleRootedTree> prunedTrees = algorithm.getHighlightedPrunedMapTrees();
 			NexusWriter writer = new NexusWriter("prunedTrees" + runCounter + ".trees");
-			writer.writeTrees(prunedTrees);
+			//writer.writeTrees(prunedTrees);
 			
 			System.out.println("Output saved as run" + runCounter + ".txt and prunedTrees" + runCounter + ".trees");
 

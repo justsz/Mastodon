@@ -106,9 +106,9 @@ public class MainCLI2 {
 
 		maxIterations = cmd.getIntegerOption("i");
 
-
-		algorithm.setTrees(bts, bts.getBitTrees());
-		algorithm.setLimits(minScore, maxPrune, maxIterations);
+		System.out.println("I haven't been updated after refactoring.");
+//		algorithm.setTrees(bts, bts.getBitTrees());
+//		algorithm.setLimits(minScore, maxPrune, maxIterations);
 		algorithm.run();
 
 		System.out.println();	//new line after progress report

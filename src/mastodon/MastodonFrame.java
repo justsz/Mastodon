@@ -177,7 +177,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 	public void initializeComponents() {
-
 		setSize(new java.awt.Dimension(1200, 800));
 
 		figTreePanel = new FigTreePanel(FigTreePanel.Style.DEFAULT);

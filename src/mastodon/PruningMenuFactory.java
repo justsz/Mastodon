@@ -32,10 +32,10 @@ public class PruningMenuFactory implements MenuFactory{
 		
 		//shouldn't be a part of the file menu handeler... create own later
 		if (frame instanceof MastodonFileMenuHandler) {
-			item = new JMenuItem(((MastodonFileMenuHandler)frame).getPruningOptionAction());
+//			item = new JMenuItem(((MastodonFileMenuHandler)frame).getPruningOptionAction());
         	//item.addActionListener(pruningAction);
         	//item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, MenuBarFactory.MENU_MASK));
-        	menu.add(item);
+//        	menu.add(item);
 		} else if (Utils.isMacOSX()) {
 			item = new JMenuItem("Pruning");
 	        menu.add(item);

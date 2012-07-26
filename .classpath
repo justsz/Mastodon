@@ -2,19 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jebl"/>
-	<classpathentry kind="lib" path="lib/commons-math3-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/jam.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/quaqua.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/freehep.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/quaqua-filechooser-only.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/quaqua-colorchooser-only.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/iText.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/jwt/commons-fileupload-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/jwt/commons-io-1.4.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/jwt/jwt-3.1.7pre1.jar"/>
-	<classpathentry kind="lib" path="/figtree/lib/jwt/servlet-api-2.5-6.0.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/lib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
