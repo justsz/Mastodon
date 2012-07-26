@@ -42,11 +42,14 @@ public class GUIInputVerifier {
 		
 		double initTemp;
 		double finalTemp;
+		double power;
 		
 		if (algSelection == 2) {
 			initTemp = 0;
 			finalTemp = 0;
+			power = checkDouble("Weighing power", input.get("power"), Double.MIN_VALUE, Double.MAX_VALUE);
 		} else {
+			power = 0;
 			initTemp = checkDouble("Initial temperature", input.get("initTemp"), Double.MIN_VALUE, Double.MAX_VALUE);
 			if (initTemp != - 1) {
 				finalTemp = checkDouble("Final temperature", input.get("finalTemp"), Double.MIN_VALUE, initTemp);
@@ -58,12 +61,13 @@ public class GUIInputVerifier {
 		int iterations = checkInt("Total iterations", input.get("totalIterations"), 1, Integer.MAX_VALUE);
 		double minMapScore = checkDouble("Desired MAP score", input.get("minMapScore"), 0.0, 1.0);
 		
-		if (k == -1 || kMin == -1 || kMax == -1 || initTemp == -1 || finalTemp == -1 || iterations == -1 || minMapScore == -1) {
+		if (k == -1 || kMin == -1 || kMax == -1 || power == -1 || initTemp == -1 || finalTemp == -1 || iterations == -1 || minMapScore == -1) {
 			showError();
 			return null;
 		} else {
 			output.put("minPruning", kMin);
 			output.put("maxPruning", kMax);
+			output.put("power", power);
 			output.put("initTemp", initTemp);
 			output.put("finalTemp", finalTemp);
 			output.put("totalIterations", iterations);

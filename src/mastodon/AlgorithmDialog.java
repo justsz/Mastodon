@@ -87,9 +87,11 @@ public class AlgorithmDialog {
 	
 	JTextField minMapScore = new JTextField("0.0");	
 	JTextField totalIterations = new JTextField("1");
+
+	JTextField power = new JTextField("1.0");
 	
-	JTextField initialTemp = new JTextField("1");
-	JTextField finalTemp = new JTextField("1");	
+	JTextField initialTemp = new JTextField("1.0");
+	JTextField finalTemp = new JTextField("0.1");	
 	
 	JRadioButton constButton = new JRadioButton(constAction);
 	JRadioButton linearButton = new JRadioButton(linearAction);
@@ -111,6 +113,8 @@ public class AlgorithmDialog {
 		OptionsPanel constOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		OptionsPanel linearAndBisectionOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		
+		OptionsPanel MHOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
+		
 		OptionsPanel SAOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		
 		OptionsPanel overallOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
@@ -120,7 +124,9 @@ public class AlgorithmDialog {
 		maxNumberToPrune.setColumns(5);
 		
 		minMapScore.setColumns(10);
-		totalIterations.setColumns(10);		
+		totalIterations.setColumns(10);
+		
+		power.setColumns(10);
 		
 		initialTemp.setColumns(10);
 		finalTemp.setColumns(10);
@@ -151,6 +157,8 @@ public class AlgorithmDialog {
 
 		linearAndBisectionOptions.addComponentWithLabel("Min number of taxa to prune[1+]", minNumberToPrune);
 		linearAndBisectionOptions.addComponentWithLabel("Max number of taxa to prune[1+]", maxNumberToPrune);
+		
+		MHOptions.addComponentWithLabel("Weighing power[>0]", power);
 
 		SAOptions.addComponentWithLabel("Initial temperature[>0]", initialTemp);
 		SAOptions.addComponentWithLabel("Final temperature[>0]", finalTemp);
@@ -162,7 +170,7 @@ public class AlgorithmDialog {
 		searchMethodCardPanel.add(linearAndBisectionOptions, "linAndBis");
 		
 		algorithmChoiceCardPanel.add(SAOptions, "SA");
-		algorithmChoiceCardPanel.add(new JPanel(), "MH");	//blank panel, no additional input needed		
+		algorithmChoiceCardPanel.add(MHOptions, "MH");
 		
 		JPanel buttonsAndFields = new JPanel();
 		buttonsAndFields.setLayout(new BoxLayout(buttonsAndFields, BoxLayout.Y_AXIS));
@@ -215,6 +223,7 @@ public class AlgorithmDialog {
 		input.put("minPruning", minNumberToPrune.getText());
 		input.put("maxPruning", maxNumberToPrune.getText());
 		input.put("constPruning", numberToPrune.getText());
+		input.put("power", power.getText());
 		input.put("initTemp", initialTemp.getText());
 		input.put("finalTemp", finalTemp.getText());
 		

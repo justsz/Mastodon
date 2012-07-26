@@ -32,6 +32,7 @@ import jebl.math.Random;
 public class MHLinearAlgorithm extends Algorithm{
 
 	private double[] stepIterations;
+	private double power;
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
@@ -39,6 +40,7 @@ public class MHLinearAlgorithm extends Algorithm{
 	}
 
 	public void setLimits(Map<String, Object> limits) {
+		power = (Double) limits.get("power");
 		minMapScore = (Double) limits.get("minMapScore");
 		minPrunedSpeciesCount = (Integer) limits.get("minPruning");
 		maxPrunedSpeciesCount = (Integer) limits.get("maxPruning");
@@ -202,7 +204,7 @@ public class MHLinearAlgorithm extends Algorithm{
 		}
 
 
-		if (Math.pow(currScore[0]/prevScore[0], 3) > Random.nextDouble()) {
+		if (Math.pow(currScore[0]/prevScore[0], power) > Random.nextDouble()) {
 			prevPruning = (BitSet) currPruning.clone(); 
 			prevScore = currScore.clone();
 

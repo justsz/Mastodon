@@ -561,7 +561,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	AlgorithmDialog algorithmDialog;
 
 	public final void doAlgorithm() throws IOException, ImportException {
-		//((MultiDocApplication) Application.getApplication()).getUpperDocumentFrame().requestClose();
 		if (algorithmDialog == null) {
 			algorithmDialog = new AlgorithmDialog(this);
 		}

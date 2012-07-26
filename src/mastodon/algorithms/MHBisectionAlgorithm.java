@@ -33,6 +33,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 
 	
 	private int stepIterations;
+	private double power;
 
 	int kLeft;
 	int kRight;
@@ -43,6 +44,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 	}
 
 	public void setLimits(Map<String, Object> limits) {
+		power = (Double) limits.get("power");
 		minMapScore = (Double) limits.get("minMapScore");
 		minPrunedSpeciesCount = (Integer) limits.get("minPruning");
 		maxPrunedSpeciesCount = (Integer) limits.get("maxPruning");
@@ -182,7 +184,7 @@ public class MHBisectionAlgorithm extends Algorithm{
 		}
 
 
-		if (currScore[0]/prevScore[0] > Random.nextDouble()) {
+		if (Math.pow(currScore[0]/prevScore[0], power) > Random.nextDouble()) {
 			prevPruning = (BitSet) currPruning.clone(); 
 			prevScore = currScore.clone();
 

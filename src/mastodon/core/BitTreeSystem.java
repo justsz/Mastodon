@@ -65,7 +65,7 @@ public class BitTreeSystem {
 		subSystem.taxa.addAll(this.taxa);
 		for(Map.Entry<BitSet, BitSet> entry : subClades.entrySet()) {
 			BitSet bits = (BitSet) entry.getKey().clone();
-			subSystem.clades.put(bits, new Clade(bits, (BitSet) entry.getValue().clone()));
+			subSystem.clades.put(bits, new Clade((BitSet) bits.clone(), (BitSet) entry.getValue().clone()));
 		}
 		for(BitTree bt : bitTrees) {
 			List<BitSet> btCopy = new ArrayList<BitSet>();

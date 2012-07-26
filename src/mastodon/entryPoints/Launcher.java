@@ -118,7 +118,9 @@ public class Launcher {
 			List<BitSet> b = new ArrayList<BitSet>();
 			b.add(new BitSet());
 			List<double[]> c = new ArrayList<double[]>();
-			c.add(new double[] {0,0});
+			//c.add(new double[] {0,0});
+			c.add(bts.pruneFast(new BitSet()));
+			bts.unPrune();
 			List<SimpleRootedTree> d = new ArrayList<SimpleRootedTree>();
 			d.add(bts.reconstructMapTree(null, null));
 			Map<Taxon, Double> e = new HashMap<Taxon, Double>();

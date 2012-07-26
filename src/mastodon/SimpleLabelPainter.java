@@ -11,6 +11,7 @@ import jebl.util.Attributable;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -158,7 +159,8 @@ public class SimpleLabelPainter extends LabelPainter<Node> {
 			} else if (displayAttribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
 				return getNumberFormat().format(rtree.getLength(node));
 			} else if (displayAttribute.equalsIgnoreCase(NODE_PROB)) {
-				return ((Double) node.getAttribute("cladeProb")).toString();
+				DecimalFormat df = new DecimalFormat("#.0000");
+				return (df.format((Double) node.getAttribute("cladeProb"))).toString();	//display to 4 decimal places
 			}
 		}
 
