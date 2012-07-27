@@ -9,15 +9,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.ProgressMonitorInputStream;
 
+import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NewickImporter;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.io.TreeImporter;
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.CompactRootedTree;
 import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.ReRootedTree;
+import jebl.evolution.trees.RootedFromUnrooted;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
@@ -32,14 +37,14 @@ public class TreeReader {
 	private TreeImporter imp;	 
 	private String fileName;	//Currently used filename.	
 
-	
+
 	/**
 	 * Plain constructor. Call setFile afterwards. 
 	 * @throws IOException 
 	 */
 	public TreeReader() {
 	}
-	
+
 	/**
 	 * Constructor that creates a NexusImporter or NewickImporter object bound to the provided filename. 
 	 * @param filename - name of input file
@@ -66,7 +71,7 @@ public class TreeReader {
 		bufferedReader.close();
 
 		boolean isNexus = (line != null && line.toUpperCase().contains("#NEXUS"));
-		
+
 		reader = new FileReader(fileName);
 
 		if (isNexus) {
@@ -75,7 +80,7 @@ public class TreeReader {
 			imp = new NewickImporter(reader, true);
 		}	  
 	}
-	
+
 	/**
 	 * Returns the current set filename.
 	 * @return current set filename
@@ -131,7 +136,7 @@ public class TreeReader {
 		while (imp.hasTree()) {
 			tree = imp.importNextTree();
 			System.out.println("Reading mutable rooted trees only works with JEBL 2, modified by Andrew to convert a simple rooted tree to a mutable one");
-//			trees.add(new MutableRootedTree((RootedTree) tree));
+			//			trees.add(new MutableRootedTree((RootedTree) tree));
 		}
 
 		if (trees.size() == 0) {
@@ -149,8 +154,8 @@ public class TreeReader {
 	 * @throws IOException
 	 * @throws ImportException
 	 */
-	public List<SimpleRootedTree> read100Trees() throws IOException, ImportException {
-		List<SimpleRootedTree> trees = new ArrayList<SimpleRootedTree>();
+	public List<RootedTree> read100RootedTrees() throws IOException, ImportException {
+		List<RootedTree> trees = new ArrayList<RootedTree>();
 		Tree tree;
 
 		if(!imp.hasTree()) {	//in case number of trees is an integer multiple of 100
@@ -160,13 +165,50 @@ public class TreeReader {
 			while (imp.hasTree() && counter > 0) {
 				tree = imp.importNextTree();
 				//trees.add(new MutableRootedTree((RootedTree) tree));
-				trees.add((SimpleRootedTree) tree);
+				trees.add((RootedTree) tree);
 				counter--;
 			}
 		}
 		return trees;
 	}
-	
+
+	/**
+	 * Reads the next 100 trees in the file file and converts to a list of SimpleRootedTree objects.
+	 * @return list of SimpleRootedTree objects
+	 * @throws IOException
+	 * @throws ImportException
+	 */
+	public List<RootedTree> read100ReRootedTrees(String outgroupString) throws IOException, ImportException {
+		List<RootedTree> trees = new ArrayList<RootedTree>();
+		Tree tree;
+
+		if(!imp.hasTree()) {	//in case number of trees is an integer multiple of 100
+			reader.close();
+		} else {
+			int counter = 100;
+			while (imp.hasTree() && counter > 0) {
+				tree = imp.importNextTree();
+
+				Node outgroup = tree.getNode(Taxon.getTaxon(outgroupString));
+				trees.add(new RootedFromUnrooted(tree, tree.getAdjacencies(outgroup).get(0), outgroup, 1));
+				counter--;
+			}
+		}
+		return trees;
+	}
+
+
+	public RootedTree readNextTree() throws IOException, ImportException {
+
+		RootedTree tree = null;
+
+		if(imp.hasTree()) {
+			tree = (RootedTree) imp.importNextTree();
+		}
+
+		return tree;
+	}
+
 	/**
 	 * Reads in only the tree at the specified position in the file. !Might not be working correctly!
 	 * @param index - position of desired tree in file

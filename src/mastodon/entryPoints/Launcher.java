@@ -53,20 +53,37 @@ public class Launcher {
 		setFrame(frame);
 	}
 
-	public boolean processFile(int burnin) throws IOException, ImportException{
+	public boolean processFile(int burnin, String outgroupString) throws IOException, ImportException{
 		if(reader == null) {
 			reader = new TreeReader();
 		}
 		bts = new BitTreeSystem();
-
 		reader.setFile(fileName);
 
 		treeCounter = 0;
 		int readTreeCount = 0;
+		
+		RootedTree testTree = reader.readNextTree();
+		reader.reset();
+		
+		if(testTree == null) {
+			return false;
+		} else {
+			if (outgroupString.length() > 0) {
+				if (testTree.getNode(Taxon.getTaxon(outgroupString)) == null) {
+					JOptionPane.showMessageDialog(frame, "Taxon \"" + outgroupString + "\" not found in tree set.", "Outgroup error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+			}
+		}
 
-		List<SimpleRootedTree> trees;		
+		List<RootedTree> trees;		
 		do {
-			trees = reader.read100Trees();
+			if (outgroupString.length() > 0) {
+				trees = reader.read100ReRootedTrees(outgroupString);
+			} else {
+				trees = reader.read100RootedTrees();
+			}
 			readTreeCount = trees.size();
 			if (trees.size() < 1) {
 				//mostly to check for empty file
@@ -85,17 +102,14 @@ public class Launcher {
 		} while (readTreeCount == 100);
 
 		//mark for garbage collection
-		boolean success = treeCounter != 0;
 		trees = null;
 		reader = null;
 		
-		if(success) {
-			bts.findMapTree();
-			String message = "Read successful.\nFound:\n" + bts.getBitTrees().size() + " trees,\n" + bts.getTaxaCount() + " taxa,\n" + bts.getClades().size() + " unique clades.";
-			JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);
-		}
-
-		return success;
+		bts.findMapTree();
+		String message = "Read successful.\nFound:\n" + bts.getBitTrees().size() + " trees,\n" + bts.getTaxaCount() + " taxa,\n" + bts.getClades().size() + " unique clades.";
+		JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);
+		
+		return true;
 	}
 	
 	public void setupAlgorithm(Algorithm alg, Map<String, Object> limits) {

@@ -47,6 +47,7 @@ import java.util.concurrent.ExecutionException;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
@@ -263,11 +264,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 		//removed for now because having both a table listener and a tree selection listener causes a stack overflow
-//				resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//					public void valueChanged(ListSelectionEvent evt) {
-//						resultTableSelectionChanged();
-//					}
-//				});
+		//				resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		//					public void valueChanged(ListSelectionEvent evt) {
+		//						resultTableSelectionChanged();
+		//					}
+		//				});
 
 
 
@@ -653,14 +654,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//do nothing
 		}
 	}
-	
+
 	//"commit" is a bit misleading as the old data won't be lost
 	public void commitPruning() {
 		MastodonFrame fr = (MastodonFrame) Application.getApplication().doNew();
 		Launcher newLauncher = new Launcher(fr);
 		newLauncher.setCopiedAndPrunedBTS(launcher, runResults.get(selectedRun).getPrunedTaxaBits().get(figTreePanel.getTreeViewer().getCurrentTreeIndex()));
 		fr.launcher = newLauncher;
-		
+
 		fr.getAlgorithmAction().setEnabled(true);
 		fr.progressBar.setString("");
 		fr.runResults.add(fr.launcher.getResults());
@@ -669,10 +670,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		//highlight current run in runTable and update display
 		fr.runTable.getSelectionModel().setSelectionInterval(fr.selectedRun, fr.selectedRun);
-		
+
 		((CardLayout)fr.cardPanel.getLayout()).show(fr.cardPanel, "score");
 		//setup RunResult
-		
+
 	}
 
 	private File openDefaultDirectory = null;
@@ -687,75 +688,81 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	}
 
 	protected boolean readFromFile(File file) throws IOException {
-//		JPanel burninPanel = new JPanel();
-//		burninPanel.add(new JLabel("Discard the first"));
-//		JTextField burnin = new JTextField();
-//		burnin.setColumns(5);
-//		burninPanel.add(burnin);
-//		burninPanel.add(new JLabel("trees as burn-in."));
-		
-//		JOptionPane.showInputDialog(this,
-//				"Discard first x trees as burnin", "Burn-in",
-//				JOptionPane.OK_CANCEL_OPTION);
-		String input = JOptionPane.showInputDialog("Discard first x trees as burn-in:", "0");
-		int burnin = 0;
-		try {
-			burnin = (int) Double.parseDouble(input);
-			if (burnin < 0) {
-				burnin = 0;
-			}
-		} catch (Exception ignore) {
-		}
-		
-		if (launcher == null) {
-			launcher = new Launcher(this);
-		}
-		//		boolean success = false;
-		launcher.setFileName(file.getAbsolutePath());
+		//String input = JOptionPane.showInputDialog("Discard first x trees as burn-in:", "0");
+		LoadFileDialog lfDialog = new LoadFileDialog(this);
 
-		timer = new javax.swing.Timer(1000, new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				progressBar.setStringPainted(true);
-				progressBar.setString(launcher.getTreeCounter() + " trees loaded");
+		if(lfDialog.showDialog() == JOptionPane.OK_OPTION) {
+			//String input2 = JOptionPane.showInputDialog("Specify outgroup (leave blank if trees are rooted):", "");
+			//if (input2 != null) {
+			int burninInt = 0;
+			try {
+				burninInt = (int) Double.parseDouble(lfDialog.getBurning());
+				if (burninInt < 0) {
+					burninInt = 0;
+				}
+			} catch (Exception ignore) {
 			}
-		});
-		new ReadFileWorker(burnin).execute();
-		timer.start();
-		return true;
+
+			if (launcher == null) {
+				launcher = new Launcher(this);
+			}
+			//		boolean success = false;
+			launcher.setFileName(file.getAbsolutePath());
+
+			timer = new javax.swing.Timer(1000, new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					progressBar.setStringPainted(true);
+					progressBar.setString(launcher.getTreeCounter() + " trees loaded");
+				}
+			});
+			new ReadFileWorker(burninInt, lfDialog.getOutgroup()).execute();
+			timer.start();
+			return true;
+		}  else {
+		//} 
+		return false;
+		}
 	}
 
 	class ReadFileWorker extends SwingWorker<Void, Void> {
 		int burnin;
-		
-		ReadFileWorker(int b) {
+		String outgroupString;
+		boolean success;
+
+		ReadFileWorker(int b, String os) {
 			burnin = b;
+			outgroupString = os;
 		}
-		
+
 		protected Void doInBackground() throws Exception {
-			launcher.processFile(burnin);
+			success = launcher.processFile(burnin, outgroupString);
 			return null;
 		}
 
 		protected void done() {
 			timer.stop();
-			if(launcher.getTreeCounter() < 1) {
-				JOptionPane.showMessageDialog(launcher.getFrame(), "File " + launcher.getFileName() + " contains no trees or all were discarded in Burn-in.",
-						"Error",
-						JOptionPane.ERROR_MESSAGE);
-				((DocumentFrame) launcher.getFrame()).doCloseWindow();
-			} else {
-				//((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(launcher.getMapTree());
-				getAlgorithmAction().setEnabled(true);
-				progressBar.setString("");
-				runResults.add(launcher.getResults());
-				selectedRun = runResults.size() - 1;			
-				runTableModel.fireTableDataChanged();
+			if (success) {
+				if(launcher.getTreeCounter() < 1) {
+					JOptionPane.showMessageDialog(launcher.getFrame(), "File " + launcher.getFileName() + " contains no trees or all were discarded in Burn-in.",
+							"Error",
+							JOptionPane.ERROR_MESSAGE);
+				} else {
+					//((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(launcher.getMapTree());
+					getAlgorithmAction().setEnabled(true);
+					progressBar.setString("");
+					runResults.add(launcher.getResults());
+					selectedRun = runResults.size() - 1;			
+					runTableModel.fireTableDataChanged();
 
-				//highlight current run in runTable and update display
-				runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-				
-				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+					//highlight current run in runTable and update display
+					runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+
+
+				}
+			} else {
+				((DocumentFrame) launcher.getFrame()).doCloseWindow();
 			}
+			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 		}
 
 	}

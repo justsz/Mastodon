@@ -17,6 +17,7 @@ import mastodon.core.*;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.MutableRootedTree;
+import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
 /**
@@ -40,11 +41,11 @@ public class MHBitAlgorithmTest {
 
 		TreeReader reader = new TreeReader(test);
 		BitTreeSystem bts = new BitTreeSystem();
-		List<SimpleRootedTree> trees;
+		List<RootedTree> trees;
 		
 		double start = System.currentTimeMillis();
 		do {
-			trees = reader.read100Trees();
+			trees = reader.read100RootedTrees();
 			bts.addTrees(trees);
 		} while (trees.size() == 100);
 		System.out.println(bts.getClades().size());

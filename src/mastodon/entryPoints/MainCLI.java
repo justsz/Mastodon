@@ -19,6 +19,7 @@ import org.apache.commons.cli.*;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
 /**
@@ -71,9 +72,9 @@ public class MainCLI {
 		}		
 		System.out.println("Loading trees...");
 		int treeCounter = 0;
-		List<SimpleRootedTree> trees;		
+		List<RootedTree> trees;		
 		do {
-			trees = reader.read100Trees();
+			trees = reader.read100RootedTrees();
 			bts.addTrees(trees);
 			treeCounter += trees.size();
 			if (trees.size() != 0)
