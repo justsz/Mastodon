@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mastodon.algorithms.MHBisectionAlgorithm;
-import mastodon.algorithms.MHLinearAlgorithm;
+import mastodon.algorithms.*;
 import mastodon.core.*;
 
 
@@ -24,7 +23,7 @@ import jebl.evolution.trees.SimpleRootedTree;
  * @author justs
  *
  */
-public class MHBitAlgorithmTest {
+public class AlgorithmTest {
 
 	/**
 	 * @param args
@@ -35,7 +34,8 @@ public class MHBitAlgorithmTest {
 		String test = 
 //				"simple.trees";
 //				"snowflake-48d500.trees";
-				"carnivores1k.trprobs";
+//				"carnivores1k.trprobs";
+				"carnivores1kUnWeighted.trprobs";
 //				"H3N2_1441_tips.500.trees";
 //				"H3N2_1968-2011.338_tips.500.trees";
 
@@ -50,21 +50,26 @@ public class MHBitAlgorithmTest {
 		} while (trees.size() == 100);
 		System.out.println(bts.getClades().size());
 		trees = null;	//signals to the GC that this can be disposed of
+		bts.findMapTree();
 		System.out.println("tree adding time: " + (System.currentTimeMillis() - start));
 
 //		MHLinearAlgorithm mh = new MHLinearAlgorithm();
-		MHBisectionAlgorithm mh = new MHBisectionAlgorithm();
+//		MHBisectionAlgorithm mh = new MHBisectionAlgorithm();
+		FlipPenaltyAlgorithm fp = new FlipPenaltyAlgorithm();
 		start = System.currentTimeMillis();
 		
 		Map<String, Object> limits = new HashMap<String, Object>();
-		limits.put("minMapScore", 0.6);
+		limits.put("minMapScore", 0.7);
 		limits.put("minPruning", 1);
 		limits.put("maxPruning", 83);
 		limits.put("totalIterations", 10000);
 
-		mh.setBTS(bts);
-		mh.setLimits(limits);
-		mh.run();
+//		mh.setBTS(bts);
+//		mh.setLimits(limits);
+//		mh.run();
+		fp.setBTS(bts);
+		fp.setLimits(limits);
+		fp.run();
 		System.out.println("pruning time: " + (System.currentTimeMillis() - start));
 
 //		List<SimpleRootedTree> prunedTrees = mh.getPrunedMapTrees();
@@ -83,7 +88,7 @@ public class MHBitAlgorithmTest {
 		
 		
 		System.out.print("Final Pruned taxa: ");
-		for(List<Taxon> taxaList : mh.getRunResult().getPrunedTaxa()) {
+		for(List<Taxon> taxaList : fp.getRunResult().getPrunedTaxa()) {
 			for (Taxon taxon : taxaList) {
 				System.out.print(taxon.getName() + ", ");
 			}

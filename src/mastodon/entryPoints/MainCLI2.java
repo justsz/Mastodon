@@ -21,6 +21,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
 /**
+ * Command Line Interface (CLI) version of Mastodon that uses Arguments for input parsing. 
  * @author justs
  *
  */
@@ -38,10 +39,20 @@ public class MainCLI2 {
 
 		List<Option> options = new ArrayList<Option>();
 		options.add(new Option("help", "display this page"));
-		options.add(new StringOption("n", "s", "stem of output files. Default is stem of input file"));
-		options.add(new RealOption("s", 0.0, 1.0, "*desired minimum MAP score [0.0 - 1.0]"));
-		options.add(new IntegerOption("p", 1, Integer.MAX_VALUE, "*maximum number of taxa to prune [1+]"));
-		options.add(new IntegerOption("i", 1, Integer.MAX_VALUE, "*maximum number of iterations [1+]"));
+		options.add(new StringOption("stem", "s", "*stem of output files. Default is stem of input file"));
+		options.add(new RealOption("score", 0.0, 1.0, "*desired minimum MAP score [0.0 - 1.0]"));
+		options.add(new IntegerOption("iter", 1, Integer.MAX_VALUE, "*maximum number of iterations [1+]"));
+		options.add(new Option("lin", "set search method to Linear between min and max K"));
+		options.add(new Option("bis", "set search method to Bisection between min and max K"));
+		options.add(new IntegerOption("minK", 1, Integer.MAX_VALUE, "*minimum number of taxa to prune [1+]"));
+		options.add(new IntegerOption("maxK", 1, Integer.MAX_VALUE, "*maximum number of taxa to prune [1-all taxa]"));
+		options.add(new Option("SA", "set algorithm to Simulated Annealing"));
+		options.add(new Option("MH", "set algorithm to Metropolis Hastings"));
+		options.add(new RealOption("initT", Double.MIN_VALUE, Double.MAX_VALUE, "initial temperature for SA [>0]"));
+		options.add(new RealOption("finalT", Double.MIN_VALUE, Double.MAX_VALUE, "final temperature for SA [>0 and <initT]"));
+		options.add(new RealOption("power", Double.MIN_VALUE, Double.MAX_VALUE, "weighing power for MH, higher number is more aggressive [>0]"));
+		options.add(new StringOption("root", "s", "outgroup taxon to root against. Exclude if trees are already rooted"));
+		options.add(new IntegerOption("burnin", 0, Integer.MAX_VALUE, "ignore first {burnin} trees [0+]"));
 
 		Option[] optsArray = new Option[options.size()];
 		for(int i = 0; i < options.size(); i++) {
@@ -52,7 +63,8 @@ public class MainCLI2 {
 		cmd.parseArguments(args);
 
 		if(cmd.hasOption("help")) {
-			cmd.printUsage("java -jar MASTodon.jar", "\nStarred entries are required.");
+			cmd.printUsage("java -jar MASTodon.jar", "\nStarred entries are always required." +
+													"\nYou should also specify a choice of search method and algorithm. ");
 			System.out.println("Example:  java -jar MASTodon.jar -s 0.8 -p 10 -i 20000 carnivores.trees");
 			System.exit(0);
 		}

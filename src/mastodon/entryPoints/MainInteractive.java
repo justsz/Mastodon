@@ -21,6 +21,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
 /**
+ * Interactive command line version of an early version of Mastodon. Outdated now and replaced by the graphical version.
  * @author justs
  *
  */

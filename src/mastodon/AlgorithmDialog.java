@@ -60,6 +60,13 @@ public class AlgorithmDialog {
 		}
 	};
 	
+	private AbstractAction flipPenaltyAction = new AbstractAction("Flip Penalty") {
+		public void actionPerformed(ActionEvent ae) {
+			searchMethodSelection = 40;
+			((CardLayout)searchMethodCardPanel.getLayout()).show(searchMethodCardPanel, "linAndBis");
+		}
+	};
+	
 	
 	private AbstractAction SAAction = new AbstractAction("Simulated Annealing") {
 		public void actionPerformed(ActionEvent ae) {
@@ -96,6 +103,7 @@ public class AlgorithmDialog {
 	JRadioButton constButton = new JRadioButton(constAction);
 	JRadioButton linearButton = new JRadioButton(linearAction);
 	JRadioButton bisectionButton = new JRadioButton(bisectionAction);
+	JRadioButton flipPenaltyButton = new JRadioButton(flipPenaltyAction);
 	
 	JRadioButton MHButton = new JRadioButton(MHAction);
 	JRadioButton SAButton = new JRadioButton(SAAction);
@@ -141,9 +149,11 @@ public class AlgorithmDialog {
 		searchGroup.add(constButton);
 		searchGroup.add(linearButton);
 		searchGroup.add(bisectionButton);
+		searchGroup.add(flipPenaltyButton);
 		searchMethodButtonsPanel.add(constButton);
 		searchMethodButtonsPanel.add(linearButton);
 		searchMethodButtonsPanel.add(bisectionButton);
+		searchMethodButtonsPanel.add(flipPenaltyButton);
 		
 		JPanel algorithmChoiceButtonsPanel = new JPanel();
 		ButtonGroup algGroup = new ButtonGroup();

@@ -23,6 +23,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 
 /**
+ * CLI that uses Apache libraries. Replaced by MainCLI2 which uses Arguments.
  * @author justs
  *
  */

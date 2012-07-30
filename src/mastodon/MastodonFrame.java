@@ -152,7 +152,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				boolean firstInterval = true;
 				for(Node node : nodes) {
 					String taxonName = tree.getTaxon(node).getName();
-					int k = resultTable.convertRowIndexToModel(searchTable(taxonName));
+					int k = resultTable.convertRowIndexToView(searchTable(taxonName));
 
 					if(firstInterval) {
 						resultTable.getSelectionModel().setSelectionInterval(k, k);
@@ -585,6 +585,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 					} else { //MH
 						algorithm = new MHBisectionAlgorithm();
 					}
+				} else if((int) (selection / 10) == 4) {
+					algorithm = new FlipPenaltyAlgorithm();
 				} else { //constant or linear
 					if ((int) (selection % 10) == 1) {	//SA
 						algorithm = new SALinearAlgorithm();
@@ -719,8 +721,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			timer.start();
 			return true;
 		}  else {
-		//} 
-		return false;
+			//} 
+			return false;
 		}
 	}
 
