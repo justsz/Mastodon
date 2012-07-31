@@ -456,6 +456,7 @@ public class BitTreeSystem {
 //			System.out.println(((BitSet) filter.getKey().clone()).hashCode());
 //			System.out.println(clades.containsKey(filter.getKey()));
 			clades.get(filter.getKey()).getCladeBits().xor(filter.getValue());
+//			filters = null;
 		}
 	}
 
@@ -471,7 +472,9 @@ public class BitTreeSystem {
 		//List<HashSet<Integer>> subTrees = new ArrayList<HashSet<Integer>>();
 		//List<Clade3> mapClades = new ArrayList<Clade3>(mapTree.getBits().size());
 
-		Map<BitSet, BitSet> filters = new HashMap<BitSet, BitSet>();
+//		if (filters == null) {
+			filters = new HashMap<BitSet, BitSet>();
+//		}
 		prunedClades = new HashMap<BitSet, BitSet>(clades.size());
 		//		List<BitSet> possibleLimiters = new ArrayList<BitSet>(); 
 
@@ -483,7 +486,12 @@ public class BitTreeSystem {
 			if(cladeBits.intersects(pruner)) {
 				BitSet filter = (BitSet) pruner.clone();
 				filter.and(cladeBits);
-				filters.put(entry.getKey(), filter);
+//				BitSet f = filters.get(entry.getKey());
+//				if (f == null) {
+					filters.put(entry.getKey(), filter);
+//				} else {
+//					f.or(filter);
+//				}
 				cladeBits.xor(filter);
 			}
 			if (cladeBits.cardinality() > 1) {	//not very needed, might be some performance benefit			
@@ -524,7 +532,7 @@ public class BitTreeSystem {
 				}
 			}
 			if (runningIntersection.cardinality() == 1) {	//a limiting clade has reduced it to only the map tree
-				this.filters = filters;
+				//this.filters = filters;
 				if(weighted) {
 					result[0] = bitTrees.get(runningIntersection.nextSetBit(0)).getWeight();
 				} else {
@@ -583,7 +591,7 @@ public class BitTreeSystem {
 		result[1] = subTreeCount;
 
 
-		this.filters = filters;
+		//this.filters = filters;
 		forTest = runningIntersection;
 		return result;
 	}

@@ -59,9 +59,10 @@ public class AlgorithmTest {
 		start = System.currentTimeMillis();
 		
 		Map<String, Object> limits = new HashMap<String, Object>();
+		limits.put("power", 1.0);
 		limits.put("minMapScore", 0.7);
-		limits.put("minPruning", 1);
-		limits.put("maxPruning", 83);
+		limits.put("minPruning", 35);
+		limits.put("maxPruning", 35);
 		limits.put("totalIterations", 10000);
 
 //		mh.setBTS(bts);

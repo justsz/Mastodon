@@ -12,6 +12,7 @@ import org.apache.commons.math3.distribution.PoissonDistribution;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.math.Random;
 
 /**
  * @author justs
@@ -67,7 +68,7 @@ public abstract class Algorithm {
 			iterationCounter++;
 		}
 		afterActions();		
-		System.out.println(totalPruningFreq);
+		System.out.println("times a new solution was accepted: " + totalPruningFreq);
 	}
 
 	public RunResult getRunResult() {

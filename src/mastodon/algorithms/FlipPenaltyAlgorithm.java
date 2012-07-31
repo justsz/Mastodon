@@ -31,7 +31,9 @@ import jebl.math.Random;
  */
 public class FlipPenaltyAlgorithm extends Algorithm{
 	
-	int bitToFlip;
+	int bitToFlip1;
+	int bitToFlip2;
+	
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
@@ -44,7 +46,9 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 	}
 
 	protected void initialize() {
-			stub = "Flip Penalty";
+		stub = "Flip Penalty";
+		
+		//Random.setSeed(444);
 		
 		pruningFreq = new HashMap<Integer, Integer>();
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
@@ -63,7 +67,7 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 	}
 
 	protected boolean finished() {
-		return maxScore[0] >= minMapScore || iterationCounter >= totalIterations;
+		return  iterationCounter >= totalIterations; //maxScore[0] >= minMapScore ||
 	}
 
 	protected void choosePruningCount() {
@@ -72,18 +76,39 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 	
 	
 	protected void tryPruning() {
-		bitToFlip = (int) (Random.nextDouble() * bts.getTaxaCount());
+		bitToFlip1 = (int) (Random.nextDouble() * bts.getTaxaCount());
+		//bitToFlip2 = (int) (Random.nextDouble() * bts.getTaxaCount());
+		
+//		int kBefore = currPruning.cardinality();
 
-		currPruning.flip(bitToFlip);
+		currPruning.flip(bitToFlip1);
+		//currPruning.flip(bitToFlip2);
+//		int kAfter = currPruning.cardinality();
+		
+//		if (kAfter < kBefore) {
+//			bts.unPrune();
+//		}
 
 		currScore = bts.pruneFast(currPruning);
 		bts.unPrune();
+		
 	}
+	
+	private int prevK = 0;
 	
 	private double getScore(int k, double currMap, double prevMap) {
 		//penalty is a decreasing exponential with (k, penalty). Starts at (0, 1), ends at (taxaCount, baseOfPow)
-		double penalty = Math.pow(0.05, k/bts.getTaxaCount());
-		double gain = currMap / prevMap;
+		double penalty;
+//		if (k > prevK) {
+			penalty = Math.pow(0.001, (double)k/bts.getTaxaCount()) / Math.pow(0.001, (double)prevK/bts.getTaxaCount());
+			System.out.println(penalty);
+			//penalty = 1 - (double) k/bts.getTaxaCount();
+//		penalty = Math.pow(1.0 - (double) k/bts.getTaxaCount(), 3);
+			
+//		} else {
+//			penalty = 0.9;
+//		}
+		double gain = currMap/prevMap;
 		return penalty * gain;
 	}
 
@@ -99,21 +124,31 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 
 
 		if (getScore(currPruning.cardinality(), currScore[0], prevScore[0]) > Random.nextDouble()) {
+			
+			
+			
+			prevK = currPruning.cardinality();
+			//System.out.println(prevK);
+			//System.out.println("score: " + currScore[0] + " getScore: " + getScore(currPruning.cardinality(), currScore[0], prevScore[0]) + " k: " + currPruning.cardinality() + " penalty: " + Math.pow(0.05, (double) currPruning.cardinality()/bts.getTaxaCount()));
+			//System.out.println(currScore[0] + " " + getScore(currPruning.cardinality(), currScore[0], prevScore[0]) + " " + currPruning.cardinality() + " " + Math.pow(0.01, (double) currPruning.cardinality()/bts.getTaxaCount()));
 			prevPruning = (BitSet) currPruning.clone(); 
 			prevScore = currScore.clone();	
 
 			for (int a = currPruning.nextSetBit(0); a >= 0; a = currPruning.nextSetBit(a+1)) {
 				pruningFreq.put(a, pruningFreq.get(a) + 1);
 			}
+//			pruningFreq.put(bitToFlip, pruningFreq.get(bitToFlip) + 1);
 			totalPruningFreq++;
 
 		} else {
 			//undo pruning
-			currPruning.flip(bitToFlip);
+			currPruning.flip(bitToFlip1);
+			//currPruning.flip(bitToFlip2);
 		}
 	}
 
 	protected void afterActions() {
+//		bts.unPrune();
 		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		System.out.println("Pruning count: " + currPrunedSpeciesCount);
 		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
