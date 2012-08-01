@@ -48,7 +48,7 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 	protected void initialize() {
 		stub = "Flip Penalty";
 		
-		//Random.setSeed(444);
+		Random.setSeed(4443245);
 		
 		pruningFreq = new HashMap<Integer, Integer>();
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
@@ -100,8 +100,8 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 		//penalty is a decreasing exponential with (k, penalty). Starts at (0, 1), ends at (taxaCount, baseOfPow)
 		double penalty;
 //		if (k > prevK) {
-			penalty = Math.pow(0.001, (double)k/bts.getTaxaCount()) / Math.pow(0.001, (double)prevK/bts.getTaxaCount());
-			System.out.println(penalty);
+			penalty = Math.pow(0.01, (double)k/bts.getTaxaCount()) / Math.pow(0.01, (double)prevK/bts.getTaxaCount());
+//			System.out.println(penalty);
 			//penalty = 1 - (double) k/bts.getTaxaCount();
 //		penalty = Math.pow(1.0 - (double) k/bts.getTaxaCount(), 3);
 			
@@ -111,6 +111,8 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 		double gain = currMap/prevMap;
 		return penalty * gain;
 	}
+	
+	int pruningCountSum = 0;
 
 	protected void setNewBest() {
 		if (currScore[0] > maxScore[0]) {	//set new optimum
@@ -124,13 +126,11 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 
 
 		if (getScore(currPruning.cardinality(), currScore[0], prevScore[0]) > Random.nextDouble()) {
-			
-			
-			
 			prevK = currPruning.cardinality();
+			pruningCountSum += prevK;
 			//System.out.println(prevK);
 			//System.out.println("score: " + currScore[0] + " getScore: " + getScore(currPruning.cardinality(), currScore[0], prevScore[0]) + " k: " + currPruning.cardinality() + " penalty: " + Math.pow(0.05, (double) currPruning.cardinality()/bts.getTaxaCount()));
-			//System.out.println(currScore[0] + " " + getScore(currPruning.cardinality(), currScore[0], prevScore[0]) + " " + currPruning.cardinality() + " " + Math.pow(0.01, (double) currPruning.cardinality()/bts.getTaxaCount()));
+//			System.out.println(currScore[0] + " " + getScore(currPruning.cardinality(), currScore[0], prevScore[0]) + " " + currPruning.cardinality() / 84.0 + " " + Math.pow(0.01, (double) currPruning.cardinality()/bts.getTaxaCount()));
 			prevPruning = (BitSet) currPruning.clone(); 
 			prevScore = currScore.clone();	
 
@@ -149,6 +149,7 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 
 	protected void afterActions() {
 //		bts.unPrune();
+		System.out.println("average pruning count: " + pruningCountSum/totalPruningFreq);
 		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		System.out.println("Pruning count: " + currPrunedSpeciesCount);
 		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);

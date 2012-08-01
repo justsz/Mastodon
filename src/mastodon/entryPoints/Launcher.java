@@ -34,6 +34,8 @@ public class Launcher {
 
 	private String fileName;
 	
+	private RootedTree mapTree;
+	
 	public String getFileName() {
 		return fileName;
 	}
@@ -176,7 +178,10 @@ public class Launcher {
 	}
 	
 	public RootedTree getMapTree() {
-		return bts.reconstructMapTree(null, null);
+		if (mapTree == null) {
+			mapTree = bts.reconstructMapTree(null, null);
+		}
+		return mapTree;
 	}
 	
 	public void setCopiedAndPrunedBTS(Launcher oldLauncher, BitSet pruning) {

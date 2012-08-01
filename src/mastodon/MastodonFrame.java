@@ -24,6 +24,8 @@ import jam.framework.MultiDocApplication;
 import jam.panels.ActionPanel;
 import jam.table.TableRenderer;
 
+import org.freehep.util.export.ExportDialog;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
@@ -31,7 +33,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -237,6 +242,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		topPanel.add(scrollPane1, BorderLayout.CENTER);
 		topPanel.add(controlPanel1, BorderLayout.SOUTH);
 
+		ColorRenderer colorRenderer = new ColorRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
+
+
 		resultTableModel = new ResultTableModel(null, figTreePanel);
 		resultTable = new JTable(resultTableModel) {
 			//Implement table header tool tips.
@@ -250,16 +258,26 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 					}
 				};
 			}
+
+			//			public TableCellRenderer getCellRenderer(int row, int column) {
+			//			    // TODO Auto-generated method stub
+			//			    return colorRenderer;
+			//			}
+
 		};
+
+		//resultTable.setDefaultRenderer(String.class, new ColorRenderer());
+
+
 
 		resultTable.setAutoCreateRowSorter(true);
 		resultTable.getColumnModel().getColumn(0).setPreferredWidth(10);
 		resultTable.getColumnModel().getColumn(1).setPreferredWidth(5);
 		//resultTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-		resultTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
-		resultTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
-		resultTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
-		resultTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
+		resultTable.getColumnModel().getColumn(0).setCellRenderer(colorRenderer);
+		resultTable.getColumnModel().getColumn(1).setCellRenderer(colorRenderer);
+		resultTable.getColumnModel().getColumn(2).setCellRenderer(colorRenderer);
+		resultTable.getColumnModel().getColumn(3).setCellRenderer(colorRenderer);
 		resultTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 
@@ -311,7 +329,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		JPanel rightPanel = new JPanel(new BorderLayout(0,0));
 		rightPanel.add(topToolbar.getToolbar(), BorderLayout.NORTH);
 		rightPanel.add(figTreePanel, BorderLayout.CENTER);
-		rightPanel.setBackground(new Color(231, 237, 246));
+		//rightPanel.setBackground(new Color(231, 237, 246));
 		rightPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
 
 
@@ -645,7 +663,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//List<String> taxonNames = new ArrayList<String>();
 			for(int i = 0; i < selRows.length; i++) {
 				//taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
-				pruning.flip(resultTable.convertRowIndexToModel(selRows[i]));
+				if (!((ResultTableModel) resultTable.getModel()).isPruned(resultTable.convertRowIndexToView(selRows[i]))) {
+					pruning.flip(resultTable.convertRowIndexToModel(selRows[i]));
+				}
 			}
 			runResult.updateRun(currentTree);
 			//			resultTableModel.fireTableDataChanged();
@@ -782,6 +802,31 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		return figTreePanel.getTreeViewer();
 	}
 
+	private class ColorRenderer extends TableRenderer {
+		/**
+		 * @param arg0
+		 * @param arg1
+		 */
+		public ColorRenderer(int arg0, Insets arg1) {
+			super(arg0, arg1);
+		}
+
+		public Component getTableCellRendererComponent(JTable table, Object value,
+				boolean isSelected, boolean hasFocus, int row, int column) {
+
+			Component rendererComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+					row, column);
+
+			if(((ResultTableModel) table.getModel()).isPruned(table.convertRowIndexToView(row))) {
+				rendererComp.setForeground(Color.LIGHT_GRAY);
+				rendererComp.setBackground(Color.GRAY);
+			}
+
+			return rendererComp;
+		}
+	}
+
+
 
 	class RunTableModel extends AbstractTableModel {
 		final String[] columnNames = {"Run","Pruned k", "Min k", "Max k", "Score"};
@@ -850,6 +895,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		return removeRunAction;
 	}
 
+	public Action getExportGraphicAction() {
+		return exportGraphicAction;
+	}
+
 	private final AbstractAction removeRunAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent ae) {
 			removeRun();
@@ -868,4 +917,15 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	};
 
-}
+	private final AbstractAction exportGraphicAction = new AbstractAction("Export Graphic...") {
+		public void actionPerformed(ActionEvent ae) {
+			doExportGraphic();
+		}
+	};
+
+	public final void doExportGraphic() {
+		ExportDialog export = new ExportDialog();
+		export.showExportDialog( this, "Export view as ...", figTreePanel.getTreeViewer().getContentPane(), "export" );
+	}
+
+}	

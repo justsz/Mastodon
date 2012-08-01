@@ -56,6 +56,10 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
 
             menu.addSeparator();
 
+            item = new JMenuItem(((MastodonFileMenuHandler)frame).getExportGraphicAction());
+			item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
+			menu.add(item);
+            
 //            item = new JMenuItem(((MastodonFileMenuHandler)frame).getExportDataAction());
 //            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
 //            menu.add(item);
@@ -74,6 +78,11 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
 //            menu.add(item);
 
             menu.addSeparator();
+            
+            item = new JMenuItem("Export Graphic...");
+            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
+            item.setEnabled(false);
+            menu.add(item);
 
 //            item = new JMenuItem("Export Data...");
 //            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));

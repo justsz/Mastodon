@@ -54,22 +54,29 @@ class ResultTableModel extends AbstractTableModel {
 
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 
-		if (col == 0) return row + 1;
-		if(unRemovedTaxa.contains(taxon)) {	
-			if (col == 1) {
-				if (runResult.getPrunedTaxa().size() > 0) {
-					if (runResult.getPrunedTaxa().get(currentTree).contains(taxon)) {
-						return "Ã";
-					} 
-				}
-				return "";
+		if (col == 0) return row + 1;	
+		if (col == 1) {
+			if (runResult.getPrunedTaxa().size() > 0) {
+				if (runResult.getPrunedTaxa().get(currentTree).contains(taxon) || runResult.getPrunedMapTrees().get(0).getNode(taxon) == null) {
+					return "Ã";
+				} 
 			}
-			if (col == 2) return taxon.getName();
-			if (col == 3) return Double.valueOf(twoDForm.format(runResult.getPruningFreq().get(taxon)));
+			return "";
 		}
+		if (col == 2) return taxon.getName();
+		if (col == 3) return Double.valueOf(twoDForm.format(runResult.getPruningFreq().get(taxon)));
+
 
 
 		return "";
+	}
+
+	public boolean isPruned(int row) {
+		int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
+		Taxon taxon = (Taxon) runResult.getBts().getAllTaxa().toArray()[row];
+		Set<Taxon> unRemovedTaxa = runResult.getPrunedMapTrees().get(currentTree).getTaxa();
+
+		return !unRemovedTaxa.contains(taxon);		
 	}
 
 	public boolean isCellEditable(int row, int col) {
