@@ -148,24 +148,28 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		@Override
 		public void selectionChanged() {
-			Set<Node> nodes = figTreePanel.getTreeViewer().getSelectedTips();
-			RootedTree tree = launcher.getMapTree();
+			if (!quiet) {
+				quiet = true;
+				Set<Node> nodes = figTreePanel.getTreeViewer().getSelectedTips();
+				RootedTree tree = launcher.getMapTree();
 
-			if(nodes.size() < 1) {
-				resultTable.clearSelection();
-			} else {
-				boolean firstInterval = true;
-				for(Node node : nodes) {
-					String taxonName = tree.getTaxon(node).getName();
-					int k = resultTable.convertRowIndexToView(searchTable(taxonName));
+				if(nodes.size() < 1) {
+					resultTable.clearSelection();
+				} else {
+					boolean firstInterval = true;
+					for(Node node : nodes) {
+						String taxonName = tree.getTaxon(node).getName();
+						int k = resultTable.convertRowIndexToView(searchTable(taxonName));
 
-					if(firstInterval) {
-						resultTable.getSelectionModel().setSelectionInterval(k, k);
-						firstInterval = false;
-					} else {
-						resultTable.getSelectionModel().addSelectionInterval(k, k);
-					}				
+						if(firstInterval) {
+							resultTable.getSelectionModel().setSelectionInterval(k, k);
+							firstInterval = false;
+						} else {
+							resultTable.getSelectionModel().addSelectionInterval(k, k);
+						}				
+					}
 				}
+				quiet = false;
 			}
 		}
 
@@ -281,12 +285,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		resultTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 
-		//removed for now because having both a table listener and a tree selection listener causes a stack overflow
-		//				resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-		//					public void valueChanged(ListSelectionEvent evt) {
-		//						resultTableSelectionChanged();
-		//					}
-		//				});
+		resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				resultTableSelectionChanged();
+			}
+		});
 
 
 
@@ -451,18 +454,22 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		//figTreePanel.setColourBy("pruned");
 	}
 
+	private boolean quiet = false;
 
 	public void resultTableSelectionChanged() {
-
-		int[] selRows = resultTable.getSelectedRows();
-		if (selRows.length > 0) {
-			List<String> taxonNames = new ArrayList<String>();
-			for(int i = 0; i < selRows.length; i++) {
-				taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
+		if (!quiet) {
+			quiet = true;
+			int[] selRows = resultTable.getSelectedRows();
+			if (selRows.length > 0) {
+				List<String> taxonNames = new ArrayList<String>();
+				for(int i = 0; i < selRows.length; i++) {
+					taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
+				}
+				figTreePanel.getTreeViewer().selectTaxa(taxonNames);
+			} else {
+				figTreePanel.getTreeViewer().clearSelectedTaxa();
 			}
-			figTreePanel.getTreeViewer().selectTaxa(taxonNames);
-		} else {
-			figTreePanel.getTreeViewer().clearSelectedTaxa();
+			quiet = false;
 		}
 	}
 
@@ -663,6 +670,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//List<String> taxonNames = new ArrayList<String>();
 			for(int i = 0; i < selRows.length; i++) {
 				//taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
+				//don't prune if it is in the pruned set after a "commit"
 				if (!((ResultTableModel) resultTable.getModel()).isPruned(resultTable.convertRowIndexToView(selRows[i]))) {
 					pruning.flip(resultTable.convertRowIndexToModel(selRows[i]));
 				}
