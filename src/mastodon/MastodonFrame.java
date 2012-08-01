@@ -209,6 +209,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				};
 			}
 		};
+		
+		runTable.setPreferredSize(new Dimension(400, 100));
 		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
 		//runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
@@ -228,7 +230,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		scrollPane1 = new JScrollPane(runTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
 
 		//the little plus/minus sign under top left table
 		ActionPanel actionPanel1 = new ActionPanel(false);
@@ -299,13 +300,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		JPanel bottomPanel = new JPanel(new BorderLayout(0, 0));
-		bottomPanel.add(new JLabel("Pruned Taxa:"), BorderLayout.NORTH);
+		bottomPanel.add(new JLabel("Pruning run details:"), BorderLayout.NORTH);
 		bottomPanel.add(scrollPane2, BorderLayout.CENTER);
 
 		JPanel leftPanel = new JPanel(new BorderLayout(0, 0));
 		leftPanel.setPreferredSize(new Dimension(400, 300));
 		splitPane1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, topPanel, bottomPanel);
 		splitPane1.setBorder(null);
+		//splitPane1.setDividerLocation(150);
 
 		JPanel progressPanel = new JPanel(new BorderLayout(0, 0));
 		progressLabel = new JLabel("");
@@ -352,7 +354,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		getContentPane().setLayout(new java.awt.BorderLayout(0, 0));
 		getContentPane().add(splitPane2, BorderLayout.CENTER);
 
-		splitPane1.setDividerLocation(2000);
+		//splitPane1.setDividerLocation(2000);
 	}
 
 	public void setVisible(boolean b) {
