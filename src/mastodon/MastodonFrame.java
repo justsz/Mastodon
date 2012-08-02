@@ -98,7 +98,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		setTitle(title);
 
-		getOpenAction().setEnabled(false);
+		getOpenAction().setEnabled(true);
 		getSaveAction().setEnabled(false);
 		getSaveAsAction().setEnabled(false);
 

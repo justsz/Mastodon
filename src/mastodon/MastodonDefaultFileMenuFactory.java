@@ -37,7 +37,6 @@ public class MastodonDefaultFileMenuFactory implements MenuFactory {
 
 		item = new JMenuItem(application.getOpenAction());
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MenuBarFactory.MENU_MASK));
-		item.setEnabled(true);
 		menu.add(item);
 
 		// On Windows and Linux platforms, each window has its own menu so items which are not needed

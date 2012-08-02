@@ -18,7 +18,7 @@ if [ -z "$PATHOGEN" ]; then
 	# make it fully qualified
 	saveddir=`pwd`
 	PATHOGEN0=`dirname "$PRG"`
-	PATHOGEN=`cd "$PATHOGEN0" && pwd`
+	PATHOGEN=`cd "$PATHOGEN0" && cd ".." && pwd`
 	cd "$saveddir"
 fi
 

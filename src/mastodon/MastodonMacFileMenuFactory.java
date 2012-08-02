@@ -81,7 +81,6 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
             
             item = new JMenuItem("Export Graphic...");
             item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MenuBarFactory.MENU_MASK));
-            item.setEnabled(false);
             menu.add(item);
 
 //            item = new JMenuItem("Export Data...");
