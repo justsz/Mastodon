@@ -101,6 +101,20 @@ public class TopToolbar{
 		}
 	};
 	
+	final ToolbarAction undoPruningAction =
+			new ToolbarAction("Undo", "Undo last manual pruning", null) {
+		public void actionPerformed(ActionEvent e){
+			frame.undo();
+		}
+	};
+	
+	final ToolbarAction redoPruningAction =
+			new ToolbarAction("Redo", "Redo last manual pruning", null) {
+		public void actionPerformed(ActionEvent e){
+			frame.redo();
+		}
+	};
+	
 	
 
 	//    private AbstractAction nextTreeAction =
@@ -140,6 +154,9 @@ public class TopToolbar{
 	JButton pruned = new ToolbarButton(prunedAction, true);
 	JButton frequencies = new ToolbarButton(pruningFreqAction, true);	
 	JButton commit = new ToolbarButton(commitPruningAction, true);
+	
+	JButton undo = new ToolbarButton(undoPruningAction, true);
+	JButton redo = new ToolbarButton(redoPruningAction, true);
 	
 	JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
 
@@ -182,6 +199,9 @@ public class TopToolbar{
 		noColor.setEnabled(false);
 		pruned.setEnabled(false);		
 		frequencies.setEnabled(false);
+		
+		redo.setEnabled(false);
+		undo.setEnabled(false);
 				
 //		ButtonGroup coloringGroup = new ButtonGroup();		
 //		coloringGroup.add(noColor);
@@ -204,6 +224,8 @@ public class TopToolbar{
 		pruneButton.registerKeyboardAction(pruneToolbarAction, KeyStroke.getKeyStroke("p"), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		toolBar.addComponent(pruneButton);	
 		toolBar.addComponent(commit);
+		toolBar.addComponent(undo);
+		toolBar.addComponent(redo);
 		
 		
 

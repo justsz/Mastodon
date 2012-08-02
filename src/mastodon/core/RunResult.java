@@ -25,6 +25,8 @@ public class RunResult {
 	private List<SimpleRootedTree> prunedMapTrees;
 	private Map<Taxon, Double> pruningFreq;
 	private String name;
+	private List<BitSet> changeStack;
+	private int stackPointer;
 
 	public RunResult(BitTreeSystem bts, List<ArrayList<Taxon>> pt, List<BitSet> ptb, List<double[]> ps, List<SimpleRootedTree> pmt, Map<Taxon, Double> pf, String name, int minK, int maxK) {
 		this.bts = bts;
@@ -36,6 +38,60 @@ public class RunResult {
 		this.name = name;
 		minPruning = minK;
 		maxPruning = maxK;
+		changeStack = new ArrayList<BitSet>();
+		changeStack.add(new BitSet()); //put empty set at the bottom of stack
+		stackPointer = 0;
+	}
+
+	public void addChange(BitSet change) {
+		
+		//this initial block makes the stack tree-like as opposed to storing all changes
+		if (stackPointer < changeStack.size() - 1) {
+			int stackSize = changeStack.size();
+			for (int i = stackPointer + 1; i < stackSize; i++) {
+				changeStack.remove(changeStack.size() - 1);
+			}
+		}
+		changeStack.add(change);
+		stackPointer++;
+	}
+
+	public BitSet getPrevChange() {
+		BitSet output = changeStack.get(stackPointer);	
+		stackPointer--;
+		if (stackPointer < 0) {
+			stackPointer = 0;
+		}
+		return output;
+	}
+	
+	public void printStack() {
+		for(int i = 0; i < changeStack.size(); i++) {
+			System.out.print(changeStack.get(i));
+			if (i == stackPointer) {
+				System.out.print(" <-");
+			}
+			System.out.println();
+		}
+	}
+	
+	public BitSet getNextChange() {
+		BitSet output = new BitSet();
+		stackPointer++;
+		if (stackPointer > changeStack.size() - 1) {
+			stackPointer--;
+		} else {
+			output = changeStack.get(stackPointer);
+		}
+		return output;
+	}
+	
+	public boolean hasPrev() {
+		return stackPointer > 0;
+	}
+	
+	public boolean hasNext() {
+		return stackPointer < changeStack.size() - 1;
 	}
 
 	public List<ArrayList<Taxon>> getPrunedTaxa() {
@@ -61,7 +117,7 @@ public class RunResult {
 	public void setPrunedMapTrees(List<SimpleRootedTree> prunedMapTrees) {
 		this.prunedMapTrees = prunedMapTrees;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -101,7 +157,7 @@ public class RunResult {
 	public List<BitSet> getPrunedTaxaBits() {
 		return prunedTaxaBits;
 	}
-	
+
 	public void updateRun(int selectedTree) {
 		prunedTaxa.set(selectedTree, (ArrayList<Taxon>) bts.getTaxa(prunedTaxaBits.get(selectedTree)));
 		pruningScores.set(selectedTree, bts.pruneFast(prunedTaxaBits.get(selectedTree)));

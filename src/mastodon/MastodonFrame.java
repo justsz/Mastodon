@@ -209,8 +209,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				};
 			}
 		};
-		
-		runTable.setPreferredSize(new Dimension(400, 100));
+
 		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
 		//runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
@@ -307,7 +306,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		leftPanel.setPreferredSize(new Dimension(400, 300));
 		splitPane1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, topPanel, bottomPanel);
 		splitPane1.setBorder(null);
-		//splitPane1.setDividerLocation(150);
+		splitPane1.setDividerLocation(180);
 
 		JPanel progressPanel = new JPanel(new BorderLayout(0, 0));
 		progressLabel = new JLabel("");
@@ -334,7 +333,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		JPanel rightPanel = new JPanel(new BorderLayout(0,0));
 		rightPanel.add(topToolbar.getToolbar(), BorderLayout.NORTH);
 		rightPanel.add(figTreePanel, BorderLayout.CENTER);
-		//rightPanel.setBackground(new Color(231, 237, 246));
 		rightPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(12, 12, 12, 6)));
 
 
@@ -359,7 +357,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	public void setVisible(boolean b) {
 		super.setVisible(b);
-		setupDividerLocation();
+		//setupDividerLocation();
 	}
 
 	private void setupDividerLocation() {
@@ -433,7 +431,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 		selectedRun = selRow;
 		updateDataDisplay();
-
 	}
 
 	public void updateDataDisplay() {
@@ -452,6 +449,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
+		
+		topToolbar.undo.setEnabled(runResult.hasPrev());
+		topToolbar.redo.setEnabled(runResult.hasNext());
 
 		//figTreePanel.setColourBy("pruned");
 	}
@@ -665,27 +665,65 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		RunResult runResult = runResults.get(selectedRun);
 		int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
 		BitSet pruning = runResult.getPrunedTaxaBits().get(currentTree);
-		System.out.println(pruning);
 
 		int[] selRows = resultTable.getSelectedRows();
 		if (selRows.length > 0) {
 			//List<String> taxonNames = new ArrayList<String>();
+			BitSet toFlip = new BitSet();
 			for(int i = 0; i < selRows.length; i++) {
 				//taxonNames.add((String) resultTableModel.getValueAt(resultTable.convertRowIndexToModel(selRows[i]), 2));
 				//don't prune if it is in the pruned set after a "commit"
 				if (!((ResultTableModel) resultTable.getModel()).isPruned(resultTable.convertRowIndexToView(selRows[i]))) {
-					pruning.flip(resultTable.convertRowIndexToModel(selRows[i]));
+					toFlip.set(resultTable.convertRowIndexToModel(selRows[i]));
 				}
 			}
+			pruning.xor(toFlip);
+			runResult.addChange(toFlip);
 			runResult.updateRun(currentTree);
 			//			resultTableModel.fireTableDataChanged();
 			//			runTableModel.fireTableDataChanged();
 			runTableModel.fireTableDataChanged();
-			updateDataDisplay();
+			//updateDataDisplay();
+			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+//			topToolbar.undo.setEnabled(runResult.hasPrev());
+//			topToolbar.redo.setEnabled(runResult.hasNext());
 		} else {
 			//do nothing
 		}
 	}
+
+	public void undo() {
+		if(runResults.size() > 0) {
+			RunResult runResult = runResults.get(selectedRun);
+			int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
+			BitSet pruning = runResult.getPrunedTaxaBits().get(currentTree);
+
+			pruning.xor(runResult.getPrevChange());
+
+			runResult.updateRun(currentTree);
+			runTableModel.fireTableDataChanged();
+			//updateDataDisplay();
+			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+		}
+	}
+
+	
+	public void redo() {
+		if (runResults.size() > 0) {
+			RunResult runResult = runResults.get(selectedRun);
+			int currentTree = figTreePanel.getTreeViewer().getCurrentTreeIndex();
+			BitSet pruning = runResult.getPrunedTaxaBits().get(currentTree);
+
+			pruning.xor(runResult.getNextChange());
+
+			runResult.updateRun(currentTree);
+			runTableModel.fireTableDataChanged();
+			//updateDataDisplay();
+			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+		}
+	}
+
+
 
 	//"commit" is a bit misleading as the old data won't be lost
 	public void commitPruning() {
