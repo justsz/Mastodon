@@ -202,6 +202,8 @@ public class TopToolbar{
 		
 		redo.setEnabled(false);
 		undo.setEnabled(false);
+		
+		commit.setEnabled(false);
 				
 //		ButtonGroup coloringGroup = new ButtonGroup();		
 //		coloringGroup.add(noColor);

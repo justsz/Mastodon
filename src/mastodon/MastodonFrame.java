@@ -657,6 +657,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
 			topToolbar.enablePruneButton(true);
+			topToolbar.commit.setEnabled(true);
 		}
 
 	}
