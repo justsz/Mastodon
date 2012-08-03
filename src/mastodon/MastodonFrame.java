@@ -1,15 +1,5 @@
 package mastodon;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.DefaultFontMapper;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfTemplate;
-import com.lowagie.text.pdf.PdfWriter;
-import mastodon.app.gui.MapperPanel;
-import mastodon.app.gui.FileDrop;
-import mastodon.app.gui.ChartRuntimeException;
-import mastodon.app.gui.TableEditorStopper;
 import mastodon.core.Algorithm;
 import mastodon.algorithms.*;
 import mastodon.core.RunResult;
@@ -20,7 +10,6 @@ import figtree.treeviewer.TreeSelectionListener;
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.Application;
 import jam.framework.DocumentFrame;
-import jam.framework.MultiDocApplication;
 import jam.panels.ActionPanel;
 import jam.table.TableRenderer;
 
@@ -30,34 +19,26 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.SimpleRootedTree;
+
 
 /**
- * @author Just Zarins
+ * @author Justs Zarins
  * @author Andrew Rambaut
  * @version $Id$
  */
@@ -79,7 +60,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	private JTable resultTable = null;
 	private ResultTableModel resultTableModel = null;
-
 
 	private JScrollPane scrollPane1;
 
@@ -111,22 +91,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		getZoomWindowAction().setEnabled(false);
 
-		AbstractAction importAction = new AbstractAction("Import Trace File...") {
-			public void actionPerformed(ActionEvent ae) {
-				doImport();
-			}
-		};
-		setImportAction(importAction);
-		setExportAction(exportDataAction);
-
-		setAnalysesEnabled(false);
-
 		runResults = new ArrayList<RunResult>();
 	}
 
 	TreeViewerListener scoreListener = new TreeViewerListener() {
 		public void treeChanged() {
-			//TreeViewer treeViewer = figTreePanel.getTreeViewer();
 			double[] scores;
 			try {	//likely a temporary solution
 				scores = runResults.get(selectedRun).getPruningScores().get(figTreePanel.getTreeViewer().getCurrentTreeIndex());
@@ -140,13 +109,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		public void treeSettingsChanged() {
 		}
-
-
 	};
 
 	TreeSelectionListener selectionListener = new TreeSelectionListener() {
-
-		@Override
 		public void selectionChanged() {
 			if (!quiet) {
 				quiet = true;
@@ -212,9 +177,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		runTable.setAutoCreateRowSorter(true);
 		TableRenderer renderer = new TableRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
-		//runTable.getColumnModel().getColumn(0).setPreferredWidth(30);
 		runTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
-		//runTable.getColumnModel().getColumn(1).setPreferredWidth(50);
 		runTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
 		runTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
 		runTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
@@ -262,22 +225,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 					}
 				};
 			}
-
-			//			public TableCellRenderer getCellRenderer(int row, int column) {
-			//			    // TODO Auto-generated method stub
-			//			    return colorRenderer;
-			//			}
-
 		};
-
-		//resultTable.setDefaultRenderer(String.class, new ColorRenderer());
-
 
 
 		resultTable.setAutoCreateRowSorter(true);
 		resultTable.getColumnModel().getColumn(0).setPreferredWidth(10);
 		resultTable.getColumnModel().getColumn(1).setPreferredWidth(5);
-		//resultTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+
 		resultTable.getColumnModel().getColumn(0).setCellRenderer(colorRenderer);
 		resultTable.getColumnModel().getColumn(1).setCellRenderer(colorRenderer);
 		resultTable.getColumnModel().getColumn(2).setCellRenderer(colorRenderer);
@@ -291,9 +245,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}
 		});
 
-
-
-		TableEditorStopper.ensureEditingStopWhenTableLosesFocus(resultTable);
 
 		JScrollPane scrollPane2 = new JScrollPane(resultTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -345,47 +296,22 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		splitPane1.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		new FileDrop(null, splitPane1, focusBorder, new FileDrop.Listener() {
 			public void filesDropped(java.io.File[] files) {
-				importFiles(files);
+				for(File file : files) {
+					Application.getApplication().doOpenFile(file);
+				}
 			}   // end filesDropped
 		}); // end FileDrop.Listener
 
 		getContentPane().setLayout(new java.awt.BorderLayout(0, 0));
 		getContentPane().add(splitPane2, BorderLayout.CENTER);
 
-		//splitPane1.setDividerLocation(2000);
 	}
 
 	public void setVisible(boolean b) {
 		super.setVisible(b);
-		//setupDividerLocation();
 	}
-
-	private void setupDividerLocation() {
-
-		if (dividerLocation == -1 || dividerLocation == splitPane1.getDividerLocation()) {
-			int h0 = topPanel.getHeight();
-			int h1 = scrollPane1.getViewport().getHeight();
-			int h2 = runTable.getPreferredSize().height;
-			dividerLocation = h2 + h0 - h1;
-
-			//		   	int h0 = topPanel.getHeight() - scrollPane1.getViewport().getHeight();
-			// 			dividerLocation = traceTable.getPreferredSize().height + h0;
-
-			if (dividerLocation > 400) dividerLocation = 400;
-			splitPane1.setDividerLocation(dividerLocation);
-		}
-	}
-
-	public void setAnalysesEnabled(boolean enabled) {
-		getExportAction().setEnabled(enabled);
-		getExportDataAction().setEnabled(enabled);
-		getExportPDFAction().setEnabled(enabled);
-		getCopyAction().setEnabled(true);
-	}
-
-
+	
 	private void removeRun() {
-		//figTreePanel.getTreeViewer().
 		int selRow = runTable.getSelectedRow();
 
 		if (selRow < 0) {
@@ -395,13 +321,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		runResults.remove(selRow);
 		int prevRow = selRow - 1;
 		if (prevRow < 0) {
-			//getRemoveRunAction().setEnabled(false);
 			prevRow = 0;
 		}
 		selectedRun = prevRow;
 		runTableModel.fireTableDataChanged();
 		runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-		//		setupDividerLocation();
 	}
 
 
@@ -409,25 +333,22 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	public void runTableSelectionChanged() {
 		int selRow = runTable.getSelectedRow();
 
-		//needed?
 		if (selRow < 0) {
 			getRemoveRunAction().setEnabled(false);
-			//setAnalysesEnabled(false);
 			return;
 		}
-		//
-
-		//what is this?
-		setAnalysesEnabled(true);
+		
 
 		if(runResults.size() > 0) {
 			topToolbar.enablePruneButton(true);
 			topToolbar.enableColorButtons(true);
 			getRemoveRunAction().setEnabled(true);
+			topToolbar.commit.setEnabled(true);
 		} else {
 			topToolbar.enablePruneButton(false);
 			topToolbar.enableColorButtons(false);
 			getRemoveRunAction().setEnabled(false);
+			topToolbar.commit.setEnabled(false);
 		}
 		selectedRun = selRow;
 		updateDataDisplay();
@@ -449,11 +370,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
-		
+
 		topToolbar.undo.setEnabled(runResult.hasPrev());
 		topToolbar.redo.setEnabled(runResult.hasNext());
-
-		//figTreePanel.setColourBy("pruned");
 	}
 
 	private boolean quiet = false;
@@ -475,95 +394,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	}
 
-	public final void doExportData() {
-
-		FileDialog dialog = new FileDialog(this,
-				"Export Data...",
-				FileDialog.SAVE);
-
-		dialog.setVisible(true);
-		if (dialog.getFile() != null) {
-			File file = new File(dialog.getDirectory(), dialog.getFile());
-
-			try {
-				FileWriter writer = new FileWriter(file);
-				//                writer.write(mapperPanel.getExportText());
-				writer.close();
-
-
-			} catch (IOException ioe) {
-				JOptionPane.showMessageDialog(this, "Unable to write file: " + ioe,
-						"Unable to write file",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		}
-
-	}
-
-	public final void doExportPDF() {
-		FileDialog dialog = new FileDialog(this,
-				"Export PDF Image...",
-				FileDialog.SAVE);
-
-		dialog.setVisible(true);
-		if (dialog.getFile() != null) {
-			File file = new File(dialog.getDirectory(), dialog.getFile());
-
-			Rectangle2D bounds = figTreePanel.getTreeViewer().getBounds();
-			Document document = new Document(new com.lowagie.text.Rectangle((float) bounds.getWidth(), (float) bounds.getHeight()));
-			try {
-				// step 2
-				PdfWriter writer;
-				writer = PdfWriter.getInstance(document, new FileOutputStream(file));
-				// step 3
-				document.open();
-				// step 4
-				PdfContentByte cb = writer.getDirectContent();
-				PdfTemplate tp = cb.createTemplate((float) bounds.getWidth(), (float) bounds.getHeight());
-				Graphics2D g2d = tp.createGraphics((float) bounds.getWidth(), (float) bounds.getHeight(), new DefaultFontMapper());
-				figTreePanel.getTreeViewer().print(g2d);
-				g2d.dispose();
-				cb.addTemplate(tp, 0, 0);
-			}
-			catch (DocumentException de) {
-				JOptionPane.showMessageDialog(this, "Error writing PDF file: " + de,
-						"Export PDF Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			catch (FileNotFoundException e) {
-				JOptionPane.showMessageDialog(this, "Error writing PDF file: " + e,
-						"Export PDF Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			document.close();
-		}
-	}
-
-	public final void doImport() {
-		final JFileChooser chooser = new JFileChooser(openDefaultDirectory);
-		chooser.setMultiSelectionEnabled(true);
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("BEAST log (*.log) Files", "log", "txt");
-		chooser.setFileFilter(filter);
-
-		final int returnVal = chooser.showOpenDialog(this);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File[] files = chooser.getSelectedFiles();
-			importFiles(files);
-		}
-	}
-
-	private void importFiles(File[] files) {
-		//        LogFileTraces[] traces = new LogFileTraces[files.length];
-		//
-		//        for (int i = 0; i < files.length; i++) {
-		//            traces[i] = new LogFileTraces(files[i].getName(), files[i]);
-		//        }
-		//
-		//        processTraces(traces);
-
-
-	}
 
 	PruningDialog pruningDialog;
 	Launcher launcher;
@@ -656,8 +486,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
-			topToolbar.enablePruneButton(true);
-			topToolbar.commit.setEnabled(true);
 		}
 
 	}
@@ -686,8 +514,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			runTableModel.fireTableDataChanged();
 			//updateDataDisplay();
 			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-//			topToolbar.undo.setEnabled(runResult.hasPrev());
-//			topToolbar.redo.setEnabled(runResult.hasNext());
+			//			topToolbar.undo.setEnabled(runResult.hasPrev());
+			//			topToolbar.redo.setEnabled(runResult.hasNext());
 		} else {
 			//do nothing
 		}
@@ -708,7 +536,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	}
 
-	
+
 	public void redo() {
 		if (runResults.size() > 0) {
 			RunResult runResult = runResults.get(selectedRun);
@@ -761,6 +589,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	protected boolean readFromFile(File file) throws IOException {
 		//String input = JOptionPane.showInputDialog("Discard first x trees as burn-in:", "0");
 		LoadFileDialog lfDialog = new LoadFileDialog(this);
+		setDefaultDir(file);
 
 		if(lfDialog.showDialog() == JOptionPane.OK_OPTION) {
 			//String input2 = JOptionPane.showInputDialog("Specify outgroup (leave blank if trees are rooted):", "");
@@ -841,12 +670,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	protected boolean writeToFile(File file) {
 		throw new RuntimeException("Cannot write file - this is a read-only application");
 	}
-
-	public void doCopy() {
-
-	}
-
-
+	
 	public JComponent getExportableComponent() {
 		return figTreePanel.getTreeViewer();
 	}
@@ -931,14 +755,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	}
 
-	public Action getExportDataAction() {
-		return exportDataAction;
-	}
-
-	public Action getExportPDFAction() {
-		return exportPDFAction;
-	}
-
 
 	public Action getRemoveRunAction() {
 		return removeRunAction;
@@ -951,18 +767,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private final AbstractAction removeRunAction = new AbstractAction() {
 		public void actionPerformed(ActionEvent ae) {
 			removeRun();
-		}
-	};
-
-	private final AbstractAction exportDataAction = new AbstractAction("Export Data...") {
-		public void actionPerformed(ActionEvent ae) {
-			doExportData();
-		}
-	};
-
-	private final AbstractAction exportPDFAction = new AbstractAction("Export PDF...") {
-		public void actionPerformed(ActionEvent ae) {
-			doExportPDF();
 		}
 	};
 
