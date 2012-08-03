@@ -16,12 +16,10 @@ import java.util.Set;
  */
 public class Clade {
 	private BitSet clade;
-	//private int count;
 	private BitSet cladeToTrees;
 	
 	public Clade(BitSet bits) {
 		clade = bits;
-//		count = 1;
 		cladeToTrees = new BitSet();
 	}
 	
@@ -43,14 +41,6 @@ public class Clade {
 	public BitSet getCladeToTrees() {
 		return cladeToTrees;
 	}
-	
-//	public void incrementCount() {
-//		count++;
-//	}
-	
-//	public void setCount(int count) {
-//		this.count = count;
-//	}
 	
 	public BitSet getCladeBits() {
 		return clade;

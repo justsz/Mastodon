@@ -10,7 +10,8 @@ import java.io.File;
 import java.util.Locale;
 
 /**
- * @author Just Zarins
+ * This is the main entry point to the MASTadon graphical application.
+ * @author Justs Zarins
  * @author Andrew Rambaut
  * @version $Id$
  */
@@ -117,12 +118,10 @@ public class MastodonApp extends MultiDocApplication {
 
             if (args.length > 0) {
                 MastodonFrame frame = (MastodonFrame) app.getDefaultFrame();
-//                for (String fileName : args) {
-//
-//                    File file = new File(fileName);
-//
-//                    frame.processTreefile(file);
-//                }
+                for (String fileName : args) {
+                    File file = new File(fileName);
+                    app.doOpenFile(file);
+                }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), "Fatal exception: " + e,

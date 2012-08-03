@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 /**
+ * Taxa pruning frequency heatmap frame.
  * @author justs
  *
  */

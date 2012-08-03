@@ -3,30 +3,19 @@
  */
 package mastodon;
 
-import java.awt.BorderLayout;
+
 import java.awt.CardLayout;
-import java.awt.FileDialog;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import jam.panels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import mastodon.inputVerifiers.*;
 
 /**
+ * This class creates a dialog that the user can interact with to setup a pruning algorithm.
  * @author justs
  *
  */
@@ -36,8 +25,12 @@ public class AlgorithmDialog {
 	JPanel searchMethodCardPanel;
 	JPanel algorithmChoiceCardPanel;
 
+	//store algorithm choice as a 2 digit integer and decode as needed. Search method is in the tens and algorithm in the ones
 	int searchMethodSelection = 10;
 	int algorithmSelection = 1;
+	
+	
+	//---Button actions---
 	
 	private AbstractAction constAction = new AbstractAction("Constant") {
 		public void actionPerformed(ActionEvent ae) {
@@ -88,6 +81,7 @@ public class AlgorithmDialog {
 	private final JOptionPane optionPane;
 
 	
+	//components
 	JTextField numberToPrune = new JTextField("1");
 	JTextField minNumberToPrune = new JTextField("1");
 	JTextField maxNumberToPrune = new JTextField("1");
@@ -111,7 +105,11 @@ public class AlgorithmDialog {
 	
 
 	
-	
+	/**
+	 * Sets up all fields and creates a dialog window for pruning algorithm selection.
+	 * CardLayout is used to swap between different input option depending on the user choice of algorithm.
+	 * @param frame - parent frame of this dialog
+	 */
 	public AlgorithmDialog(JFrame frame) {
 		this.frame = frame;
 		
@@ -207,6 +205,10 @@ public class AlgorithmDialog {
 
 	}
 
+	/**
+	 * Display the dialog and get user button click.
+	 * @return integer representing which button the user clicked
+	 */
 	public int showDialog() {
 		dialog.setVisible(true);
 		int result = JOptionPane.CANCEL_OPTION;
@@ -221,10 +223,18 @@ public class AlgorithmDialog {
 		return result;
 	}
 	
+	/**
+	 * Returns the 2 digit integer representing algorithm choice.
+	 * @return 2 digit integer representing algorithm choice
+	 */
 	public int getSelection() {
 		return searchMethodSelection + algorithmSelection;
 	}
 	
+	/**
+	 * Collects all text entered into al fields and returns as a map.
+	 * @return map of all inputs
+	 */
 	public Map<String, String> getInput() {
 		Map<String, String> input = new HashMap<String, String>();
 		

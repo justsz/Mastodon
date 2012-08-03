@@ -11,27 +11,26 @@ import org.apache.commons.math3.distribution.PoissonDistribution;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
-import jebl.math.Random;
 
 /**
+ * This is the general layout that a pruning Algorithm has to follow. 
+ * A subclass needs to implement the individual steps and then the superclass loops over them until a finishing condition is satisfied.	
  * @author justs
  *
  */
 public abstract class Algorithm {
-	protected Map<BitSet, double[]> finalPruning;
-	protected String stub;
+	protected Map<BitSet, double[]> finalPruning;	//the best pruning found
+	protected String stub;	//name of the algorithm, numbering could be added to the stub for consequent runs
 
 	protected double minMapScore;
 	protected int totalIterations;
-	protected Map<Integer, Integer> pruningFreq;
-	protected int totalPruningFreq;
+	protected Map<Integer, Integer> pruningFreq;	//map of how often each taxa appears in accepted pruning moves
+	protected int totalPruningFreq;	//total number of accepted pruning moves
 	
 	protected int minPrunedSpeciesCount;
 	protected int currPrunedSpeciesCount;
 	protected int maxPrunedSpeciesCount;
 
-//	protected int mapTreeIndex;
 	protected int iterationCounter = 0;
 
 	protected BitTreeSystem bts;
@@ -44,17 +43,28 @@ public abstract class Algorithm {
 	protected BitSet prevPruning;
 	protected BitSet currPruning;
 
-	protected PoissonDistribution pd;
+	protected PoissonDistribution pd;	//used to find a "nearby step" in the space of taxa
 
+	/**
+	 * Set the BitTreeSystem to prune.
+	 * @param bts - target BitTreeSystem
+	 */
 	public abstract void setBTS(BitTreeSystem bts);
+	/**
+	 * Set limits required by specific algorithm.
+	 * @param limits - algorithm settings
+	 */
 	public abstract void setLimits(Map<String, Object> limits);	
 	protected abstract void initialize();	
-	protected abstract boolean finished();
-	protected abstract void choosePruningCount();
-	protected abstract void tryPruning();
-	protected abstract void setNewBest();
-	protected abstract void afterActions();
+	protected abstract boolean finished();	//condition when the algorithm stops
+	protected abstract void choosePruningCount();	//change the number of pruned taxa iteration to iteration, as required
+	protected abstract void tryPruning();	//execute a pruning combination and see what score it produces
+	protected abstract void setNewBest();	//decide whether to accept this pruning
+	protected abstract void afterActions();	//execute some final commands after the algorithm has finished
 
+	/**
+	 * Execute the setup algorithm.
+	 */
 	public void run() {
 		//add a check to see if everything has been set correctly
 		initialize();
@@ -71,14 +81,16 @@ public abstract class Algorithm {
 		System.out.println("times a new solution was accepted: " + totalPruningFreq);
 	}
 
+	/**
+	 * Construct a RunResult based on the outcome of the previous run of the algorithm.
+	 * @return the result of the algorithm
+	 */
 	public RunResult getRunResult() {
 		List<ArrayList<Taxon>> prunedTaxa = new ArrayList<ArrayList<Taxon>>();
 		List<BitSet> prunedTaxaBits = new ArrayList<BitSet>();
 		List<double[]> pruningScores = new ArrayList<double[]>();
 		List<SimpleRootedTree> prunedMapTrees = new ArrayList<SimpleRootedTree>();
 		Map<Taxon, Double> pruningFrequencies = new HashMap<Taxon, Double>();
-
-//		BitTree mapTree = bitTrees.get(mapTreeIndex).clone();
 		
 		for(Entry<Integer, Integer> entry : pruningFreq.entrySet()) {
 			double freq = 0.0;

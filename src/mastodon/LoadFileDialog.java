@@ -7,6 +7,11 @@ import javax.swing.*;
 
 import com.lowagie.text.Font;
 
+/**
+ * A dialog for getting user input about burnin and rooting options.
+ * @author justs
+ *
+ */
 public class LoadFileDialog {
 	JFrame frame;
 	JOptionPane pane;
@@ -14,6 +19,10 @@ public class LoadFileDialog {
 	JTextField burnin = new JTextField(5);
 	JTextField outgroup = new JTextField(10);
 
+	/**
+	 * Initialize the dialog.
+	 * @param frame - parent frame of this component
+	 */
 	public LoadFileDialog(JFrame frame) {
 		this.frame = frame;
 
@@ -49,7 +58,12 @@ public class LoadFileDialog {
 		dialog = pane.createDialog(frame, "Set file loading options");
 		dialog.pack();
 	}
+	
 
+	/**
+	 * Displays the dialog and returns user's button press.
+	 * @return user button press
+	 */
 	public int showDialog() {
 		dialog.setVisible(true);
 		int result = JOptionPane.CANCEL_OPTION;
@@ -63,10 +77,12 @@ public class LoadFileDialog {
 
 		return result;
 	}
+	
 
 	public String getBurning() {
 		return burnin.getText();
 	}
+	
 
 	public String getOutgroup() {
 		return outgroup.getText();

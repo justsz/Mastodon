@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.swing.JPanel;
 
 /**
+ * Taxa pruning frequency heatmap panel.
  * @author justs
  *
  */

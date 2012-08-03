@@ -3,7 +3,6 @@
  */
 package mastodon;
 
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -18,9 +17,8 @@ import javax.swing.*;
 
 import figtree.treeviewer.TreeViewerListener;
 
-//import figtree.treeviewer.TreeViewer;
-
 /**
+ * This is the toolbar found above the tree viewing panel. 
  * @author justs
  *
  */
@@ -38,6 +36,7 @@ public class TopToolbar{
 	Icon freqIcon = IconUtils.getIcon(this.getClass(), "images/gradient.gif");
 	
 	
+	//---button actions---
 	final ToolbarAction noColorAction =
 			new ToolbarAction(null, "No color", noColorIcon) {
 		public void actionPerformed(ActionEvent e){
@@ -115,30 +114,14 @@ public class TopToolbar{
 		}
 	};
 	
-	
 
-	//    private AbstractAction nextTreeAction =
-	//            new AbstractAction("Next Tree") {
-	//                public void actionPerformed(ActionEvent e){
-	//                    treeViewer.showNextTree();
-	//                }
-	//            };
-	//
-	//    private AbstractAction previousTreeAction =
-	//            new AbstractAction("Previous Tree") {
-	//                public void actionPerformed(ActionEvent e){
-	//                    treeViewer.showPreviousTree();
-	//                }
-	//            };
-
+	//listens for changes in the tree display to decide if the next/prev tree buttons should be active
 	TreeViewerListener l = new TreeViewerListener() {
 		public void treeChanged() {
 			boolean nextTreeEnabled = treeViewer.getCurrentTreeIndex() < treeViewer.getTreeCount() - 1;
-			//            nextTreeAction.setEnabled(nextTreeEnabled);
 			nextTreeToolbarAction.setEnabled(nextTreeEnabled);
 
 			boolean prevTreeEnabled = treeViewer.getCurrentTreeIndex() > 0;
-			//            previousTreeAction.setEnabled(prevTreeEnabled);
 			prevTreeToolbarAction.setEnabled(prevTreeEnabled);
 		}
 
@@ -147,9 +130,6 @@ public class TopToolbar{
 		}
 	};
 	
-	//JRadioButton noColor = new JRadioButton(noColorAction);
-	//JRadioButton pruned = new JRadioButton(prunedAction);
-	//JRadioButton frequencies = new JRadioButton(pruningFreqAction);
 	JButton noColor = new ToolbarButton(noColorAction, true);
 	JButton pruned = new ToolbarButton(prunedAction, true);
 	JButton frequencies = new ToolbarButton(pruningFreqAction, true);	
@@ -160,6 +140,12 @@ public class TopToolbar{
 	
 	JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
 
+	/**
+	 * Create the toolbar and set all actions.
+	 * @param treeViewer - treeViewer that shows the trees
+	 * @param resultTable - table that turns a RunResult into table display
+	 * @param frame - parent frame for this component
+	 */
 	public TopToolbar(SimpleTreeViewer treeViewer, JTable resultTable, MastodonFrame frame) {
 		this.treeViewer = treeViewer;
 		this.resultTable = resultTable;
@@ -194,21 +180,15 @@ public class TopToolbar{
 		box.add(nextTreeToolButton);
 		toolBar.addComponent(new GenericToolbarItem("Prev/Next", "Navigate through the trees", box));
 				
-		//noColor.setSelected(true);
 		
 		noColor.setEnabled(false);
 		pruned.setEnabled(false);		
 		frequencies.setEnabled(false);
 		
-		redo.setEnabled(false);
 		undo.setEnabled(false);
+		redo.setEnabled(false);		
 		
 		commit.setEnabled(false);
-				
-//		ButtonGroup coloringGroup = new ButtonGroup();		
-//		coloringGroup.add(noColor);
-//		coloringGroup.add(pruned);
-//		coloringGroup.add(frequencies);
 		
 		Box colorBox = Box.createHorizontalBox();
 		colorBox.add(noColor);
@@ -217,20 +197,17 @@ public class TopToolbar{
 		
 		toolBar.addComponent(new GenericToolbarItem("Coloring", "Choose how to color the tree", colorBox));
 		
-//		toolBar.addComponent(noColor);
-//		toolBar.addComponent(pruned);
-//		toolBar.addComponent(frequencies);
-		
 		
 		pruneButton.setEnabled(false);
 		pruneButton.registerKeyboardAction(pruneToolbarAction, KeyStroke.getKeyStroke("p"), JComponent.WHEN_IN_FOCUSED_WINDOW);
-		toolBar.addComponent(pruneButton);	
-		toolBar.addComponent(commit);
-		toolBar.addComponent(undo);
-		toolBar.addComponent(redo);
 		
+		Box pruneBox = Box.createHorizontalBox();
+		pruneBox.add(pruneButton);
+		pruneBox.add(undo);
+		pruneBox.add(redo);
+		pruneBox.add(commit);
 		
-
+		toolBar.addComponent(new GenericToolbarItem("Pruning", "Prune taxa", pruneBox));
 
 		treeViewer.addTreeViewerListener(l);
 		l.treeChanged();

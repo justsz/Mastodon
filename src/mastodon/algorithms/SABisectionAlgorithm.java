@@ -16,6 +16,7 @@ import jebl.math.Random;
 import mastodon.core.*;
 
 /**
+ * SA algorithm with a bisection search.
  * @author justs
  *
  */
@@ -29,12 +30,13 @@ public class SABisectionAlgorithm extends Algorithm{
 	private double initTemp;
 	private double currTemp;
 	private double finalTemp;
-	private double coolingRate;
+	private double coolingRate;	//cooling rate is chose to be a smooth exponential going from the max value to min value within the alloted step iterations
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
 		bitTrees = bts.getBitTrees();		
 	}
+	
 
 	public void setLimits(Map<String, Object> limits) {
 		minMapScore = (Double) limits.get("minMapScore");
@@ -44,9 +46,8 @@ public class SABisectionAlgorithm extends Algorithm{
 
 		initTemp = (Double) limits.get("initTemp");
 		finalTemp = (Double) limits.get("finalTemp");
-		//coolingRate = (Double) limits.get("coolingRate");
-
 	}
+	
 
 	protected void initialize() {
 		stub = "SA Bi.";
@@ -55,9 +56,6 @@ public class SABisectionAlgorithm extends Algorithm{
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
 			pruningFreq.put(i, 0);
 		}
-
-//		mapTreeIndex = bts.getMapTreeIndex();
-//		System.out.println("Map tree: " + (mapTreeIndex+1));
 
 		currTemp = initTemp;
 
@@ -75,11 +73,12 @@ public class SABisectionAlgorithm extends Algorithm{
 
 		iterationCounter = 0;
 	}
+	
 
 	protected boolean finished() {
 		return iterationCounter >= totalIterations;
-		// || currTemp < finalTemp 
 	}
+	
 
 	protected void choosePruningCount() {
 		if (iterationCounter % stepIterations == 0) {
@@ -136,14 +135,8 @@ public class SABisectionAlgorithm extends Algorithm{
 		if (numberToSet > (bts.getTaxaCount() - currPrunedSpeciesCount)) {
 			numberToSet = bts.getTaxaCount() - currPrunedSpeciesCount;
 		}
-
-		//if we are pruning by one more species now, clear one species less from the pruning list this time
-		if(currPruning.cardinality() < currPrunedSpeciesCount) {
-			numberToClear = numberToSet - 1;
-		} else {
-			numberToClear = numberToSet;
-		}
-
+		
+		numberToClear = numberToSet;
 
 		BitSet bitsToSet = new BitSet();
 		BitSet bitsToClear = new BitSet();
@@ -188,6 +181,7 @@ public class SABisectionAlgorithm extends Algorithm{
 		}
 
 
+		//set next step
 		if (Random.nextDouble() < Math.exp((currScore[0] - prevScore[0]) / currTemp)) {
 			prevPruning = (BitSet) currPruning.clone(); 
 			prevScore = currScore.clone();

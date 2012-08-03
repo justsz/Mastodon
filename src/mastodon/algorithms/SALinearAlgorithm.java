@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mastodon.algorithms;
 
 import java.util.BitSet;
@@ -16,6 +13,7 @@ import jebl.math.Random;
 import mastodon.core.*;
 
 /**
+ * SA algorithm with linear search.
  * @author justs
  *
  */
@@ -26,7 +24,7 @@ public class SALinearAlgorithm extends Algorithm{
 	private double initTemp;
 	private double currTemp;
 	private double finalTemp;
-	private double coolingRate;
+	private double coolingRate;	//cooling rate is chose to be a smooth exponential going from the max value to min value within the alloted step iterations
 
 	public void setBTS(BitTreeSystem bts) {
 		this.bts = bts;
@@ -41,8 +39,6 @@ public class SALinearAlgorithm extends Algorithm{
 
 		initTemp = (Double) limits.get("initTemp");
 		finalTemp = (Double) limits.get("finalTemp");
-		//coolingRate = (Double) limits.get("coolingRate");
-
 	}
 
 	protected void initialize() {
@@ -57,9 +53,6 @@ public class SALinearAlgorithm extends Algorithm{
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
 			pruningFreq.put(i, 0);
 		}
-
-//		mapTreeIndex = bts.getMapTreeIndex();
-//		System.out.println("Map tree: " + (mapTreeIndex+1));
 
 		currTemp = initTemp;
 

@@ -1,32 +1,20 @@
 
 package mastodon.algorithms;
 
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import mastodon.core.*;
-import mastodon.graphics.DrawFrame;
-import mastodon.graphics.DrawPanel;
-import mastodon.scoreCalculators.BitMAPScoreCalculator;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.util.ArithmeticUtils;
 
-
-import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
 /**
- * A BitTree implementation of a Metropolis-Hastings (MH) algorithm for pruning trees.
+ * MH algorithm with linear search.
  * @author justs
  */
 public class MHLinearAlgorithm extends Algorithm{
@@ -58,9 +46,6 @@ public class MHLinearAlgorithm extends Algorithm{
 		for(int i = 0; i < bts.getTaxaCount(); i++) {
 			pruningFreq.put(i, 0);
 		}
-
-//		mapTreeIndex = bts.getMapTreeIndex();
-//		System.out.println("Map tree: " + (mapTreeIndex+1));
 
 		currPrunedSpeciesCount = minPrunedSpeciesCount;
 		maxScorePruning = new HashMap<BitSet, double[]>();
@@ -222,8 +207,8 @@ public class MHLinearAlgorithm extends Algorithm{
 		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
 	}
 
-
-	public void runnnnn() {		
+	
+//	public void runnnnn() {		
 
 
 		//BitMAPScoreCalculator calc = new BitMAPScoreCalculator();
@@ -390,5 +375,5 @@ public class MHLinearAlgorithm extends Algorithm{
 		//				frame.setVisible(true);
 
 
-	}
+//	}
 }
