@@ -10,6 +10,7 @@ import mastodon.core.BitTree;
 
 /**
  * Used to calculate the MAP score of a given tree with respect to all trees in set.
+ * Use in conjunction with the normal "prune" method. "pruneFast" includes a score calculator.
  * @author justs
  *
  */

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mastodon.core;
 
 import java.util.ArrayList;
@@ -12,6 +9,10 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 
 /**
+ * An object that contains all relevant information about the results of a pruning algorithm run:
+ * pruning count upper and lower limits, the BitTreeSystem the run was carried out on, map of pruning frequencies of individual taxa, name of run, 
+ * Lists (entry for each pruning set that resulted in the same MAP score) of pruned taxa as Taxon objects or BitSet, score ({MAP score, number of matching trees}) and the MAP tree with pruned nodes annotated.
+ * There is also a change stack facility to undo and redo manual pruning actions.
  * @author justs
  *
  */
@@ -25,9 +26,21 @@ public class RunResult {
 	private List<SimpleRootedTree> prunedMapTrees;
 	private Map<Taxon, Double> pruningFreq;
 	private String name;
-	private List<BitSet> changeStack;
-	private int stackPointer;
+	private List<BitSet> changeStack;	//list of chronological changes applied to the pruning. XOR reverts the changes
+	private int stackPointer;	//does not necessarily point to the top of the stack
 
+	/**
+	 * One big constructor. An empty BitSet is inserted at the bottom of the stack and pointer set to 0.
+	 * @param bts - the BitTreeSystem the run was carried out on
+	 * @param pt - pruned taxa
+	 * @param ptb - pruned taxa as a bitset
+	 * @param ps - pruning scores
+	 * @param pmt - pruned map trees
+	 * @param pf - pruning frequencies
+	 * @param name - name of algorithm
+	 * @param minK - lower pruning count limit
+	 * @param maxK - upper pruning count limit
+	 */
 	public RunResult(BitTreeSystem bts, List<ArrayList<Taxon>> pt, List<BitSet> ptb, List<double[]> ps, List<SimpleRootedTree> pmt, Map<Taxon, Double> pf, String name, int minK, int maxK) {
 		this.bts = bts;
 		prunedTaxa = pt;
@@ -43,8 +56,13 @@ public class RunResult {
 		stackPointer = 0;
 	}
 
-	public void addChange(BitSet change) {
-		
+	
+	/**
+	 * Add a manual pruning to stack of changes. 
+	 * Adding something while in the middle of the stack makes it the added change the new top and deletes the changes that previously followed.
+	 * @param change - bitset used in manual pruning
+	 */
+	public void addChange(BitSet change) {		
 		//this initial block makes the stack tree-like as opposed to storing all changes
 		if (stackPointer < changeStack.size() - 1) {
 			int stackSize = changeStack.size();
@@ -55,26 +73,12 @@ public class RunResult {
 		changeStack.add(change);
 		stackPointer++;
 	}
+	
 
-	public BitSet getPrevChange() {
-		BitSet output = changeStack.get(stackPointer);	
-		stackPointer--;
-		if (stackPointer < 0) {
-			stackPointer = 0;
-		}
-		return output;
-	}
-	
-	public void printStack() {
-		for(int i = 0; i < changeStack.size(); i++) {
-			System.out.print(changeStack.get(i));
-			if (i == stackPointer) {
-				System.out.print(" <-");
-			}
-			System.out.println();
-		}
-	}
-	
+	/**
+	 * Return the next change in the stack. If the pointer is at the top of the stack, return and empty BitSet.
+	 * @return next change in stack
+	 */
 	public BitSet getNextChange() {
 		BitSet output = new BitSet();
 		stackPointer++;
@@ -86,12 +90,62 @@ public class RunResult {
 		return output;
 	}
 	
+	
+	/**
+	 * Return last performed changed. If the pointer is at the bottom of the stack, returns the empty BitSet placed there at creaetion.
+	 * @return last performed change
+	 */
+	public BitSet getPrevChange() {
+		BitSet output = changeStack.get(stackPointer);	
+		stackPointer--;
+		if (stackPointer < 0) {
+			stackPointer = 0;
+		}
+		return output;
+	}
+	
+	
+	/**
+	 * Print the stack and current pointer location to console.
+	 */
+	public void printStack() {
+		for(int i = 0; i < changeStack.size(); i++) {
+			System.out.print(changeStack.get(i));
+			if (i == stackPointer) {
+				System.out.print(" <-");
+			}
+			System.out.println();
+		}
+	}
+	
+
+	/**
+	 * Returns if there is a previous element in the stack.
+	 * @return if there is a previous element in the stack
+	 */
 	public boolean hasPrev() {
 		return stackPointer > 0;
 	}
 	
+	
+	/**
+	 * Returns if there is a next element in the stack.
+	 * @return if there is a next element in the stack
+	 */
 	public boolean hasNext() {
 		return stackPointer < changeStack.size() - 1;
+	}
+	
+	
+	/**
+	 * Updates pruned taxa, pruning scores and pruned map trees if the pruning BitSet has been altered.
+	 * @param selectedTree - currently displayed tree index in the tree view
+	 */
+	public void updateRun(int selectedTree) {
+		prunedTaxa.set(selectedTree, (ArrayList<Taxon>) bts.getTaxa(prunedTaxaBits.get(selectedTree)));
+		pruningScores.set(selectedTree, bts.pruneFast(prunedTaxaBits.get(selectedTree)));
+		bts.unPrune();
+		prunedMapTrees.set(selectedTree, bts.reconstructMapTree(prunedTaxaBits.get(selectedTree), pruningFreq));
 	}
 
 	public List<ArrayList<Taxon>> getPrunedTaxa() {
@@ -156,13 +210,5 @@ public class RunResult {
 
 	public List<BitSet> getPrunedTaxaBits() {
 		return prunedTaxaBits;
-	}
-
-	public void updateRun(int selectedTree) {
-		prunedTaxa.set(selectedTree, (ArrayList<Taxon>) bts.getTaxa(prunedTaxaBits.get(selectedTree)));
-		pruningScores.set(selectedTree, bts.pruneFast(prunedTaxaBits.get(selectedTree)));
-		bts.unPrune();
-		prunedMapTrees.set(selectedTree, bts.reconstructMapTree(prunedTaxaBits.get(selectedTree), pruningFreq));	
-		//System.out.println(prunedTaxaBits.get(selectedTree));
 	}
 }

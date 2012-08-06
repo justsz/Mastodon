@@ -149,8 +149,8 @@ public class TreeReader {
 
 
 	/**
-	 * Reads the next 100 trees in the file file and converts to a list of SimpleRootedTree objects.
-	 * @return list of SimpleRootedTree objects
+	 * Reads the next 100 trees in the file file and converts to a list of RootedTree objects. Input has to be rooted trees.
+	 * @return list of RootedTree objects
 	 * @throws IOException
 	 * @throws ImportException
 	 */
@@ -173,8 +173,9 @@ public class TreeReader {
 	}
 
 	/**
-	 * Reads the next 100 trees in the file file and converts to a list of SimpleRootedTree objects.
-	 * @return list of SimpleRootedTree objects
+	 * Reads the next 100 trees in the file file and converts to a list of RootedTree objects. Input is rooted on the specified outgroupString taxon.
+	 * @param outgroupString - outgroup to root trees on
+	 * @return list of RootedTree objects rooted on the specified outgroup
 	 * @throws IOException
 	 * @throws ImportException
 	 */
@@ -198,6 +199,12 @@ public class TreeReader {
 	}
 
 
+	/**
+	 * Read one more tree.
+	 * @return the read tree
+	 * @throws IOException
+	 * @throws ImportException
+	 */
 	public RootedTree readNextTree() throws IOException, ImportException {
 
 		RootedTree tree = null;
@@ -210,7 +217,8 @@ public class TreeReader {
 	}
 
 	/**
-	 * Reads in only the tree at the specified position in the file. !Might not be working correctly!
+	 * Reads in only the tree at the specified position in the file.
+	 * Check that indexing matches up correctly and the expected tree is returned.
 	 * @param index - position of desired tree in file
 	 * @return the tree at index
 	 * @throws IOException
