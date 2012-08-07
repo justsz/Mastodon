@@ -195,7 +195,7 @@ public class BitTreeSystem {
 	 * If the trees are weighted, set the max weight tree. Otherwise set the index of the tree that has the maximum probability clades. 
 	 * @return index of the MAP tree
 	 */
-	public void findMapTree() {
+	public int findMapTree() {
 		index = 0;
 		if(weighted) {
 			double maxWeight = 0;
@@ -233,7 +233,8 @@ public class BitTreeSystem {
 		}
 		
 		System.out.println("Map tree: " + (index+1));
-		mapTree = bitTrees.get(index);		
+		mapTree = bitTrees.get(index);
+		return index;
 	}
 	
 

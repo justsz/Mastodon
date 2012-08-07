@@ -457,7 +457,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				//a timer created that queries the launcher for progress
 				timer = new javax.swing.Timer(1000, new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						progressBar.setValue(launcher.getCurrentIterations(selection));
+						progressBar.setValue(launcher.getCurrentIterations());
 					}
 				});
 
