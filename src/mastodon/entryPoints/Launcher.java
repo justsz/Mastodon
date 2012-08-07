@@ -142,10 +142,18 @@ public class Launcher {
 
 	
 	/**
-	 * Call algorithm's run() function.
+	 * Call the algorithm's run method.
 	 */
 	public void runAlgorithm() {
 		algorithm.run();
+	}
+	
+	
+	/**
+	 * Call the algorithm's stop method.
+	 */
+	public void stopAlgorithm() {
+		algorithm.stopAlgorithm();
 	}
 
 	

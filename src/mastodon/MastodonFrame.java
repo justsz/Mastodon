@@ -71,6 +71,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private int selectedRun;
 	private JLabel score;
 
+	private AlgorithmWorker algorithmWorker = new AlgorithmWorker(this);
+
 	String message = "";
 
 	private boolean quiet = false;	//prevents table selection and tree selection from going into an infinite loop
@@ -272,11 +274,19 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		splitPane1.setBorder(null);
 		splitPane1.setDividerLocation(180);
 
+		JButton cancelButton = new JButton(new AbstractAction("Cancel") {
+			public void actionPerformed(ActionEvent arg0) {
+				algorithmWorker.cancel(true);
+			}
+		});
+
+
 		JPanel progressPanel = new JPanel(new BorderLayout(0, 0));
 		progressLabel = new JLabel("");
 		progressBar = new JProgressBar();
 		progressPanel.add(progressLabel, BorderLayout.NORTH);
 		progressPanel.add(progressBar, BorderLayout.CENTER);
+		progressPanel.add(cancelButton, BorderLayout.EAST);
 		progressPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
 
 		JPanel scorePanel = new JPanel(new BorderLayout(0, 0));
@@ -285,6 +295,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		scorePanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
 
 		cardPanel = new JPanel(new CardLayout());
+		cardPanel.add(new JPanel(), "blank");	//add a blank panel
 		cardPanel.add(progressPanel, "progress");
 		cardPanel.add(scorePanel, "score");		
 		cardPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
@@ -380,14 +391,15 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		if (runResult == null) {
 			score.setText("");
 			((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(null);
+			topToolbar.undo.setEnabled(false);
+			topToolbar.redo.setEnabled(false);
 		} else {
-			figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());			
+			figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());	
+			topToolbar.undo.setEnabled(runResult.hasPrev());
+			topToolbar.redo.setEnabled(runResult.hasNext());
 		}
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
-
-		topToolbar.undo.setEnabled(runResult.hasPrev());
-		topToolbar.redo.setEnabled(runResult.hasNext());
 	}
 
 
@@ -451,8 +463,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				}
 
 				launcher.setupAlgorithm(algorithm, input);
+				
 				//the algorithm needs to be run in background so that the GUI doesn't freeze up
-				new AlgorithmWorker().execute();
+				algorithmWorker = new AlgorithmWorker(this);
+				algorithmWorker.execute();
 
 				//a timer created that queries the launcher for progress
 				timer = new javax.swing.Timer(1000, new ActionListener() {
@@ -468,8 +482,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	}
 
-	
+
 	class AlgorithmWorker extends SwingWorker<Void, Void> {
+		JFrame frame;
+		public AlgorithmWorker(JFrame frame) {
+			this.frame = frame;
+		}
+		
 		protected Void doInBackground() throws Exception {
 			topToolbar.enablePruneButton(false);
 			launcher.runAlgorithm();
@@ -478,19 +497,28 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		protected void done() {
 			timer.stop();
-			runResults.add(launcher.getResults());
-			selectedRun = runResults.size() - 1;			
+			if (isCancelled()) {
+				launcher.stopAlgorithm();
+				
+				int n = JOptionPane.showOptionDialog(frame, "Discard run completely?\nPressing No will display best found pruning.", "Run cancel action", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.NO_OPTION);
+				if (n == JOptionPane.NO_OPTION) {
+					runResults.add(launcher.getResults());
+					selectedRun = runResults.size() - 1;
+				}
+			} else {
+				runResults.add(launcher.getResults());
+				selectedRun = runResults.size() - 1;			
+			}
 			runTableModel.fireTableDataChanged();
-
 			//highlight current run in runTable and update display
 			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-
+			
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
 		}
 	}
-	
+
 
 	/**
 	 * Flips the pruning status of selected taxa and updates scores.
@@ -582,7 +610,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	}
 
-	
+
 	private File openDefaultDirectory = null;
 
 	private void setDefaultDir(File file) {
@@ -632,7 +660,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			return false;
 		}
 	}
-	
+
 
 	class ReadFileWorker extends SwingWorker<Void, Void> {
 		int burnin;
@@ -675,7 +703,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 		}
 	}
-	
+
 	/**
 	 * Provides options for exporting the tree view using "freehep.jar".
 	 */
@@ -692,7 +720,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		return figTreePanel.getTreeViewer();
 	}
 
-	
+
 	/**
 	 * A TableRenderer that grays out taxa that have been removed from the tree after a commit.
 	 *

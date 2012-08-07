@@ -35,6 +35,8 @@ public abstract class Algorithm {
 
 	protected BitTreeSystem bts;
 	protected List<BitTree> bitTrees;
+	
+	private boolean forceStop = false;
 
 	protected double[] maxScore;
 	protected double[] prevScore;
@@ -70,7 +72,7 @@ public abstract class Algorithm {
 		initialize();
 		totalPruningFreq = 0;
 
-		while (!finished()) {
+		while (!finished() && !forceStop) {
 			choosePruningCount();
 			tryPruning();
 			setNewBest();
@@ -111,6 +113,14 @@ public abstract class Algorithm {
 		
 		String name = stub;
 		return new RunResult(bts, prunedTaxa, prunedTaxaBits, pruningScores, prunedMapTrees, pruningFrequencies, name, minPrunedSpeciesCount, maxPrunedSpeciesCount);
+	}
+	
+	
+	/**
+	 * Call for the algorithm to finish before the allocated iterations run out.
+	 */
+	public void stopAlgorithm() {
+		forceStop = true;
 	}
 
 	public int getIterationCounter() {

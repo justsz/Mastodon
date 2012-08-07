@@ -53,16 +53,16 @@ public class AlgorithmTest {
 		bts.findMapTree();
 		System.out.println("tree adding time: " + (System.currentTimeMillis() - start));
 
-//		MHLinearAlgorithm mh = new MHLinearAlgorithm();
+		MHLinearAlgorithm mh = new MHLinearAlgorithm();
 //		MHBisectionAlgorithm mh = new MHBisectionAlgorithm();
 		FlipPenaltyAlgorithm fp = new FlipPenaltyAlgorithm();
 		start = System.currentTimeMillis();
 		
 		Map<String, Object> limits = new HashMap<String, Object>();
 		limits.put("power", 1.0);
-		limits.put("minMapScore", 0.7);
-		limits.put("minPruning", 35);
-		limits.put("maxPruning", 35);
+		limits.put("minMapScore", 0.9);
+		limits.put("minPruning", 45);
+		limits.put("maxPruning", 45);
 		limits.put("totalIterations", 10000);
 
 //		mh.setBTS(bts);

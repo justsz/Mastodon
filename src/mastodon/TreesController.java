@@ -38,24 +38,27 @@ public class TreesController extends AbstractController {
 
         optionsPanel = new OptionsPanel();
 
-        rootingCheck = new JCheckBox("Midpoint root");
-        rootingCheck.setOpaque(false);
-        optionsPanel.addComponent(rootingCheck);
-
-        rootingCheck.setSelected(treeViewer.isRootingOn());
-
-        rootingCheck.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                if (rootingCheck.isSelected()) {
-                    treeViewer.setRootingOn(true);
-                    treeViewer.setRootingType(TreePane.RootingType.MID_POINT);
-                } else {
-                    treeViewer.setRootingOn(false);
-                    treeViewer.setRootingType(TreePane.RootingType.USER_ROOTING);
-                }
-
-            }
-        });
+        rootingCheck = null;
+        //commented out to remove "midpoint root option" for MASTadon
+        
+//        rootingCheck = new JCheckBox("Midpoint root");
+//        rootingCheck.setOpaque(false);
+//        optionsPanel.addComponent(rootingCheck);
+//
+//        rootingCheck.setSelected(treeViewer.isRootingOn());
+//
+//        rootingCheck.addChangeListener(new ChangeListener() {
+//            public void stateChanged(ChangeEvent changeEvent) {
+//                if (rootingCheck.isSelected()) {
+//                    treeViewer.setRootingOn(true);
+//                    treeViewer.setRootingType(TreePane.RootingType.MID_POINT);
+//                } else {
+//                    treeViewer.setRootingOn(false);
+//                    treeViewer.setRootingType(TreePane.RootingType.USER_ROOTING);
+//                }
+//
+//            }
+//        });
 
         orderCombo = new JComboBox(new String[] {"Off",
                 SortedRootedTree.BranchOrdering.INCREASING_NODE_DENSITY.toString(),
