@@ -207,7 +207,7 @@ public class TopToolbar{
 		pruneBox.add(redo);
 		pruneBox.add(commit);
 		
-		toolBar.addComponent(new GenericToolbarItem("Pruning", "Prune taxa", pruneBox));
+		toolBar.addComponent(new GenericToolbarItem("Manual Pruning", "(Disabled while a pruning algorithm is running.)", pruneBox));
 
 		treeViewer.addTreeViewerListener(l);
 		l.treeChanged();
@@ -229,7 +229,10 @@ public class TopToolbar{
 		frequencies.setEnabled(enable);
 	}
 	
-	public void enablePruneButton(boolean enable) {
+	public void enablePruningButtons(boolean enable) {
 		pruneButton.setEnabled(enable);
+		undo.setEnabled(enable);
+		redo.setEnabled(enable);
+		commit.setEnabled(enable);
 	}
 }

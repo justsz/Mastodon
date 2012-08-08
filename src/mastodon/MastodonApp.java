@@ -84,23 +84,25 @@ public class MastodonApp extends MultiDocApplication {
             }
 
             final String nameString = "MASTodon";
-            final String versionString = "v1.0pre";
-            String aboutString = "<html><center><p>MCMC Trace Analysis Tool<br>" +
-                    "Version " + versionString + ", 2003-2012</p>" +
+            final String versionString = "v0.2";
+            String aboutString = "<html><center><p>Common subtree search tool<br>" +
+            		"Made as part of Google SoC 2012.<br>" +
+                    "Version " + versionString + ", 2012</p>" +
                     "<p>by<br>" +
 
-                    "Andrew Rambaut, Trevor Bedford & Marc A. Suchard</p>" +
+                    "Justs Zarins<br>" +
+                    "with supervision from<br>" +
+                    "Andrew Rambaut, Karen Cranston and Benjamin Redelings<br>" +
+                    "</p>" +
 
-                    "<p>Institute of Evolutionary Biology, University of Edinburgh<br>" +
-                    "<a href=\"mailto:a.rambaut@ed.ac.uk\">a.rambaut@ed.ac.uk</a></p>" +
+                    "<p>Mentoring organization: National Evolutionary Synthesis Center, NC<br>" +
+                    "<a href=\"http://informatics.nescent.org/wiki/Main_Page\">Informatics at NESCent</a></p>" +
+                    
+                    "<p>Project wiki:<br>" +
+                    "<a href=\"http://informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets\">informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets</a></p>" +
 
-                    "<p>Departments of Biomathematics, Biostatistics and Human Genetics, UCLA<br>" +
-                    "<a href=\"mailto:msuchard@ucla.edu\">msuchard@ucla.edu</a></p>" +
-
-                    "<p>Available from the BEAST site:<br>" +
-                    "<a href=\"http://beast.bio.ed.ac.uk/\">http://beast.bio.ed.ac.uk/</a></p>" +
-                    "<p>Source code distributed under the GNU LGPL:<br>" +
-                    "<a href=\"http://code.google.com/p/beast-mcmc/\">http://code.google.com/p/beast-mcmc/</a></p>" +
+                    "<p>Source and application available from GitHub site: <br>" +
+                    "<a href=\"https://github.com/justsz/Mastodon/downloads\">https://github.com/justsz/Mastodon/downloads</a></p>" +
                     "</center></html>";
 
             String websiteURLString = "http://informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets";

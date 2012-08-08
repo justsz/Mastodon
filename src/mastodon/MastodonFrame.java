@@ -72,6 +72,12 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private JLabel score;
 
 	private AlgorithmWorker algorithmWorker = new AlgorithmWorker(this);
+	
+	private JButton cancelButton = new JButton(new AbstractAction("Cancel") {
+		public void actionPerformed(ActionEvent arg0) {
+			algorithmWorker.cancel(true);
+		}
+	});
 
 	String message = "";
 
@@ -209,20 +215,29 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		//the little plus/minus sign under top left table
-		ActionPanel actionPanel1 = new ActionPanel(false);
-		actionPanel1.setAddAction(getAlgorithmAction());
-		actionPanel1.setRemoveAction(getRemoveRunAction());
+//		ActionPanel actionPanel1 = new ActionPanel(false);	
+//		actionPanel1.setAddAction(getAlgorithmAction());
+//		actionPanel1.setRemoveAction(getRemoveRunAction());
+//		getAlgorithmAction().setEnabled(false);
+//		getRemoveRunAction().setEnabled(false);
+		
+		JPanel actionPanel1 = new JPanel();
+		JButton run = new JButton(getAlgorithmAction());
+		run.setToolTipText("Run a pruning algorithm (disabled if an algorithm is already running)");
+		JButton removeRun = new JButton(getRemoveRunAction());
+		removeRun.setToolTipText("Remove selected run from list");
+		actionPanel1.add(run);
+		actionPanel1.add(removeRun);
+		
 		getAlgorithmAction().setEnabled(false);
 		getRemoveRunAction().setEnabled(false);
-
-		JPanel controlPanel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		controlPanel1.add(actionPanel1);
+		cancelButton.setEnabled(false);
 
 		topPanel = new JPanel(new BorderLayout(0, 0));
 		topPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(0, 0, 6, 0)));
 		topPanel.add(new JLabel("Pruning Runs:"), BorderLayout.NORTH);
 		topPanel.add(scrollPane1, BorderLayout.CENTER);
-		topPanel.add(controlPanel1, BorderLayout.SOUTH);
+		topPanel.add(actionPanel1, BorderLayout.SOUTH);
 
 		ColorRenderer colorRenderer = new ColorRenderer(SwingConstants.LEFT, new Insets(0, 4, 0, 4));
 
@@ -274,13 +289,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		splitPane1.setBorder(null);
 		splitPane1.setDividerLocation(180);
 
-		JButton cancelButton = new JButton(new AbstractAction("Cancel") {
-			public void actionPerformed(ActionEvent arg0) {
-				algorithmWorker.cancel(true);
-			}
-		});
-
-
 		JPanel progressPanel = new JPanel(new BorderLayout(0, 0));
 		progressLabel = new JLabel("");
 		progressBar = new JProgressBar();
@@ -295,7 +303,6 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		scorePanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
 
 		cardPanel = new JPanel(new CardLayout());
-		cardPanel.add(new JPanel(), "blank");	//add a blank panel
 		cardPanel.add(progressPanel, "progress");
 		cardPanel.add(scorePanel, "score");		
 		cardPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
@@ -365,15 +372,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 
 		if(runResults.size() > 0) {
-			topToolbar.enablePruneButton(true);
+			topToolbar.enablePruningButtons(true);
 			topToolbar.enableColorButtons(true);
 			getRemoveRunAction().setEnabled(true);
-			topToolbar.commit.setEnabled(true);
 		} else {
-			topToolbar.enablePruneButton(false);
+			topToolbar.enablePruningButtons(false);
 			topToolbar.enableColorButtons(false);
 			getRemoveRunAction().setEnabled(false);
-			topToolbar.commit.setEnabled(false);
 		}
 		selectedRun = selRow;
 		updateDataDisplay();
@@ -478,6 +483,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				timer.start();
 				//having multiple algorithms running from the same window feels like asking for trouble
 				getAlgorithmAction().setEnabled(false);
+				cancelButton.setEnabled(true);
 			}//the input verifier will display the input validation error if required
 		}
 	}
@@ -490,7 +496,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 		
 		protected Void doInBackground() throws Exception {
-			topToolbar.enablePruneButton(false);
+			topToolbar.enablePruningButtons(false);
 			launcher.runAlgorithm();
 			return null;
 		}
@@ -500,7 +506,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			if (isCancelled()) {
 				launcher.stopAlgorithm();
 				
-				int n = JOptionPane.showOptionDialog(frame, "Discard run completely?\nPressing No will display best found pruning.", "Run cancel action", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.NO_OPTION);
+				int n = JOptionPane.showOptionDialog(frame, "Algorithm run cancelled.\n" +
+						"Discard run completely?\n" +
+						"Pressing No will display best found pruning.", "Run cancel action", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.NO_OPTION);
 				if (n == JOptionPane.NO_OPTION) {
 					runResults.add(launcher.getResults());
 					selectedRun = runResults.size() - 1;
@@ -516,6 +524,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
+			cancelButton.setEnabled(false);
 		}
 	}
 
@@ -645,6 +654,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				launcher = new Launcher(this);
 			}
 			launcher.setFileName(file.getAbsolutePath());
+			
 
 			//start a timer that will update progress every second
 			timer = new javax.swing.Timer(1000, new ActionListener() {
@@ -815,7 +825,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		return exportGraphicAction;
 	}
 
-	protected AbstractAction algorithmAction = new AbstractAction("Run...") {
+	protected AbstractAction algorithmAction = new AbstractAction("Run") {
 		public void actionPerformed(ActionEvent ae) {
 			try {
 				doAlgorithm();
@@ -827,7 +837,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 	};
 
-	private final AbstractAction removeRunAction = new AbstractAction("Remove Run from List...") {
+	private final AbstractAction removeRunAction = new AbstractAction("Remove") {
 		public void actionPerformed(ActionEvent ae) {
 			removeRun();
 		}
