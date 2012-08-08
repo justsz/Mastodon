@@ -22,6 +22,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.text.DefaultCaret;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -67,12 +68,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private JLabel progressLabel;
 	private JProgressBar progressBar;
 
+	private JTextArea statusBox;
+
 	private List<RunResult> runResults;
 	private int selectedRun;
 	private JLabel score;
 
 	private AlgorithmWorker algorithmWorker = new AlgorithmWorker(this);
-	
+
 	private JButton cancelButton = new JButton(new AbstractAction("Cancel") {
 		public void actionPerformed(ActionEvent arg0) {
 			algorithmWorker.cancel(true);
@@ -215,12 +218,12 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		//the little plus/minus sign under top left table
-//		ActionPanel actionPanel1 = new ActionPanel(false);	
-//		actionPanel1.setAddAction(getAlgorithmAction());
-//		actionPanel1.setRemoveAction(getRemoveRunAction());
-//		getAlgorithmAction().setEnabled(false);
-//		getRemoveRunAction().setEnabled(false);
-		
+		//		ActionPanel actionPanel1 = new ActionPanel(false);	
+		//		actionPanel1.setAddAction(getAlgorithmAction());
+		//		actionPanel1.setRemoveAction(getRemoveRunAction());
+		//		getAlgorithmAction().setEnabled(false);
+		//		getRemoveRunAction().setEnabled(false);
+
 		JPanel actionPanel1 = new JPanel();
 		JButton run = new JButton(getAlgorithmAction());
 		run.setToolTipText("Run a pruning algorithm (disabled if an algorithm is already running)");
@@ -228,7 +231,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		removeRun.setToolTipText("Remove selected run from list");
 		actionPanel1.add(run);
 		actionPanel1.add(removeRun);
-		
+
 		getAlgorithmAction().setEnabled(false);
 		getRemoveRunAction().setEnabled(false);
 		cancelButton.setEnabled(false);
@@ -290,11 +293,21 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		splitPane1.setDividerLocation(180);
 
 		JPanel progressPanel = new JPanel(new BorderLayout(0, 0));
+		statusBox = new JTextArea(4, 20);
+		statusBox.setToolTipText("Current status of algorithm. K is the number of taxa currently being pruned.");
+		statusBox.setEditable(false);
+
+		DefaultCaret caret = (DefaultCaret)statusBox.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+		JScrollPane sp = new JScrollPane(statusBox);
+
 		progressLabel = new JLabel("");
 		progressBar = new JProgressBar();
 		progressPanel.add(progressLabel, BorderLayout.NORTH);
 		progressPanel.add(progressBar, BorderLayout.CENTER);
 		progressPanel.add(cancelButton, BorderLayout.EAST);
+		progressPanel.add(sp, BorderLayout.SOUTH);
 		progressPanel.setBorder(new BorderUIResource.EmptyBorderUIResource(new java.awt.Insets(6, 0, 0, 0)));
 
 		JPanel scorePanel = new JPanel(new BorderLayout(0, 0));
@@ -337,6 +350,20 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		getContentPane().add(splitPane2, BorderLayout.CENTER);
 
 	}
+
+	
+	/**
+	 * Put text in the text area under the progress bar.
+	 * @param text - String to append
+	 */
+	private void updateTextArea(final String text) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				statusBox.append(text);
+			}
+		});
+	}
+	
 
 	public void setVisible(boolean b) {
 		super.setVisible(b);
@@ -468,15 +495,19 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				}
 
 				launcher.setupAlgorithm(algorithm, input);
-				
+
 				//the algorithm needs to be run in background so that the GUI doesn't freeze up
 				algorithmWorker = new AlgorithmWorker(this);
 				algorithmWorker.execute();
+				
+				statusBox.setText("");
 
 				//a timer created that queries the launcher for progress
 				timer = new javax.swing.Timer(1000, new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						progressBar.setValue(launcher.getCurrentIterations());
+						String status = launcher.getStatus();
+						updateTextArea(status + "\n");
 					}
 				});
 
@@ -494,7 +525,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		public AlgorithmWorker(JFrame frame) {
 			this.frame = frame;
 		}
-		
+
 		protected Void doInBackground() throws Exception {
 			topToolbar.enablePruningButtons(false);
 			launcher.runAlgorithm();
@@ -505,7 +536,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			timer.stop();
 			if (isCancelled()) {
 				launcher.stopAlgorithm();
-				
+
 				int n = JOptionPane.showOptionDialog(frame, "Algorithm run cancelled.\n" +
 						"Discard run completely?\n" +
 						"Pressing No will display best found pruning.", "Run cancel action", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.NO_OPTION);
@@ -520,7 +551,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			runTableModel.fireTableDataChanged();
 			//highlight current run in runTable and update display
 			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-			
+
 			//switch from progress bar to score panel
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			getAlgorithmAction().setEnabled(true);
@@ -654,7 +685,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				launcher = new Launcher(this);
 			}
 			launcher.setFileName(file.getAbsolutePath());
-			
+
 
 			//start a timer that will update progress every second
 			timer = new javax.swing.Timer(1000, new ActionListener() {

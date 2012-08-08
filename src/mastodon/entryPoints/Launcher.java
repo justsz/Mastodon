@@ -199,6 +199,15 @@ public class Launcher {
 		oldBts.unPrune();
 	}
 	
+	/**
+	 * Get a string of the current pruning status.
+	 * @return current pruning status
+	 */
+	public String getStatus() {
+		String out = "k=" + algorithm.getCurrPrunedSpeciesCount() + ", Best score: " + algorithm.getMaxScore()[0];
+		return out;
+	}
+	
 
 	/**
 	 * Returns current input filename.

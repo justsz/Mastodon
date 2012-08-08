@@ -130,4 +130,10 @@ public abstract class Algorithm {
 	public void setIterationCounter(int i) {
 		iterationCounter = i;
 	}
+	public int getCurrPrunedSpeciesCount() {
+		return currPrunedSpeciesCount;
+	}
+	public double[] getMaxScore() {
+		return maxScore;
+	}
 }
