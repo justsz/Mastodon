@@ -118,13 +118,14 @@ public class MastodonApp extends MultiDocApplication {
 
             app.doNew();
 
-            if (args.length > 0) {
-                MastodonFrame frame = (MastodonFrame) app.getDefaultFrame();
-                for (String fileName : args) {
-                    File file = new File(fileName);
-                    app.doOpenFile(file);
-                }
-            }
+            //not accepting any arguments for now to simplify things
+//            if (args.length > 0) {
+//                MastodonFrame frame = (MastodonFrame) app.getDefaultFrame();
+//                for (String fileName : args) {
+//                    File file = new File(fileName);
+//                    app.doOpenFile(file);
+//                }
+//            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), "Fatal exception: " + e,
                     "Please report this to the authors",

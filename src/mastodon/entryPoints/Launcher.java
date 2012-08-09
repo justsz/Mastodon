@@ -120,6 +120,13 @@ public class Launcher {
 		trees = null;
 		reader = null;
 
+		if (bts.getBitTrees().size() < 1) {
+		JOptionPane.showMessageDialog(frame, "File " + getFileName() + " contains no trees or all were discarded in Burn-in.",
+				"Error",
+				JOptionPane.ERROR_MESSAGE);
+		return false;
+		}
+		
 		int mapTreeIndex = bts.findMapTree() + 1;	//adjusted to count from 1
 		String message = "Read successful.\nFound:\n" + bts.getBitTrees().size() + " trees,\n" + bts.getTaxaCount() + " taxa,\n" + bts.getClades().size() + " unique clades.\nMap tree index: " + mapTreeIndex + ".";
 		JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);

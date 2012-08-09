@@ -1,5 +1,6 @@
 package mastodon.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;

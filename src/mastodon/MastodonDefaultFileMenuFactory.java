@@ -7,6 +7,7 @@ import jam.framework.MenuBarFactory;
 
 import javax.swing.*;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /**
@@ -34,9 +35,21 @@ public class MastodonDefaultFileMenuFactory implements MenuFactory {
 		item = new JMenuItem(application.getNewAction());
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, MenuBarFactory.MENU_MASK));
 		menu.add(item);
+		
+		item = new JMenuItem(frame.getImportAction());
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, MenuBarFactory.MENU_MASK));
+        menu.add(item);
 
 		item = new JMenuItem(application.getOpenAction());
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MenuBarFactory.MENU_MASK));
+		menu.add(item);
+		
+//		item = new JMenuItem(frame.getSaveAction());
+//		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, MenuBarFactory.MENU_MASK));
+//		menu.add(item);
+		
+		item = new JMenuItem(frame.getSaveAsAction());
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, MenuBarFactory.MENU_MASK + ActionEvent.SHIFT_MASK));
 		menu.add(item);
 		
 		menu.addSeparator();

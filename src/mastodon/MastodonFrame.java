@@ -95,7 +95,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		setTitle(title);
 
-		getOpenAction().setEnabled(true);
+		getOpenAction().setEnabled(false);
 		getSaveAction().setEnabled(false);
 		getSaveAsAction().setEnabled(false);
 
@@ -303,6 +303,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		progressLabel = new JLabel("");
 		progressBar = new JProgressBar();
+		progressBar.setString("");
 		progressPanel.add(progressLabel, BorderLayout.NORTH);
 		progressPanel.add(progressBar, BorderLayout.CENTER);
 		progressPanel.add(cancelButton, BorderLayout.EAST);
@@ -345,13 +346,13 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}   // end filesDropped
 		}); // end FileDrop.Listener
 
-		
+
 		getContentPane().setLayout(new java.awt.BorderLayout(0, 0));
 		getContentPane().add(splitPane2, BorderLayout.CENTER);
 
 	}
 
-	
+
 	/**
 	 * Put text in the text area under the progress bar.
 	 * @param text - String to append
@@ -363,7 +364,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}
 		});
 	}
-	
+
 
 	public void setVisible(boolean b) {
 		super.setVisible(b);
@@ -402,10 +403,14 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			topToolbar.enablePruningButtons(true);
 			topToolbar.enableColorButtons(true);
 			getRemoveRunAction().setEnabled(true);
+			getSaveAction().setEnabled(true);
+			getSaveAsAction().setEnabled(true);
 		} else {
 			topToolbar.enablePruningButtons(false);
 			topToolbar.enableColorButtons(false);
 			getRemoveRunAction().setEnabled(false);
+			getSaveAction().setEnabled(false);
+			getSaveAsAction().setEnabled(false);
 		}
 		selectedRun = selRow;
 		updateDataDisplay();
@@ -499,7 +504,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				//the algorithm needs to be run in background so that the GUI doesn't freeze up
 				algorithmWorker = new AlgorithmWorker(this);
 				algorithmWorker.execute();
-				
+
 				statusBox.setText("");
 
 				//a timer created that queries the launcher for progress
@@ -661,13 +666,29 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			openDefaultDirectory = null;
 		}
 	}
+	/**
+	 * needs JavaDoc
+	 */
+	protected boolean readFromFile(File file) {
+		return false;
+	}
 
 	/**
-	 * Brings up input file processing options and dispatches the task to read trees and store as BitTrees.
-	 * Called by doOpenFile. A new MastadonFrame is created for each input file. 
-	 * If problems are found during processing, the frame is closed. 
+	 * Brings up input file processing options and dispatches the task to read trees and store as BitTrees. 
 	 */
-	protected boolean readFromFile(File file) throws IOException {
+	protected void importTrees() {
+		FileDialog dialog = new FileDialog(this, "Import Tree Data", FileDialog.LOAD);
+		dialog.setVisible(true);
+
+		File file = null;
+
+		if (dialog.getFile() != null) {
+			file = new File(dialog.getDirectory(), dialog.getFile());
+		} else {
+			return;
+		}
+
+
 		LoadFileDialog lfDialog = new LoadFileDialog(this);
 		setDefaultDir(file);
 
@@ -696,9 +717,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			});
 			new ReadFileWorker(burninInt, lfDialog.getOutgroup()).execute();
 			timer.start();
-			return true;
+			progressBar.setStringPainted(true);
+			return;
 		}  else {
-			return false;
+			return;
 		}
 	}
 
@@ -721,27 +743,24 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		protected void done() {
 			timer.stop();
 			if (success) {
-				if(launcher.getTreeCounter() < 1) {
-					JOptionPane.showMessageDialog(launcher.getFrame(), "File " + launcher.getFileName() + " contains no trees or all were discarded in Burn-in.",
-							"Error",
-							JOptionPane.ERROR_MESSAGE);
-				} else {
-					//set up a Run without an algorithm done first and display it
-					getAlgorithmAction().setEnabled(true);
-					progressBar.setString("");
-					runResults.add(launcher.getResults());
-					selectedRun = runResults.size() - 1;			
-					runTableModel.fireTableDataChanged();
+				//set up a Run without an algorithm done first and display it
+				getAlgorithmAction().setEnabled(true);
+				progressBar.setString("");
+				runResults.add(launcher.getResults());
+				selectedRun = runResults.size() - 1;			
+				runTableModel.fireTableDataChanged();
 
-					//highlight current run in runTable and update display
-					runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-
-
-				}
+				//highlight current run in runTable and update display
+				runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+				
+				//can't import twice into the same frame
+				getImportAction().setEnabled(false);
+				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			} else {
-				((DocumentFrame) launcher.getFrame()).doCloseWindow();
+				progressBar.setString("");
+				progressBar.setStringPainted(false);
 			}
-			((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
+			
 		}
 	}
 
@@ -754,7 +773,17 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	}
 
 	protected boolean writeToFile(File file) {
-		throw new RuntimeException("Cannot write file - this is a read-only application");
+		try {
+			FileOutputStream fileOut = new FileOutputStream(file);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(runResults);
+			out.close();
+			fileOut.close();
+			return true;
+		} catch(IOException i) {
+			i.printStackTrace();
+			return true;
+		}
 	}
 
 	public JComponent getExportableComponent() {
@@ -855,41 +884,51 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	public Action getExportGraphicAction() {
 		return exportGraphicAction;
 	}
-	
+
 	public Action getManualPruneAction() {
 		return manualPruneAction;
 	}
-	
+
 	public Action getUndoAction() {
 		return undoAction;
 	}
-	
+
 	public Action getRedoAction() {
 		return redoAction;
 	}
-	
+
 	public Action getCommitAction() {
 		return commitAction;
 	}
-	
+
+	public Action getImportAction() {
+		return importAction;
+	}
+
+	protected AbstractAction importAction = new AbstractAction("Import trees") {
+		public void actionPerformed(ActionEvent ae) {
+			importTrees();
+		}
+	};
+
 	protected AbstractAction undoAction = new AbstractAction("Undo") {
 		public void actionPerformed(ActionEvent ae) {
 			undo();
 		}
 	};
-	
+
 	protected AbstractAction redoAction = new AbstractAction("Redo") {
 		public void actionPerformed(ActionEvent ae) {
 			redo();
 		}
 	};
-	
+
 	protected AbstractAction commitAction = new AbstractAction("Commit") {
 		public void actionPerformed(ActionEvent ae) {
 			commitPruning();
 		}
 	};
-	
+
 	protected AbstractAction manualPruneAction = new AbstractAction("Flip selected") {
 		public void actionPerformed(ActionEvent ae) {
 			pruneTaxa();

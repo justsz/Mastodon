@@ -1,5 +1,6 @@
 package mastodon.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -16,15 +17,15 @@ import jebl.evolution.trees.SimpleRootedTree;
  * @author justs
  *
  */
-public class RunResult {
+public class RunResult implements Serializable{
 	private int minPruning;
 	private int maxPruning;
-	private BitTreeSystem bts;
-	private List<ArrayList<Taxon>> prunedTaxa;
+	private transient BitTreeSystem bts;
+	private transient List<ArrayList<Taxon>> prunedTaxa;
 	private List<BitSet> prunedTaxaBits;
 	private List<double[]> pruningScores;
-	private List<SimpleRootedTree> prunedMapTrees;
-	private Map<Taxon, Double> pruningFreq;
+	private transient List<SimpleRootedTree> prunedMapTrees;
+	private transient Map<Taxon, Double> pruningFreq;
 	private String name;
 	private List<BitSet> changeStack;	//list of chronological changes applied to the pruning. XOR reverts the changes
 	private int stackPointer;	//does not necessarily point to the top of the stack
