@@ -3,7 +3,7 @@ package mastodon;
 import javax.swing.*;
 
 /**
- * @author Just Zarins
+ * @author Justs Zarins
  * @author Andrew Rambaut
  * @version $Id$
  */

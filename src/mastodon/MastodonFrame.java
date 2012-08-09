@@ -10,7 +10,6 @@ import figtree.treeviewer.TreeSelectionListener;
 import figtree.treeviewer.TreeViewerListener;
 import jam.framework.Application;
 import jam.framework.DocumentFrame;
-import jam.panels.ActionPanel;
 import jam.table.TableRenderer;
 
 import org.freehep.util.export.ExportDialog;
@@ -44,7 +43,7 @@ import jebl.evolution.trees.RootedTree;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHandler {
+public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHandler, MastodonPruneMenuHandler {
 	private final String[] resultTableColumnToolTips = {"", "Checkmark indicates inclusion in the pruning set that produced the highest MAP score"
 			, "", "Number of times the taxon is included in a pruning set that is accepted by the search algorithm as the next step, divided by total accepted steps"};
 	private final String[] runTableColumnToolTips = {"Algorithm run", "Number of taxa pruned in the pruning set that produced the highest MAP score", "Pruned taxa lower limit", "Pruned taxa upper limit", "MAP score"};
@@ -346,6 +345,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}   // end filesDropped
 		}); // end FileDrop.Listener
 
+		
 		getContentPane().setLayout(new java.awt.BorderLayout(0, 0));
 		getContentPane().add(splitPane2, BorderLayout.CENTER);
 
@@ -423,12 +423,12 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		if (runResult == null) {
 			score.setText("");
 			((SimpleTreeViewer)figTreePanel.getTreeViewer()).setTree(null);
-			topToolbar.undo.setEnabled(false);
-			topToolbar.redo.setEnabled(false);
+			getUndoAction().setEnabled(false);
+			getRedoAction().setEnabled(false);
 		} else {
 			figTreePanel.getTreeViewer().setTrees(runResult.getPrunedMapTrees());	
-			topToolbar.undo.setEnabled(runResult.hasPrev());
-			topToolbar.redo.setEnabled(runResult.hasNext());
+			getUndoAction().setEnabled(runResult.hasPrev());
+			getRedoAction().setEnabled(runResult.hasNext());
 		}
 		topToolbar.fireTreesChanged(); 
 		resultTableModel.fireTableDataChanged();
@@ -855,6 +855,46 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	public Action getExportGraphicAction() {
 		return exportGraphicAction;
 	}
+	
+	public Action getManualPruneAction() {
+		return manualPruneAction;
+	}
+	
+	public Action getUndoAction() {
+		return undoAction;
+	}
+	
+	public Action getRedoAction() {
+		return redoAction;
+	}
+	
+	public Action getCommitAction() {
+		return commitAction;
+	}
+	
+	protected AbstractAction undoAction = new AbstractAction("Undo") {
+		public void actionPerformed(ActionEvent ae) {
+			undo();
+		}
+	};
+	
+	protected AbstractAction redoAction = new AbstractAction("Redo") {
+		public void actionPerformed(ActionEvent ae) {
+			redo();
+		}
+	};
+	
+	protected AbstractAction commitAction = new AbstractAction("Commit") {
+		public void actionPerformed(ActionEvent ae) {
+			commitPruning();
+		}
+	};
+	
+	protected AbstractAction manualPruneAction = new AbstractAction("Flip selected") {
+		public void actionPerformed(ActionEvent ae) {
+			pruneTaxa();
+		}
+	};
 
 	protected AbstractAction algorithmAction = new AbstractAction("Run") {
 		public void actionPerformed(ActionEvent ae) {

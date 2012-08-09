@@ -15,12 +15,15 @@ public class MastodonMenuBarFactory extends DefaultMenuBarFactory {
     public MastodonMenuBarFactory() {
         if (OSType.isMac()) {
             registerMenuFactory(new MastodonMacFileMenuFactory());
-            registerMenuFactory(new DefaultEditMenuFactory());
+            //might need to implement a Mac version of this menu later
+            registerMenuFactory(new MastodonDefaultPruneMenuFactory());
+            //registerMenuFactory(new DefaultEditMenuFactory());
             registerMenuFactory(new MacWindowMenuFactory());
             registerMenuFactory(new MacHelpMenuFactory());
         } else {
             registerMenuFactory(new MastodonDefaultFileMenuFactory());
-            registerMenuFactory(new DefaultEditMenuFactory());
+            registerMenuFactory(new MastodonDefaultPruneMenuFactory());
+            //registerMenuFactory(new DefaultEditMenuFactory());
             registerMenuFactory(new DefaultHelpMenuFactory());
             
         }

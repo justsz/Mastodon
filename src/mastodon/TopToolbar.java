@@ -83,37 +83,7 @@ public class TopToolbar{
 			((ResultTableModel)resultTable.getModel()).fireTableDataChanged();
 		}
 	};
-	
-	final ToolbarAction pruneToolbarAction =
-			new ToolbarAction("Prune", "Prune/UnPrune selected taxa", pruneIcon) {
 		
-		public void actionPerformed(ActionEvent e){
-			frame.pruneTaxa();
-			l.treeChanged();
-		}
-	};
-	
-	final ToolbarAction commitPruningAction =
-			new ToolbarAction("Commit", "Remove red branches and open as new file", null) {
-		public void actionPerformed(ActionEvent e){
-			frame.commitPruning();
-		}
-	};
-	
-	final ToolbarAction undoPruningAction =
-			new ToolbarAction("Undo", "Undo last manual pruning", null) {
-		public void actionPerformed(ActionEvent e){
-			frame.undo();
-		}
-	};
-	
-	final ToolbarAction redoPruningAction =
-			new ToolbarAction("Redo", "Redo last manual pruning", null) {
-		public void actionPerformed(ActionEvent e){
-			frame.redo();
-		}
-	};
-	
 
 	//listens for changes in the tree display to decide if the next/prev tree buttons should be active
 	TreeViewerListener l = new TreeViewerListener() {
@@ -133,12 +103,12 @@ public class TopToolbar{
 	JButton noColor = new ToolbarButton(noColorAction, true);
 	JButton pruned = new ToolbarButton(prunedAction, true);
 	JButton frequencies = new ToolbarButton(pruningFreqAction, true);	
-	JButton commit = new ToolbarButton(commitPruningAction, true);
+	JButton commit;
 	
-	JButton undo = new ToolbarButton(undoPruningAction, true);
-	JButton redo = new ToolbarButton(redoPruningAction, true);
+	JButton undo;
+	JButton redo;
 	
-	JButton pruneButton = new ToolbarButton(pruneToolbarAction, true);
+	JButton pruneButton;
 
 	/**
 	 * Create the toolbar and set all actions.
@@ -155,21 +125,31 @@ public class TopToolbar{
 		toolBar.setRollover(true);
 		toolBar.setFloatable(false);
 
-		pruneToolbarAction.putValue(AbstractAction.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
+//		pruneToolbarAction.putValue(AbstractAction.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
+		
+		pruneButton = new JButton(frame.getManualPruneAction());
+		pruneButton.setToolTipText("Flip the pruning status of currently selected taxa");
+		undo = new JButton(frame.getUndoAction());
+		undo.setToolTipText("Undo last manual pruning");
+		redo = new JButton(frame.getRedoAction());
+		redo.setToolTipText("Redo last manual pruning");
+		commit = new JButton(frame.getCommitAction());
+		commit.setToolTipText("Remove red branches and open as new file");
+		
 
 
 		JButton prevTreeToolButton = new ToolbarButton(prevTreeToolbarAction, true);
 		prevTreeToolButton.setFocusable(false);
-		prevTreeToolButton.putClientProperty("JButton.buttonType", "segmentedTextured");
-		prevTreeToolButton.putClientProperty("JButton.segmentPosition", "first");
-		prevTreeToolButton.putClientProperty( "Quaqua.Button.style", "toggleWest");
+//		prevTreeToolButton.putClientProperty("JButton.buttonType", "segmentedTextured");
+//		prevTreeToolButton.putClientProperty("JButton.segmentPosition", "first");
+//		prevTreeToolButton.putClientProperty( "Quaqua.Button.style", "toggleWest");
 
 
 		JButton nextTreeToolButton = new ToolbarButton(nextTreeToolbarAction, true);
 		nextTreeToolButton.setFocusable(false);
-		nextTreeToolButton.putClientProperty("JButton.buttonType", "segmentedTextured");
-		nextTreeToolButton.putClientProperty("JButton.segmentPosition", "last");
-		nextTreeToolButton.putClientProperty( "Quaqua.Button.style", "toggleEast");
+//		nextTreeToolButton.putClientProperty("JButton.buttonType", "segmentedTextured");
+//		nextTreeToolButton.putClientProperty("JButton.segmentPosition", "last");
+//		nextTreeToolButton.putClientProperty( "Quaqua.Button.style", "toggleEast");
 
 		nextTreeToolbarAction.setEnabled(treeViewer.getCurrentTreeIndex() < treeViewer.getTreeCount() - 1);
 		prevTreeToolbarAction.setEnabled(treeViewer.getCurrentTreeIndex() > 0);
@@ -185,10 +165,10 @@ public class TopToolbar{
 		pruned.setEnabled(false);		
 		frequencies.setEnabled(false);
 		
-		undo.setEnabled(false);
-		redo.setEnabled(false);		
+		frame.getUndoAction().setEnabled(false);
+		frame.getRedoAction().setEnabled(false);		
 		
-		commit.setEnabled(false);
+		frame.getCommitAction().setEnabled(false);
 		
 		Box colorBox = Box.createHorizontalBox();
 		colorBox.add(noColor);
@@ -198,8 +178,7 @@ public class TopToolbar{
 		toolBar.addComponent(new GenericToolbarItem("Coloring", "Choose how to color the tree", colorBox));
 		
 		
-		pruneButton.setEnabled(false);
-		pruneButton.registerKeyboardAction(pruneToolbarAction, KeyStroke.getKeyStroke("p"), JComponent.WHEN_IN_FOCUSED_WINDOW);
+		frame.getManualPruneAction().setEnabled(false);
 		
 		Box pruneBox = Box.createHorizontalBox();
 		pruneBox.add(pruneButton);
@@ -207,7 +186,7 @@ public class TopToolbar{
 		pruneBox.add(redo);
 		pruneBox.add(commit);
 		
-		toolBar.addComponent(new GenericToolbarItem("Manual Pruning", "(Disabled while a pruning algorithm is running.)", pruneBox));
+		toolBar.addComponent(new GenericToolbarItem("Manual pruning options", "(Disabled while a pruning algorithm is running.)", pruneBox));
 
 		treeViewer.addTreeViewerListener(l);
 		l.treeChanged();
@@ -230,9 +209,9 @@ public class TopToolbar{
 	}
 	
 	public void enablePruningButtons(boolean enable) {
-		pruneButton.setEnabled(enable);
-		undo.setEnabled(enable);
-		redo.setEnabled(enable);
-		commit.setEnabled(enable);
+		frame.getManualPruneAction().setEnabled(enable);
+		frame.getUndoAction().setEnabled(enable);
+		frame.getRedoAction().setEnabled(enable);
+		frame.getCommitAction().setEnabled(enable);
 	}
 }
