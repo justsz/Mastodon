@@ -77,6 +77,9 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private int selectedRun;
 	private JLabel score;
 
+	private boolean hasBeenCommited = false;
+	private boolean hasBeenSavedOnce = false;
+
 	private AlgorithmWorker algorithmWorker = new AlgorithmWorker(this);
 
 	private JButton cancelButton = new JButton(new AbstractAction("Cancel") {
@@ -407,14 +410,20 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			topToolbar.enablePruningButtons(true);
 			topToolbar.enableColorButtons(true);
 			getRemoveRunAction().setEnabled(true);
-			getSaveAction().setEnabled(true);
-			getSaveAsAction().setEnabled(true);
+
+			if (!hasBeenCommited) {
+				getSaveAction().setEnabled(true);
+				getSaveAsAction().setEnabled(true);
+			}
 		} else {
 			topToolbar.enablePruningButtons(false);
 			topToolbar.enableColorButtons(false);
 			getRemoveRunAction().setEnabled(false);
-			getSaveAction().setEnabled(false);
-			getSaveAsAction().setEnabled(false);
+
+			if (!hasBeenCommited) {
+				getSaveAction().setEnabled(false);
+				getSaveAsAction().setEnabled(false);
+			}
 		}
 		selectedRun = selRow;
 		updateDataDisplay();
@@ -638,6 +647,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	 * Opens a new MastadonFrame with a BitTreeSystem that has all the pruned taxa completely removed from the dataset. 
 	 * Clade probabilities are recalculated and pruning can be done as usual.
 	 * "Commit" is a bit misleading as the old data won't be lost.
+	 * In a "commited" window you cannot save or load the RunResult data.
 	 */
 	public void commitPruning() {
 		MastodonFrame fr = (MastodonFrame) Application.getApplication().doNew();
@@ -656,7 +666,11 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 		((CardLayout)fr.cardPanel.getLayout()).show(fr.cardPanel, "score");
 		//setup RunResult
-
+		fr.hasBeenCommited = true;
+		fr.getImportAction().setEnabled(false);
+		fr.getSaveAction().setEnabled(false);
+		fr.getSaveAsAction().setEnabled(false);
+		fr.getOpenAction().setEnabled(false);
 	}
 
 
@@ -670,44 +684,55 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			openDefaultDirectory = null;
 		}
 	}
-	
+
 
 	/**
 	 * Opens a serialized RunResult file. The user must first import the original tree set for this to work correctly. 
 	 * PruningFreq is not loaded at the moment.
 	 */
 	protected boolean readFromFile(File file) {
-		try {
-			FileInputStream fileIn = new FileInputStream(file);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			runResults = (List<RunResult>) in.readObject();
-			in.close();
-			fileIn.close();
-			
-			for (RunResult runResult : runResults) {
-				BitTreeSystem bts = launcher.getBTS();
-				runResult.setBts(bts);
-				runResult.setPrunedTaxa(new ArrayList<ArrayList<Taxon>>());
-				runResult.setPrunedMapTrees(new ArrayList<SimpleRootedTree>());
-				Map<Taxon, Double> pruningFreq = new HashMap<Taxon, Double>();
-				for (Taxon taxon : bts.getAllTaxa()) {
-					pruningFreq.put(taxon, 0.0);
+		int choice = JOptionPane.YES_OPTION;
+		if (runResults.size() > 0) {
+			choice = JOptionPane.showConfirmDialog(this, "The current pruning runs will be overwritten.\nOpen file anyway?", "Open pruning run data", JOptionPane.YES_NO_OPTION);
+		}
+
+		if (choice == JOptionPane.YES_OPTION) {
+			try {
+				FileInputStream fileIn = new FileInputStream(file);
+				ObjectInputStream in = new ObjectInputStream(fileIn);
+				runResults = (List<RunResult>) in.readObject();
+				in.close();
+				fileIn.close();
+
+				for (RunResult runResult : runResults) {
+					BitTreeSystem bts = launcher.getBTS();
+
+					runResult.setBts(bts);
+					runResult.setPrunedTaxa(new ArrayList<ArrayList<Taxon>>());
+					runResult.setPrunedMapTrees(new ArrayList<SimpleRootedTree>());
+					Map<Taxon, Double> pruningFreq = new HashMap<Taxon, Double>();
+					for (Taxon taxon : bts.getAllTaxa()) {
+						pruningFreq.put(taxon, 0.0);
+					}
+					runResult.setPruningFreq(pruningFreq);
+					for (BitSet pruningBits : runResult.getPrunedTaxaBits()) {
+						runResult.getPrunedTaxa().add((ArrayList<Taxon>) bts.getTaxa(pruningBits));
+						runResult.getPrunedMapTrees().add(bts.reconstructMapTree(pruningBits, null));
+					}
 				}
-				runResult.setPruningFreq(pruningFreq);
-				for (BitSet pruningBits : runResult.getPrunedTaxaBits()) {
-					runResult.getPrunedTaxa().add((ArrayList<Taxon>) bts.getTaxa(pruningBits));
-					runResult.getPrunedMapTrees().add(bts.reconstructMapTree(pruningBits, null));
-				}
+				runTableModel.fireTableDataChanged();
+				selectedRun = 0;
+				runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+				getOpenAction().setEnabled(false);
+				JOptionPane.showMessageDialog(this, "To Open a different Pruning run file, you have to\n" +
+													"open a New window and Import the trees again.", "Open", JOptionPane.INFORMATION_MESSAGE);
+				return true;
+			} catch(Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Encountered a problem while opening file.", "Open error", JOptionPane.ERROR_MESSAGE);
+				return false;
 			}
-			runTableModel.fireTableDataChanged();
-			selectedRun = 0;
-			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-			getOpenAction().setEnabled(false);
-			
-			return true;
-		} catch(Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Encountered a problem while opening file.", "Open error", JOptionPane.ERROR_MESSAGE);
+		} else {
 			return false;
 		}
 	}
@@ -812,6 +837,10 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		export.showExportDialog( this, "Export view as ...", figTreePanel.getTreeViewer().getContentPane(), "export" );
 	}
 
+
+	/**
+	 * Searializes runResults list. 
+	 */
 	protected boolean writeToFile(File file) {
 		try {
 			FileOutputStream fileOut = new FileOutputStream(file);
@@ -819,9 +848,16 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			out.writeObject(runResults);
 			out.close();
 			fileOut.close();
+			if (!hasBeenSavedOnce) {
+				JOptionPane.showMessageDialog(this, "Please note:\n" +
+						"You should import the same tree data when opening this file.\n" +
+						"Pruning frequency data is not currently saved.", "Save", JOptionPane.INFORMATION_MESSAGE);
+				hasBeenSavedOnce = true;
+			}
 			return true;
 		} catch(IOException i) {
 			i.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Encountered a problem while saving pruning runs.", "Open error", JOptionPane.ERROR_MESSAGE);
 			return true;
 		}
 	}

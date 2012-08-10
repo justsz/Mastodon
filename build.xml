@@ -1,7 +1,7 @@
 <project name="mastodon" default="build" basedir=".">
     <description>
-        Build file for mastodon release versions 0.2.
-        $Id: build_mastodon.xml,v 0.2 2012/07/26 12:06:17 justs Exp $
+        Build file for mastodon release versions 0.3.
+        $Id: build_mastodon.xml,v 0.3 2012/07/26 12:06:17 justs Exp $
     </description>
     <!-- set global properties for this build -->
     <property name="src" location="src"/>
@@ -28,7 +28,7 @@
 
     <target name="compile" depends="init">
         <!-- Compile the java code from ${src} into ${build} -->
-        <javac source="1.5" srcdir="${src}" destdir="${build}" classpathref="classpath">
+        <javac source="1.6" srcdir="${src}" destdir="${build}" classpathref="classpath">
         	<!-- <compilerarg value="-Xlint:unchecked"/> -->
             <include name="figtree/**"/>
             <include name="mastodon/**"/>            
@@ -61,7 +61,7 @@
         </jar>
     </target>
 
-    <property name="version" value="0.2" />
+    <property name="version" value="0.3" />
     <property name="release_dir" value="release" />
     <property name="name" value="MASTodon" />
 
@@ -147,7 +147,7 @@
                         name="${name} v${version}"
                         mainclass="mastodon.MastodonApp"
                         icon="${Mac_dir}/icons/mastodon.icns"
-                        jvmversion="1.5+"
+                        jvmversion="1.6+"
                         arguments=""
                         version="${version}"
                         infostring="${name} v${version}, Copyright 2012, Justs Zarins"

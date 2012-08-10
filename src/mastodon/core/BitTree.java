@@ -54,6 +54,7 @@ public class BitTree {
 		}
 	}
 
+
 	/** 
 	 * Deep copy of the given BitTree.
 	 * @return a clone of the tree 

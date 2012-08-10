@@ -1,4 +1,4 @@
-                      MASTodon v0.2 2012
+                      MASTodon v0.3 2012
                  Common subtree finding tool
                               by
                         Justs Zarins
@@ -39,8 +39,10 @@ Please see the pdf manual found at https://github.com/justsz/Mastodon/downloads 
 ___________________________________________________________________________
 4) VERSION HISTORY
 
----Version 0.2 8 August 2012---
+---Version 0.3 9 August 2012---
+*Menus have been cleaned up and there are open/save options.
 
+---Version 0.2 8 August 2012---
 * First released beta version
 
 ___________________________________________________________________________

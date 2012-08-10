@@ -47,8 +47,8 @@ public class BitTreeSystem {
 		this.bitTrees = new ArrayList<BitTree>();
 		firstTree = true;
 	}
-	
-	
+
+
 	/**
 	 * Given a pruned and collapsed (some clades now are equal do to pruning) set of clades, create an independent BitTreeSystem with the pruned taxa removed.
 	 * PruneFast can create the subClades needed for this method. Problems might arse if you call unPrune before this method finishes.

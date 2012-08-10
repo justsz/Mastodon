@@ -3,15 +3,15 @@
   <icon>icons/mastodon.ico</icon>
   <cmdLine/>
   <jre>
-    <minVersion>1.5.0</minVersion>
+    <minVersion>1.6.0</minVersion>
     <initialHeapSize>64</initialHeapSize>
     <maxHeapSize>128</maxHeapSize>
   </jre>    
   <versionInfo>
-    <fileDescription>Path-O-Gen</fileDescription>
-    <copyright>2006-2009</copyright>
-    <productName>Path-O-Gen</productName>
-    <internalName>Path-O-Gen</internalName>
-    <originalFilename>Path-O-Gen.exe</originalFilename>    
+    <fileDescription>MASTodon</fileDescription>
+    <copyright>2012</copyright>
+    <productName>MASTodon</productName>
+    <internalName>MASTodon</internalName>
+    <originalFilename>mastodon.exe</originalFilename>    
   </versionInfo>
 </launch4jConfig>

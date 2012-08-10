@@ -84,7 +84,7 @@ public class MastodonApp extends MultiDocApplication {
             }
 
             final String nameString = "MASTodon";
-            final String versionString = "v0.2";
+            final String versionString = "v0.3";
             String aboutString = "<html><center><p>Common subtree search tool<br>" +
             		"Made as part of Google SoC 2012.<br>" +
                     "Version " + versionString + ", 2012</p>" +
