@@ -1,6 +1,7 @@
 package mastodon;
 
 import mastodon.core.Algorithm;
+import mastodon.core.BitTreeSystem;
 import mastodon.algorithms.*;
 import mastodon.core.RunResult;
 import mastodon.entryPoints.Launcher;
@@ -28,13 +29,16 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
 
 
 /**
@@ -666,11 +670,46 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			openDefaultDirectory = null;
 		}
 	}
+	
+
 	/**
-	 * needs JavaDoc
+	 * Opens a serialized RunResult file. The user must first import the original tree set for this to work correctly. 
+	 * PruningFreq is not loaded at the moment.
 	 */
 	protected boolean readFromFile(File file) {
-		return false;
+		try {
+			FileInputStream fileIn = new FileInputStream(file);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			runResults = (List<RunResult>) in.readObject();
+			in.close();
+			fileIn.close();
+			
+			for (RunResult runResult : runResults) {
+				BitTreeSystem bts = launcher.getBTS();
+				runResult.setBts(bts);
+				runResult.setPrunedTaxa(new ArrayList<ArrayList<Taxon>>());
+				runResult.setPrunedMapTrees(new ArrayList<SimpleRootedTree>());
+				Map<Taxon, Double> pruningFreq = new HashMap<Taxon, Double>();
+				for (Taxon taxon : bts.getAllTaxa()) {
+					pruningFreq.put(taxon, 0.0);
+				}
+				runResult.setPruningFreq(pruningFreq);
+				for (BitSet pruningBits : runResult.getPrunedTaxaBits()) {
+					runResult.getPrunedTaxa().add((ArrayList<Taxon>) bts.getTaxa(pruningBits));
+					runResult.getPrunedMapTrees().add(bts.reconstructMapTree(pruningBits, null));
+				}
+			}
+			runTableModel.fireTableDataChanged();
+			selectedRun = 0;
+			runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
+			getOpenAction().setEnabled(false);
+			
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Encountered a problem while opening file.", "Open error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
 	}
 
 	/**
@@ -752,15 +791,16 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 				//highlight current run in runTable and update display
 				runTable.getSelectionModel().setSelectionInterval(selectedRun, selectedRun);
-				
+
 				//can't import twice into the same frame
 				getImportAction().setEnabled(false);
+				getOpenAction().setEnabled(true);
 				((CardLayout)cardPanel.getLayout()).show(cardPanel, "score");
 			} else {
 				progressBar.setString("");
 				progressBar.setStringPainted(false);
 			}
-			
+
 		}
 	}
 
