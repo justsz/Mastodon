@@ -26,7 +26,8 @@ import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
 /**
- * A BitTree implementation of a Metropolis-Hastings (MH) algorithm for pruning trees.
+ * An algorithm that looks for a balance between MAP score and pruned taxa count. 
+ * It is functional, but unfinished. The idea is that there's a penalty for adding more taxa to the pruned set and a reward for MAP score increase. The two decide whether a step will be taken.
  * @author justs
  */
 public class FlipPenaltyAlgorithm extends Algorithm{
@@ -98,7 +99,8 @@ public class FlipPenaltyAlgorithm extends Algorithm{
 
 	private double getScore(int k, double currMap, double prevMap) {
 		int avgK = 30;
-		int functionParameter = avgK * 2;
+		//int functionParameter = avgK * 2;
+		int functionParameter = bts.getTaxaCount();
 		double targetMap = 0.7;
 		double base = 0.01;
 		//penalty is a decreasing exponential with (k, penalty). Starts at (0, 1), ends at (taxaCount, baseOfPow)

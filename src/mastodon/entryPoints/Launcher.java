@@ -31,8 +31,12 @@ public class Launcher {
 	private Algorithm algorithm;
 	private int treeCounter;
 	private JFrame frame;
-	
-	
+	private int repeatCounter = 0;
+	private int oneRunIterations = 1;
+	private double minMapScore = 0.0;
+	private RunResult[] results;
+
+
 	/**
 	 * Basic constructor that sets the parent frame.
 	 * @param frame - parent frame
@@ -121,12 +125,12 @@ public class Launcher {
 		reader = null;
 
 		if (bts.getBitTrees().size() < 1) {
-		JOptionPane.showMessageDialog(frame, "File " + getFileName() + " contains no trees or all were discarded in Burn-in.",
-				"Error",
-				JOptionPane.ERROR_MESSAGE);
-		return false;
+			JOptionPane.showMessageDialog(frame, "File " + getFileName() + " contains no trees or all were discarded in Burn-in.",
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
 		}
-		
+
 		int mapTreeIndex = bts.findMapTree() + 1;	//adjusted to count from 1
 		String message = "Read successful.\nFound:\n" + bts.getBitTrees().size() + " trees,\n" + bts.getTaxaCount() + " taxa,\n" + bts.getClades().size() + " unique clades.\nMap tree index: " + mapTreeIndex + ".";
 		JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);
@@ -134,7 +138,7 @@ public class Launcher {
 		return true;
 	}
 
-	
+
 	/**
 	 * Setup algorithm ready for running.
 	 * @param alg - the algorithm to run
@@ -144,18 +148,96 @@ public class Launcher {
 		algorithm = alg;
 		alg.setBTS(bts);
 		alg.setLimits(limits);
+		oneRunIterations = (Integer) limits.get("totalIterations");
+		minMapScore = (Double) limits.get("minMapScore");
 		alg.setIterationCounter(0);
 	}
 
-	
+
 	/**
-	 * Call the algorithm's run method.
+	 * Run the algorithm "repeats" number of times.
+	 * @param repeats - number of times to repeat algorithm
 	 */
-	public void runAlgorithm() {
-		algorithm.run();
+	public void runAlgorithm(int repeats) {
+		results = new RunResult[repeats];
+		for(int i = 0; i < repeats; i++) {
+			algorithm.run();
+			results[i] = algorithm.getRunResult();
+			repeatCounter++;
+		}
 	}
-	
-	
+
+
+	/**
+	 * Select the best result from currently available results.
+	 * @return best result from currently available results
+	 */
+	private RunResult analyseResults() {
+		List<Integer> aboveMinimumScore = new ArrayList<Integer>();
+		double highestScore = 0;
+		int highestScorer = 0;
+		
+		//first get results with score above the minimum required
+		for (int i = 0; i < repeatCounter; i++) {
+			double score = results[i].getPruningScores().get(0)[0];//there may be more than one scores per result, but generally they'll all be the same
+			if (score > highestScore) {
+				highestScore = score;
+				highestScorer = i;
+			}
+
+			if (score > minMapScore) {
+				aboveMinimumScore.add(i);
+			}
+		}
+
+		
+		if (aboveMinimumScore.size() < 1) {	//if none are above the minimum, return the highest score
+			repeatCounter = 0;
+			return results[highestScorer];
+		} else if (aboveMinimumScore.size() == 1) {	//if only one is above the minimum, return that
+			repeatCounter = 0;
+			return results[aboveMinimumScore.get(0)];
+		}
+
+		ArrayList<Integer> smallestK = new ArrayList<Integer>();
+		int k = 0;
+
+		//if there are more than 1 above the minimum, select the ones with smallest number of pruned taxa
+		for (Integer i : aboveMinimumScore) {
+			int newK = results[i].getPrunedTaxaBits().get(0).cardinality();
+			if (smallestK.size() < 1) {
+				smallestK.add(i);
+				k = newK;
+			} else {
+				if (newK < k) {
+					k = newK;
+					smallestK.clear();
+					smallestK.add(i);
+				} else if (newK == k) {
+					smallestK.add(i);
+				}
+			}
+		}
+
+		if (smallestK.size() == 1) {	//if there's one with the smallest number of pruned taxa, return that
+			repeatCounter = 0;
+			return results[smallestK.get(0)];
+		} else {	//if there are a number of results with the same K, return the one with the highest score
+			int finalChoice = 0;
+			double maxScore = 0;
+			for(Integer i : smallestK) {
+				double currScore = results[i].getPruningScores().get(0)[0];
+				if (currScore > maxScore) {
+					maxScore = currScore;
+					finalChoice = i;
+				}
+			}
+			repeatCounter = 0;
+			return results[finalChoice];
+		}
+	}
+
+
 	/**
 	 * Call the algorithm's stop method.
 	 */
@@ -163,14 +245,14 @@ public class Launcher {
 		algorithm.stopAlgorithm();
 	}
 
-	
+
 	/**
 	 * Returns the RunResult after an algorithm run. If no algorithm has been run, set up an empty result.
 	 * @return result of algorithm or empty result
 	 */
 	public RunResult getResults() {
 		if (algorithm != null) {
-			return algorithm.getRunResult();
+			return analyseResults();
 		} else {
 			List<ArrayList<Taxon>> a = new ArrayList<ArrayList<Taxon>>();
 			a.add(new ArrayList<Taxon>());
@@ -190,8 +272,8 @@ public class Launcher {
 			return emptyResult;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Removes the trees currently pruned from the tree set and creates a new BitTreeSystem.
 	 * @param oldLauncher - previous launcher
@@ -205,7 +287,7 @@ public class Launcher {
 		//bts.findMapTree();
 		oldBts.unPrune();
 	}
-	
+
 	/**
 	 * Get a string of the current pruning status.
 	 * @return current pruning status
@@ -214,7 +296,7 @@ public class Launcher {
 		String out = "k=" + algorithm.getCurrPrunedSpeciesCount() + ", Best score: " + algorithm.getMaxScore()[0];
 		return out;
 	}
-	
+
 
 	/**
 	 * Returns current input filename.
@@ -224,7 +306,7 @@ public class Launcher {
 		return fileName;
 	}
 
-	
+
 	/**
 	 * Set file to load.
 	 * @param fileName - file to load
@@ -233,7 +315,7 @@ public class Launcher {
 		this.fileName = fileName;
 	}
 
-	
+
 	/**
 	 * Returns current number of loaded trees.
 	 * @return current number of loaded trees
@@ -242,7 +324,7 @@ public class Launcher {
 		return treeCounter;
 	}
 
-	
+
 	/**
 	 * Returns parent frame of the Launcher.
 	 * @return parent frame of the Launcher
@@ -251,7 +333,7 @@ public class Launcher {
 		return frame;
 	}
 
-	
+
 	/**
 	 * @param frame - parent frame
 	 */
@@ -259,16 +341,16 @@ public class Launcher {
 		this.frame = frame;
 	}
 
-	
+
 	/**
 	 * Returns number of completed algorithm iterations.
 	 * @return number of completed algorithm iterations
 	 */
 	public int getCurrentIterations() {
-		return algorithm.getIterationCounter();
+		return (repeatCounter * oneRunIterations) + algorithm.getIterationCounter();
 	}
 
-	
+
 	/**
 	 * Returns number of total taxa in dataset.
 	 * @return number of total taxa in dataset
@@ -277,7 +359,7 @@ public class Launcher {
 		return bts.getTaxaCount();
 	}
 
-	
+
 	/**
 	 * Returns the MAP tree as a RootedTree instead of BitTree.
 	 * @return the MAP tree
@@ -289,7 +371,7 @@ public class Launcher {
 		return mapTree;
 	}
 
-	
+
 	/**
 	 * Returns the underlying BitTreeSystem that contains the tree data.
 	 * @return the underlying BitTreeSystem

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mastodon;
 
 import javax.swing.*;
@@ -12,7 +9,7 @@ import com.lowagie.text.Font;
  * @author justs
  *
  */
-public class LoadFileDialog {
+public class ImportFileDialog {
 	JFrame frame;
 	JOptionPane pane;
 	private final JDialog dialog;
@@ -23,7 +20,7 @@ public class LoadFileDialog {
 	 * Initialize the dialog.
 	 * @param frame - parent frame of this component
 	 */
-	public LoadFileDialog(JFrame frame) {
+	public ImportFileDialog(JFrame frame) {
 		this.frame = frame;
 
 		JPanel burninPanel = new JPanel();

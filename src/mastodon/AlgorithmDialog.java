@@ -5,6 +5,7 @@ package mastodon;
 
 
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,8 @@ import jam.panels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import com.lowagie.text.Font;
 
 /**
  * This class creates a dialog that the user can interact with to setup a pruning algorithm.
@@ -56,7 +59,7 @@ public class AlgorithmDialog {
 	private AbstractAction flipPenaltyAction = new AbstractAction("Flip Penalty") {
 		public void actionPerformed(ActionEvent ae) {
 			searchMethodSelection = 40;
-			((CardLayout)searchMethodCardPanel.getLayout()).show(searchMethodCardPanel, "linAndBis");
+			((CardLayout)searchMethodCardPanel.getLayout()).show(searchMethodCardPanel, "flipPenalty");
 		}
 	};
 	
@@ -88,6 +91,7 @@ public class AlgorithmDialog {
 	
 	JTextField minMapScore = new JTextField("0.0");	
 	JTextField totalIterations = new JTextField("1");
+	JTextField numberOfRepeats = new JTextField("1");
 
 	JTextField power = new JTextField("1.0");
 	
@@ -118,6 +122,7 @@ public class AlgorithmDialog {
 		
 		OptionsPanel constOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		OptionsPanel linearAndBisectionOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
+		OptionsPanel flipPenaltyOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		
 		OptionsPanel MHOptions = new OptionsPanel(12, 12, SwingConstants.RIGHT);
 		
@@ -131,6 +136,7 @@ public class AlgorithmDialog {
 		
 		minMapScore.setColumns(10);
 		totalIterations.setColumns(10);
+		numberOfRepeats.setColumns(10);
 		
 		power.setColumns(10);
 		
@@ -165,6 +171,11 @@ public class AlgorithmDialog {
 
 		linearAndBisectionOptions.addComponentWithLabel("Min number of taxa to prune[1+]", minNumberToPrune);
 		linearAndBisectionOptions.addComponentWithLabel("Max number of taxa to prune[1+]", maxNumberToPrune);
+		JTextArea flipPenaltyMessage = new JTextArea("This method is functional, but not fully implemented yet.\n" +
+				"Only \"Total iterations\" has an effect. See manual for details.");
+		flipPenaltyMessage.setEditable(false);
+		flipPenaltyMessage.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+		flipPenaltyOptions.addComponent(flipPenaltyMessage);
 		
 		MHOptions.addComponentWithLabel("Weighing power[>0]", power);
 
@@ -173,9 +184,15 @@ public class AlgorithmDialog {
 		
 		overallOptions.addComponentWithLabel("Total iterations[1+]", totalIterations);
 		overallOptions.addComponentWithLabel("Desired MAP score[0.0-1.0]", minMapScore);
+		overallOptions.addComponentWithLabel("Number of repeats[1+]", numberOfRepeats);
+		JLabel note = new JLabel("only the best result will be shown");
+		java.awt.Font font = new java.awt.Font("Courier", Font.ITALIC,10);
+		note.setFont(font);
+		overallOptions.addComponent(note);
 
 		searchMethodCardPanel.add(constOptions, "const");
 		searchMethodCardPanel.add(linearAndBisectionOptions, "linAndBis");
+		searchMethodCardPanel.add(flipPenaltyOptions, "flipPenalty");
 		
 		algorithmChoiceCardPanel.add(SAOptions, "SA");
 		algorithmChoiceCardPanel.add(MHOptions, "MH");
@@ -232,7 +249,7 @@ public class AlgorithmDialog {
 	}
 	
 	/**
-	 * Collects all text entered into al fields and returns as a map.
+	 * Collects all text entered into all fields and returns as a map.
 	 * @return map of all inputs
 	 */
 	public Map<String, String> getInput() {
@@ -248,6 +265,23 @@ public class AlgorithmDialog {
 		input.put("finalTemp", finalTemp.getText());
 		
 		return input;
+	}
+	
+	
+	/**
+	 * Returns the number of repeats entered by user. If there is a problem, just return 1.
+	 * @return number of repeats entered by user
+	 */
+	public int getRepeats() {
+		try {
+			int out = Integer.parseInt(numberOfRepeats.getText());
+			if (out < 1) {
+				out = 1;
+			}
+			return out; 
+		} catch (Exception ignore) {
+			return 1;
+		}
 	}
 	
 

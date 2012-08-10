@@ -38,6 +38,7 @@ public class MastodonMacFileMenuFactory implements MenuFactory {
         menu.add(item);
         
 		item = new JMenuItem(application.getOpenAction());
+		item.setText("Open pruning runs");
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MenuBarFactory.MENU_MASK));
 		menu.add(item);
 		

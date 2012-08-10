@@ -80,7 +80,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	private boolean hasBeenCommited = false;
 	private boolean hasBeenSavedOnce = false;
 
-	private AlgorithmWorker algorithmWorker = new AlgorithmWorker(this);
+	private AlgorithmWorker algorithmWorker = new AlgorithmWorker(this, 1);
 
 	private JButton cancelButton = new JButton(new AbstractAction("Cancel") {
 		public void actionPerformed(ActionEvent arg0) {
@@ -345,13 +345,16 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		Color focusColor = UIManager.getColor("Focus.color");
 		Border focusBorder = BorderFactory.createMatteBorder(2, 2, 2, 2, focusColor);
 		splitPane1.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		new FileDrop(null, splitPane1, focusBorder, new FileDrop.Listener() {
-			public void filesDropped(java.io.File[] files) {
-				for(File file : files) {
-					Application.getApplication().doOpenFile(file);
-				}
-			}   // end filesDropped
-		}); // end FileDrop.Listener
+		
+		//disabled for now to simplify code
+//		new FileDrop(null, splitPane1, focusBorder, new FileDrop.Listener() {
+//			public void filesDropped(java.io.File[] files) {
+//				for(File file : files) {
+//					MastodonFrame fr = (MastodonFrame) Application.getApplication().doNew();
+//					fr.importTrees();
+//				}
+//			}   // end filesDropped
+//		}); // end FileDrop.Listener
 
 
 		getContentPane().setLayout(new java.awt.BorderLayout(0, 0));
@@ -490,7 +493,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			if(input != null) {
 				((CardLayout)cardPanel.getLayout()).show(cardPanel, "progress");
 				progressBar.setValue(0);
-				progressBar.setMaximum((Integer) input.get("totalIterations"));
+				progressBar.setMaximum((Integer) input.get("totalIterations") * algorithmDialog.getRepeats());
 				progressBar.setStringPainted(false);
 
 
@@ -515,7 +518,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 				launcher.setupAlgorithm(algorithm, input);
 
 				//the algorithm needs to be run in background so that the GUI doesn't freeze up
-				algorithmWorker = new AlgorithmWorker(this);
+				algorithmWorker = new AlgorithmWorker(this, algorithmDialog.getRepeats());
 				algorithmWorker.execute();
 
 				statusBox.setText("");
@@ -540,13 +543,15 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 	class AlgorithmWorker extends SwingWorker<Void, Void> {
 		JFrame frame;
-		public AlgorithmWorker(JFrame frame) {
+		int repeats;
+		public AlgorithmWorker(JFrame frame, int repeats) {
 			this.frame = frame;
+			this.repeats = repeats;
 		}
 
 		protected Void doInBackground() throws Exception {
 			topToolbar.enablePruningButtons(false);
-			launcher.runAlgorithm();
+			launcher.runAlgorithm(repeats);
 			return null;
 		}
 
@@ -753,7 +758,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 		}
 
 
-		LoadFileDialog lfDialog = new LoadFileDialog(this);
+		ImportFileDialog lfDialog = new ImportFileDialog(this);
 		setDefaultDir(file);
 
 		if(lfDialog.showDialog() == JOptionPane.OK_OPTION) {
