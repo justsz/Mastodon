@@ -171,11 +171,9 @@ public class AlgorithmDialog {
 
 		linearAndBisectionOptions.addComponentWithLabel("Min number of taxa to prune[1+]", minNumberToPrune);
 		linearAndBisectionOptions.addComponentWithLabel("Max number of taxa to prune[1+]", maxNumberToPrune);
-		JTextArea flipPenaltyMessage = new JTextArea("This method is functional, but not fully implemented yet.\n" +
-				"Only \"Total iterations\" has an effect. See manual for details.");
-		flipPenaltyMessage.setEditable(false);
-		flipPenaltyMessage.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-		flipPenaltyOptions.addComponent(flipPenaltyMessage);
+		
+		flipPenaltyOptions.addComponent(new JLabel("This method is functional, but not fully implemented yet."));
+		flipPenaltyOptions.addComponent(new JLabel("Only \"Total iterations\" has an effect. See manual for details."));
 		
 		MHOptions.addComponentWithLabel("Weighing power[>0]", power);
 
