@@ -58,7 +58,7 @@ public class TopToolbar{
 	};
 	
 	final ToolbarAction pruningFreqAction =
-			new ToolbarAction(null, "Color by pruning frequencies", freqIcon) {
+			new ToolbarAction(null, "Color by pruning frequencies [Black -> white corresponds to less -> more frequently pruned", freqIcon) {
 		public void actionPerformed(ActionEvent e){
 			((FigTreePanel) treeViewer.getParent()).setColourBy("pruningFreq");
 			noColor.setSelected(false);
@@ -69,7 +69,7 @@ public class TopToolbar{
 	
 
 	final ToolbarAction nextTreeToolbarAction =
-			new ToolbarAction(null, "Next Tree...", nextIcon) {
+			new ToolbarAction(null, "Next pruning combination", nextIcon) {
 		public void actionPerformed(ActionEvent e){
 			treeViewer.showNextTree();
 			((ResultTableModel)resultTable.getModel()).fireTableDataChanged();
@@ -77,7 +77,7 @@ public class TopToolbar{
 	};
 
 	final ToolbarAction prevTreeToolbarAction =
-			new ToolbarAction(null, "Previous Tree...", prevIcon) {
+			new ToolbarAction(null, "Previous pruning combination", prevIcon) {
 		public void actionPerformed(ActionEvent e){
 			treeViewer.showPreviousTree();
 			((ResultTableModel)resultTable.getModel()).fireTableDataChanged();
@@ -158,7 +158,7 @@ public class TopToolbar{
 		//box2.add(Box.createVerticalStrut(annotationToolIcon.getIconHeight()));
 		box.add(prevTreeToolButton);
 		box.add(nextTreeToolButton);
-		toolBar.addComponent(new GenericToolbarItem("Prev/Next", "Navigate through the trees", box));
+		toolBar.addComponent(new GenericToolbarItem("Prev/Next", "Navigate through different pruning combinations with the same MAP score", box));
 				
 		
 		noColor.setEnabled(false);

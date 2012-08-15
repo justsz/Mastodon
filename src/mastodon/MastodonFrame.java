@@ -562,7 +562,8 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 
 				int n = JOptionPane.showOptionDialog(frame, "Algorithm run cancelled.\n" +
 						"Discard run completely?\n" +
-						"Pressing No will display best found pruning.", "Run cancel action", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.NO_OPTION);
+						"Pressing \"No\" will display\n" +
+						"the best found pruning up to now.", "Run cancel action", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.NO_OPTION);
 				if (n == JOptionPane.NO_OPTION) {
 					runResults.add(launcher.getResults());
 					selectedRun = runResults.size() - 1;
