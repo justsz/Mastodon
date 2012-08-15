@@ -1,4 +1,4 @@
-package mastodon.inputVerifiers;
+package mastodon.core;
 
 import java.util.HashMap;
 import java.util.Map;

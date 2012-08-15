@@ -208,7 +208,7 @@ public class MHLinearAlgorithm extends Algorithm{
 	}
 
 	
-//	public void runnnnn() {		
+//	public void run() {		
 
 
 		//BitMAPScoreCalculator calc = new BitMAPScoreCalculator();

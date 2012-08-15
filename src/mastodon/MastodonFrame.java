@@ -2,10 +2,10 @@ package mastodon;
 
 import mastodon.core.Algorithm;
 import mastodon.core.BitTreeSystem;
+import mastodon.core.GUIInputVerifier;
+import mastodon.core.Launcher;
 import mastodon.algorithms.*;
 import mastodon.core.RunResult;
-import mastodon.entryPoints.Launcher;
-import mastodon.inputVerifiers.GUIInputVerifier;
 import figtree.treeviewer.TreePaneSelector.SelectionMode;
 import figtree.treeviewer.TreeSelectionListener;
 import figtree.treeviewer.TreeViewerListener;

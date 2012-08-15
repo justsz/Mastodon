@@ -1,4 +1,4 @@
-package mastodon.entryPoints;
+package mastodon.core;
 
 import java.io.IOException;
 import java.util.ArrayList;

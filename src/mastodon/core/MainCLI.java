@@ -1,4 +1,4 @@
-package mastodon.entryPoints;
+package mastodon.core;
 /**
  * 
  */
@@ -25,7 +25,7 @@ import jebl.evolution.trees.SimpleRootedTree;
  * @author justs
  *
  */
-public class MainCLI2 {
+public class MainCLI {
 
 	/**
 	 * @param args
