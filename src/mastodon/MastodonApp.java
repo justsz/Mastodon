@@ -1,3 +1,20 @@
+/* Copyright (C) 2012 Justs Zarins & Andrew Rambaut
+ *
+ *This file is part of MASTodon.
+ *
+ *MASTodon is free software: you can redistribute it and/or modify
+ *it under the terms of the GNU Lesser General Public License as
+ *published by the Free Software Foundation, either version 3
+ *of the License, or (at your option) any later version.
+ *
+ *MASTodon is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU Lesser General Public License for more details.
+ *
+ *You should have received a copy of the GNU Lesser General Public License
+ *along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
 package mastodon;
 
 import mastodon.util.OSType;
@@ -100,6 +117,12 @@ public class MastodonApp extends MultiDocApplication {
                     
                     "<p>Project wiki:<br>" +
                     "<a href=\"http://informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets\">informatics.nescent.org/wiki/PhyloSoC:_Summary_and_visualization_of_phylogenetic_tree_sets</a></p>" +
+                    
+					"<p>MASTodon is distributed under GNU LGPL. It comes WITHOUT WARRANTY.<br>" +
+					"<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a></p>" +
+					
+					"<p>Uses FreeHEP:<br>" +
+					"<a href=\"http://www.freehep.org/\">http://www.freehep.org/</a></p>" +
 
                     "<p>Source and application available from GitHub site: <br>" +
                     "<a href=\"https://github.com/justsz/Mastodon/downloads\">https://github.com/justsz/Mastodon/downloads</a></p>" +

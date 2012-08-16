@@ -3,6 +3,9 @@
                               by
                         Justs Zarins
 
+   MASTodon is distributed under GNU LGPL and comes WITHOUT WARRANTY.
+                http://www.gnu.org/licenses/
+
                     University of Edinburgh
                      justs.zarins@gmail.com
 

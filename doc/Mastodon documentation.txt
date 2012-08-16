@@ -1,0 +1,127 @@
+---What does the code do---
+
+The main purpose of MASTodon is to look for a common subtree in a large set of phylogenetic trees. 
+The suitability of a subtree is measured with a MAP (maximum a-posteriori probability) score. For unweighted trees this is just the number of trees that contain the subtree divided by the total number of trees. If the trees are weighted, the MAP score is the sum of the weights of the trees that contain the subtree. 
+The MAP tree here is the either the tree with highest weight or the tree that has the highest product of clade probabilities.
+MASTodon works by removing (pruning) some taxa from all trees and then comparing each against the MAP tree. This is the same as counting the trees that contain the subtree that is obtained if you remove the selected taxa from the trees. The process goes on picking different pruning combinations and finding the MAP score for each until some stopping criteria is achieved. 
+In addition to the core functionality, MASTodon also provides a Command Line Interface and a Graphical User Interface to allow deeper analysis and search for common subtrees. The source code is freely available and has facilites to implement additional pruning algorithms.
+
+
+
+---How pruning works---
+
+The important classes here are BitTreeSystem, BitTree and Clade.
+
+When loading trees into MASTodon they must first be parsed as Tree objects as implemented by JEBL. Then the addTrees method in BitTreeSystem converts to a format that MASTodon likes to work with.
+First, a LinkedHashSet (to preserve order) is used to store all unique Taxon objects that are found in the trees. The taxa are later referred to by their position in the order. 
+Then the trees are converted to BitTree object. A BitTree represents a tree as a list of clades with size bigger than 1 leaf. This is stored as a list of BitSet where the bits that are 1 match the positions of the initially created Taxa set. 
+So if you have taxa A,B,C and a clade B,C, then the clade is represented as 0,1,1.
+
+Another thing that is created during adding of trees is a Map of all unique Clades. A Clade object has a BitSet representing it's taxa just like above, but it also keeps a BitSet that specifies in which trees (in the order they are added) this clade can be found. The BitTrees are built up of references to this central list.
+
+After all trees have been processed in this way, the findMapTree() method can be called to find the tree with maximum sum (could also be product) of clade probabilities.
+
+
+There are two ways to prune.
+One is to call prune(BitSet pruner) where pruner are the taxa that should be removed from the tree. This is a pretty basic method that removes the taxa from all clades in the central list, which automatically prunes all trees as well. Then an external score calculator needs to be called to calculate the pruning score. Finally, unPrune() should be called to restore the initial status of the trees.
+
+The other method is the preferred way. pruneFast(BitSet pruner) again starts by pruning all the central clades, but then it focuses on the clade-to-tree relationships. It goes through all the clades of the MAP tree and intersects the clade-to-tree BitSets in order to eventually find which trees contain all of the (now pruned) MAP tree clades. However, a tree can contain all the MAP tree clades but some of its own too. To avoid this, the program then checks that the MAP tree and candidate tree have the same number of clades. If both these conditions are met, then the trees are equal and pruneFast also goes ahead to calculate the MAP score of this pruning and returns it. Again, unPrune() should be called afterwards.
+
+
+
+---How the currently available algorithms are implemented---
+
+[k - number of taxa pruned]
+
+Rather than explaining each algorithm completely (except for FlipPenalty), I will say something about the components and note in which algorithms they are used. There is a fair bit of overlap, hence possibility for more abstraction in a future update.
+
+*Choosing how many taxa to prune
+In linear algorithms you start at the initial k and move up in steps of one up to the final k.
+In bisection algorithms the starting point is the middle of the min and max k range. Some pruning is done at this k and a best score recorded. If the best score is more than the minimum MAP score, less taxa is pruned in the next round and vice versa if the score is less than the minimum. The jumps are done to the midpoint of an interval and in such a way that the interval always decreases, thus theoretically zoning in on the ideal pruning count. Example: 
+|-----*-----| initial
+|--------*--| need to prune more
+|------*----| need to prune less [end of search because a half-way jump is less than 1]
+
+*Distributing total iterations between steps
+In bisection algorithms each step is given an equal share of the total iterations. The number of steps is ln(max k - min k) / ln(2) [rounded down to nearest integer].
+In linear algorithms each step with pruning number k has a different number of iterations allocated. These are chosen proportional to the natural log of the binomial coefficients (totalNumberOfTaxa choose k).
+
+*Choosing taxa to prune
+Some initial random combination is present.
+The basic choosing mechanism is the same for both SA and MH algorithms as follows. 
+The previous pruning set has produced a MAP score, we want to build on it. So, instead of generating a new random pruning combination, the previous one is perturbed. 
+The number of taxa to perturb is chosen from a poisson distribution with mean of (k-1)/2. This number of taxa to perturb is removed from the current pruning set and then the same number of taxa is added from the remaining taxa. Thus you won't have removing A from the pruned set only to have it immediately added back in.
+Note: when going up in k (Linear algorithms) the previous pruning is also preserved and simply one extra pruned. However, in bisection algorithms for each new k (after a jump) a new initial random combination is generated.
+
+*Scoring and moving
+The maximum score is always stored. If there are more than one pruning combination that produce that score, they are saved as well.
+Moving to a new point for MH: if (currentScore/previousScore)^power > uniform(0,1)
+Moving to a new point for SA: if exp((currentScore - previousScore)/currentTemperature) > uniform(0,1)
+
+*Temperature and cooling
+The cooling schedule is exponential, so currentT=rate * previousT.
+rate = (finalT/initialT)^(1/allocatedIterations)
+This ensures that the temperature will fall from the initial temperature to the final one within the allocated iterations. The initial temperature and cooling rate is reset each time k changes.
+
+*End
+All algoritms finish when the totalIterations limit is reached. Linear algorithms stop as soon as the minimum MAP score is reached.
+The pruning that produced the highest MAP score is saved as the final pruning.
+
+**FlipPenalty algorithm**
+This algorithm works a bit differently so has its own section. 
+Each iteration a random taxon is chosen and its pruning status flipped. Then a score is calculated where an increase in k penalised while an increase in MAP score is rewarded. This is compared against uniform(0,1) to decide whether to accept the pruning. The idea is to find a balance between k and MAP score. 
+The exact function to use in deciding the penalty is not fully decided yet. Right it is exponential.
+
+
+
+---Overview of packages and classes---
+
+figtree.*
+Contains imported code that handles displaying of the Tree View panel.
+
+mastodon
+Contains the main GUI classes. Large components are separated into their own classes, for example TopToolbar and Algorithm Dialog. The various menu factories deal with the drop-down menus of the application. MastodonApp contains the main entry point for the GUI. MastodonFrame handles all communication between components, graphcis and algorithms. It's probably doing too much so there is opportuniry to refactor here.
+
+mastodon.algorithms
+Contains implementations of various pruning algorithms. Some redundancy can be found here, possibility for another level of abstraction.
+
+mastodon.core
+Contains classes for the core pruning code, algorithm interface, RunResult object and tree I/O. There is also a Command Line Interface entry point.
+Launcher is the link between the GUI and algorithms. It could possibly be used by the CLI as well. GUIInputVerifier is a rather hard-coded input verifier for the currently implemented algorithms.
+
+mastodon.graphics
+This package is for some of the more interesting visualizations. For now there is only a pruning frequency heat-map class here, it didn't seem very useful at the time of development. 
+
+mastodon.scoreCalculators
+Initially score calculation was separate from pruning, but now the main pruning method (pruneFast) includes score calculation.
+
+mastodon.tests
+Some early tests for MASTodon. Not JUnit tests, more manual ones. Most focus was shifted on the GUI testing later in the project.
+
+mastodon.util
+Some utilites used by the imported application code.
+
+
+
+---How to implement an algorithm---
+
+To implement a pruning algorithm in MASTodon it's best to follow the pattern of the existing ones.
+An algorithm has to extend the Algorithm abstract class. There are a number of methods and variables that should be implemented. They are either self explanatory or documented in the code.
+
+Setting limits is done by passing a <String, Object> Map. In general you can name the input variables however you want, but there are certain keywords (like minMapScore) that the GUI implementation expects. See inputVerifiers and the algorithm related methods in MastodonFrame.
+
+An algorithm follows the pattern:
+
+initialize() - set up everything needed for execution of the algorithm
+
+the algorithm then loops until either the finished() method returns true or forceStop has been set to true from outside (like the user pressing the "cancel" button)
+
+within the algorithm each iteration starts with choosePruningCount(), then tryPruning() which generates a new combination of taxa to prune and computes the MAP score that the combination gives. Finally, setNewBest() has to decide whether this new pruning is better or worse and what to do with it.
+
+after the iteration loop is exited, afterActions() is called for any final touches. One thing that should probably be done is setting of the finalPruning variable.
+
+
+After an algorithm has been successfully executed, you may run getRunResult() to obtain a RunResult object that contains the needed data for the GUI.
+
+
+To add an algorithm to the GUI popup algorithm chooser, see AlgorithmDialog, inputVerifiers and the algorithm methods in MastodonFrame.

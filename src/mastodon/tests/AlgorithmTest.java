@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mastodon.tests;
 
 import java.io.IOException;
