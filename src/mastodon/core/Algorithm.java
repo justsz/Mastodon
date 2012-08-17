@@ -94,11 +94,13 @@ public abstract class Algorithm {
 			choosePruningCount();
 			tryPruning();
 			setNewBest();
-
 			iterationCounter++;
+			if(iterationCounter % 500 == 0) {
+				System.out.println("Iteration: " + iterationCounter + " Pruning count: " + currPrunedSpeciesCount + " Best MAP score: " + maxScore[0]);
+			}
 		}
 		afterActions();		
-		System.out.println("times a new solution was accepted: " + totalPruningFreq);
+		//System.out.println("Number of times a new step was accepted: " + totalPruningFreq);
 	}
 
 	/**
@@ -115,7 +117,7 @@ public abstract class Algorithm {
 		for(Entry<Integer, Integer> entry : pruningFreq.entrySet()) {
 			double freq = 0.0;
 			if (totalPruningFreq == 0) {
-				System.out.println("division by zero? no thanks! [Algorithm class]");
+				//System.out.println("division by zero? no thanks! [Algorithm class]");
 			} else {
 				freq = (double) entry.getValue() / totalPruningFreq;
 			}

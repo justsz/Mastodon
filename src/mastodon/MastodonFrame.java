@@ -675,7 +675,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 	 */
 	public void commitPruning() {
 		MastodonFrame fr = (MastodonFrame) Application.getApplication().doNew();
-		Launcher newLauncher = new Launcher(fr);
+		Launcher newLauncher = new Launcher(fr, true);
 		newLauncher.setCopiedAndPrunedBTS(launcher, runResults.get(selectedRun).getPrunedTaxaBits().get(figTreePanel.getTreeViewer().getCurrentTreeIndex()));
 		fr.launcher = newLauncher;
 
@@ -791,7 +791,7 @@ public class MastodonFrame extends DocumentFrame implements MastodonFileMenuHand
 			}
 
 			if (launcher == null) {
-				launcher = new Launcher(this);
+				launcher = new Launcher(this, true);
 			}
 			launcher.setFileName(file.getAbsolutePath());
 

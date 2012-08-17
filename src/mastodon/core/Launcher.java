@@ -53,14 +53,17 @@ public class Launcher {
 	private int oneRunIterations = 1;
 	private double minMapScore = 0.0;
 	private RunResult[] results;
+	private boolean showPopups;
 
 
 	/**
 	 * Basic constructor that sets the parent frame.
 	 * @param frame - parent frame
+	 * @param showPopups - if true, graphical info and error popups will be shown along with console messages
 	 */
-	public Launcher(JFrame frame) {
+	public Launcher(JFrame frame, boolean showPopups) {
 		setFrame(frame);
+		this.showPopups = showPopups;
 	}
 
 
@@ -92,11 +95,15 @@ public class Launcher {
 			reader.reset();
 
 			if(testTree == null) {
-				JOptionPane.showMessageDialog(frame, "File is empty or trees are corrupted.", "Read error", JOptionPane.ERROR_MESSAGE);
+				System.out.println("File is empty or trees are corrupted.");
+				if(showPopups)
+					JOptionPane.showMessageDialog(frame, "File is empty or trees are corrupted.", "Read error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			} else {
 				if (testTree.getNode(Taxon.getTaxon(outgroupString)) == null) {
-					JOptionPane.showMessageDialog(frame, "Taxon \"" + outgroupString + "\" not found in tree set.", "Outgroup error", JOptionPane.ERROR_MESSAGE);
+					System.out.println("Taxon \"" + outgroupString + "\" not found in tree set.");
+					if(showPopups)
+						JOptionPane.showMessageDialog(frame, "Taxon \"" + outgroupString + "\" not found in tree set.", "Outgroup error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}
@@ -110,14 +117,18 @@ public class Launcher {
 				try {
 					trees = reader.read100ReRootedTrees(outgroupString);
 				} catch (ImportException e) {
-					JOptionPane.showMessageDialog(frame, "Encountered a problem at tree " + filePosition + ".", "Read error", JOptionPane.ERROR_MESSAGE);
+					System.out.println("Encountered a problem at tree " + filePosition + ".");
+					if(showPopups)
+						JOptionPane.showMessageDialog(frame, "Encountered a problem at tree " + filePosition + ".", "Read error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			} else {
 				try {
 					trees = reader.read100RootedTrees();
 				} catch (ImportException e) {
-					JOptionPane.showMessageDialog(frame, "Encountered a problem at tree " + filePosition + ".", "Read error", JOptionPane.ERROR_MESSAGE);
+					System.out.println("Encountered a problem at tree " + filePosition + ".");
+					if(showPopups)
+						JOptionPane.showMessageDialog(frame, "Encountered a problem at tree " + filePosition + ".", "Read error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}
@@ -136,6 +147,7 @@ public class Launcher {
 				bts.addTrees(trees);
 				treeCounter += trees.size();
 			}
+			System.out.println("Loading tree: " + treeCounter);
 		} while (readTreeCount == 100);
 
 		//mark for garbage collection
@@ -143,15 +155,19 @@ public class Launcher {
 		reader = null;
 
 		if (bts.getBitTrees().size() < 1) {
-			JOptionPane.showMessageDialog(frame, "File " + getFileName() + " contains no trees or all were discarded in Burn-in.",
-					"Error",
-					JOptionPane.ERROR_MESSAGE);
+			System.out.println("File " + getFileName() + " contains no trees or all were discarded in Burn-in.");
+			if(showPopups)
+				JOptionPane.showMessageDialog(frame, "File " + getFileName() + " contains no trees or all were discarded in Burn-in.",
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 
 		int mapTreeIndex = bts.findMapTree() + 1;	//adjusted to count from 1
 		String message = "Read successful.\nFound:\n" + bts.getBitTrees().size() + " trees,\n" + bts.getTaxaCount() + " taxa,\n" + bts.getClades().size() + " unique clades.\nMap tree index: " + mapTreeIndex + ".";
-		JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);
+		System.out.println(message);
+		if(showPopups)
+			JOptionPane.showMessageDialog(frame, message, "Data set info", JOptionPane.INFORMATION_MESSAGE);
 
 		return true;
 	}

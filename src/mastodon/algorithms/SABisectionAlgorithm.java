@@ -212,8 +212,8 @@ public class SABisectionAlgorithm extends Algorithm{
 	protected void afterActions() {
 		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		stepIterations = 0;
-		System.out.println("Pruned number " + currPrunedSpeciesCount);
-		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
+		//System.out.println("Pruned number " + currPrunedSpeciesCount);
+		//System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
 	}
 
 }

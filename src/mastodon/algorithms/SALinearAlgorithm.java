@@ -229,7 +229,7 @@ public class SALinearAlgorithm extends Algorithm{
 	protected void afterActions() {
 		finalPruning = new LinkedHashMap<BitSet, double[]>(maxScorePruning);
 		stepIterations = null;
-		System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
+		//System.out.println("Results: " + maxScore[0] + " " + maxScore[1]);
 	}
 
 }
