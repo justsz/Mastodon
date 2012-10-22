@@ -521,21 +521,23 @@ public class BitTreeSystem {
 		Set<BitSet> collapsedMapClades = new HashSet<BitSet>();
 		int cladeCount = 0;
 		for (BitSet cl : mapTree.getBits()) {
-			collapsedMapClades.add(cl);
+			if (cl.cardinality() > 1) { 
+				collapsedMapClades.add(cl);
+			}
 		}
 		cladeCount = collapsedMapClades.size();
 
 		//go through the MAP tree clades and intersect the clade-to-trees bitsets to eventually find the number of trees that contain all of the MAP clades
 		BitSet runningIntersection = new BitSet();
 		for(BitSet bs : collapsedMapClades) {  
-			if (bs.cardinality() > 1) {
+			//if (bs.cardinality() > 1) {
 				BitSet clade = prunedClades.get(bs);
-				if (runningIntersection.cardinality() == 0) {
+				if (runningIntersection.cardinality() < 1) {
 					runningIntersection.or(clade);
 				} else {
 					runningIntersection.and(clade);
 				}
-			}
+			//}
 			if (runningIntersection.cardinality() == 1) {	//a limiting clade has reduced the running intersection to only the map tree
 				if(weighted) {
 					result[0] = mapTree.getWeight();
@@ -561,13 +563,13 @@ public class BitTreeSystem {
 			c = temp.size();
 
 			if(cladeCount != c) {
-				//System.out.println("Are these trees really equal? [Comparing tree " + index + " against tree " + i + "]");
-				if (mapTree.equals(bitTrees.get(i))) {
-					//System.out.println("True.");
-				} else {
+//				System.out.println("Are these trees really equal? [Comparing tree " + index + " against tree " + i + "]");
+//				if (mapTree.equals(bitTrees.get(i))) {
+//					System.out.println("True.");
+//				} else {
 					runningIntersection.clear(i);
 					//System.out.println("False. Tree removed.");
-				}
+//				}
 				//System.out.println(runningIntersection);
 			}
 		}
